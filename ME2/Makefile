@@ -90,7 +90,7 @@ STREAM_BACKEND ?= onnx
 STREAM_SOURCE ?= mic
 STREAM_ARGS ?=
 
-.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve stream wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally
+.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally
 
 WAKEWORD_CLONE_DIR ?= $(if $(TMPDIR),$(TMPDIR),/tmp)/me2_wakeword_clone
 WAKEWORD_POSITIVES_OUT_DIR ?= out/conversions/v2/wakeword/positives_real
@@ -195,8 +195,24 @@ vcmx-export:
 # VCMX_SERVE_* block above for why each value is what it is). Requires
 # vcmx-export to have run at least once. VCMX_SERVE_SOURCE defaults to the
 # live microphone; override with a wav path for deterministic file-replay.
+# VCMX_SERVE_GATE defaults to "none" -- this is the non-gated recipe (the
+# mic is always listening, no wakeword/spacebar in front of it). See
+# vcmx-serve-wakeword below for the gated counterpart.
 vcmx-serve:
 	$(UV) run python -m me2_voicegen.vcm.streaming --model "$(VCMX_TRAINED_OUT_DIR)" --backend onnx --onnx-variant $(VCMX_SERVE_VARIANT) --grammar optionb --threshold $(VCMX_SERVE_THRESHOLD) --required-command-margin $(VCMX_SERVE_MARGIN) --beam-width $(VCMX_SERVE_BEAM_WIDTH) --gate $(VCMX_SERVE_GATE) --source "$(VCMX_SERVE_SOURCE)" $(VCMX_SERVE_ARGS)
+
+# Same VCM model/margin/threshold as vcmx-serve, but fronted by the trained
+# wakeword DS-CNN (out/wakeword, feature wakeword-gate) in place of an
+# always-on mic -- mirrors stream-wakeword's pattern (--policy single_period
+# --gate wakeword --gate-period 3, ticket 04 of feature optionb-streaming).
+# --wakeword-backend onnx uses out/wakeword/export/wakeword_model.*.onnx
+# (make wakeword-export regenerates it); pass
+# VCMX_SERVE_ARGS="--wakeword-backend torch ..." to use the checkpoint
+# directly instead. Wakeword's own open threshold stays at
+# gate.DEFAULT_WAKEWORD_THRESHOLD (0.9) unless overridden with
+# --wakeword-threshold.
+vcmx-serve-wakeword:
+	$(MAKE) vcmx-serve VCMX_SERVE_GATE=wakeword VCMX_SERVE_ARGS="--policy single_period --gate-period 3 --wakeword-backend onnx --log-periods $(VCMX_SERVE_ARGS)"
 
 # Streaming spoken-command runner (ticket 04 of feature optionb-streaming).
 # STREAM_SOURCE defaults to the live microphone; override with a wav path
