@@ -336,6 +336,19 @@ def test_classify_speaker_group_non_optionb_source_is_none():
     assert classify_speaker_group("common_voice_negative", "") is None
 
 
+def test_classify_speaker_group_fil50_persona_is_always_filipino():
+    """feature accent-balance-fil50 (.scratch/accent-balance-fil50/tickets/
+    00-RECAP.md T6): every fil50_persona row is unconditionally
+    filipino_reference, including with a non-s<N>-shaped group_id (a
+    voice_id like fsc_94 or ref_tagalog3, not an optionb speaker ID) and
+    with no group_id at all."""
+    from me2_voicegen.vcm.evaluate import classify_speaker_group
+
+    assert classify_speaker_group("fil50_persona", "fsc_94") == "filipino_reference"
+    assert classify_speaker_group("fil50_persona", "ref_tagalog3") == "filipino_reference"
+    assert classify_speaker_group("fil50_persona", None) == "filipino_reference"
+
+
 def test_classify_speaker_group_malformed_or_empty_group_id_is_none():
     from me2_voicegen.vcm.evaluate import classify_speaker_group
 

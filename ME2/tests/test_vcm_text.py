@@ -197,6 +197,17 @@ def test_resolve_transcript_unknown_source_dataset_raises():
         text.resolve_transcript({"source_dataset": "not_a_real_source"})
 
 
+def test_resolve_transcript_fil50_persona_matches_optionb_branch():
+    """feature accent-balance-fil50 (.scratch/accent-balance-fil50/tickets/
+    00-RECAP.md T5): a persona-synthesized row's transcript is its own
+    `transcript` column, prepared the same way optionb/vcm_balanced rows
+    are -- including a noisy row, which stays `source_dataset=fil50_persona`
+    (noise is signaled via `_noisy` in filename, not a distinct source_dataset)."""
+    for filename in ("ALARM_6_00AM_fsc_94_v1.wav", "ALARM_6_00AM_fsc_94_v1_noisy.wav"):
+        row = {"source_dataset": "fil50_persona", "filename": filename, "transcript": "Alarm 6 AM"}
+        assert text.resolve_transcript(row) == text.prepare_ctc_transcript("Alarm 6 AM")
+
+
 # ---------------------------------------------------------------------------
 # slow drift-guard: re-derive INTENT_PHRASES from the real QA reports
 # ---------------------------------------------------------------------------

@@ -76,17 +76,24 @@ def resolve_transcript(manifest_row: Mapping[str, str]) -> str | None:
     - filipino_speech_corpus: per decision (B), always None, regardless of
       whether the row is a whole-clip or `_cNN.wav` chunked row -- excluded
       from CTC loss uniformly, kept only as an eval rejection probe.
-    - optionb / vcm_balanced: own manifest's `transcript` column, read
-      directly (no source manifest join -- unlike
+    - optionb / vcm_balanced / fil50_persona: own manifest's `transcript`
+      column, read directly (no source manifest join -- unlike
       common_voice_negative/youtube_institutional, this row *is* the
       source row), passed through
       `vcm.optionb.transcript.prepare_ctc_transcript` first so digit-bearing
       slot values (e.g. "Alarm 6 AM") survive this module's own
       `normalize_text` instead of being silently dropped. `vcm_balanced`
-      (VCM Dataset B, merged in by `vcm.vcmx_merge`) reuses this branch
-      unchanged: its own rows are pre-normalized (alias-normalized,
-      digit-kept text) the same way `optionb` rows already are, so no
-      separate digit-spelling rule is needed for it.
+      (VCM Dataset B, merged in by `vcm.vcmx_merge`) and `fil50_persona`
+      (feature `accent-balance-fil50`, persona-synthesized Filipino-voiced
+      commands whose text is copied verbatim from a same-split non-Filipino
+      row -- `.scratch/accent-balance-fil50/tickets/00-RECAP.md` T5) both
+      reuse this branch unchanged: their own rows are pre-normalized
+      (alias-normalized, digit-kept text) the same way `optionb` rows
+      already are, so no separate digit-spelling rule is needed for either.
+      A noisy `fil50_persona` row is still `source_dataset="fil50_persona"`
+      (noise is signaled via `_noisy` in `filename`, the same convention
+      `optionb`'s own noisy rows use -- not a distinct source_dataset
+      value the way wakeword's `_noisy` subsets are).
     """
     source_dataset = manifest_row["source_dataset"]
 
@@ -99,7 +106,7 @@ def resolve_transcript(manifest_row: Mapping[str, str]) -> str | None:
     if source_dataset == "filipino_speech_corpus":
         return None
 
-    if source_dataset in ("optionb", "vcm_balanced"):
+    if source_dataset in ("optionb", "vcm_balanced", "fil50_persona"):
         return prepare_ctc_transcript(manifest_row["transcript"])
 
     if source_dataset in ("common_voice_negative", "youtube_institutional"):

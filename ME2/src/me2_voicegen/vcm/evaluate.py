@@ -390,11 +390,21 @@ def false_accept_stats(results: list[RowResult], threshold: float, bucket: str) 
 
 def classify_speaker_group(source_dataset: str | None, group_id: str | None) -> str | None:
     """`filipino_reference` / `foreign_reference` / `None` (unclassified or
-    not applicable). Only `optionb` rows are classified -- the other four
-    `source_dataset` values (`background_noise`, `youtube_institutional`,
-    `filipino_speech_corpus`, `common_voice_negative`) use unrelated
-    `group_id` shapes (ESC-50 filenames, video IDs, zero-padded numerics,
-    empty) that must never be misread as a foreign `s<N>` speaker ID."""
+    not applicable). Only `optionb` and `fil50_persona` rows are classified
+    -- the other four `source_dataset` values (`background_noise`,
+    `youtube_institutional`, `filipino_speech_corpus`,
+    `common_voice_negative`) use unrelated `group_id` shapes (ESC-50
+    filenames, video IDs, zero-padded numerics, empty) that must never be
+    misread as a foreign `s<N>` speaker ID.
+
+    `fil50_persona` (feature `accent-balance-fil50`,
+    .scratch/accent-balance-fil50/tickets/00-RECAP.md T6): every row is a
+    persona-synthesized Filipino voice by construction (`collate.py` only
+    ever emits it for rows drawn from the Filipino voice pool), so it's
+    unconditionally `filipino_reference` -- it never needs `group_id`
+    disambiguation the way `optionb`'s pooled `s<N>` IDs do."""
+    if source_dataset == "fil50_persona":
+        return "filipino_reference"
     if source_dataset != "optionb":
         return None
     if not group_id:

@@ -1,0 +1,2275 @@
+{
+  "checkpoint_path": "out/vcm/option-d-dataset-v2/checkpoints/checkpoint.pt",
+  "checkpoint_sha256": "bdd99f37b911fd653128956c86d2abcfdc151e699bba1332daee8711eacab55a",
+  "beam_width": 50,
+  "threshold": -0.075,
+  "margin": 4.0,
+  "baseline_metrics": {
+    "margin": null,
+    "is_baseline": true,
+    "target_exact_accuracy": {
+      "n": 129,
+      "n_exact_correct": 114,
+      "exact_accuracy": 0.8837209302325582
+    },
+    "confusion_counts": {
+      "PLAY_MUSIC": {
+        "PLAY_MUSIC": 9
+      },
+      "WEATHER": {
+        "WEATHER": 1,
+        "REJECTED": 1
+      },
+      "TIME": {
+        "TIME": 5,
+        "REJECTED": 1
+      },
+      "LIGHT_ON": {
+        "LIGHT_ON": 2,
+        "REJECTED": 1
+      },
+      "ALARM": {
+        "ALARM": 1,
+        "REJECTED": 9
+      },
+      "PAUSE": {
+        "PAUSE": 5
+      },
+      "STOP": {
+        "STOP": 11
+      },
+      "NEXT": {
+        "NEXT": 60
+      },
+      "VOLUME_UP": {
+        "VOLUME_UP": 11
+      },
+      "VOLUME_DOWN": {
+        "VOLUME_DOWN": 9,
+        "REJECTED": 3
+      }
+    },
+    "slot_accuracy": null,
+    "incomplete_prefix_far": {
+      "n": 10688,
+      "n_false_accept": 1182,
+      "far": 0.11059131736526946,
+      "per_prefix": {
+        "adjust": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1,
+            "STOP": 1
+          }
+        },
+        "adjust brightness": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to one": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to one hundred": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to sixty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "alarm": {
+          "n": 80,
+          "n_false_accept": 6,
+          "far": 0.075,
+          "false_accept_intent_distribution": {
+            "CALL": 2,
+            "PAUSE": 4
+          }
+        },
+        "alarm eight": {
+          "n": 64,
+          "n_false_accept": 8,
+          "far": 0.125,
+          "false_accept_intent_distribution": {
+            "ALARM": 8
+          }
+        },
+        "alarm nine": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "alarm six": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1
+          }
+        },
+        "brightness": {
+          "n": 80,
+          "n_false_accept": 5,
+          "far": 0.0625,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1,
+            "TIME": 4
+          }
+        },
+        "brightness level": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1
+          }
+        },
+        "brightness level one": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness level one hundred": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness level sixty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness level twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness one": {
+          "n": 80,
+          "n_false_accept": 3,
+          "far": 0.0375,
+          "false_accept_intent_distribution": {
+            "LIGHT_ON": 3
+          }
+        },
+        "brightness one hundred": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "LIGHT_ON": 2
+          }
+        },
+        "brightness sixty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change": {
+          "n": 80,
+          "n_false_accept": 13,
+          "far": 0.1625,
+          "false_accept_intent_distribution": {
+            "STOP": 13
+          }
+        },
+        "change color": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change color to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the": {
+          "n": 80,
+          "n_false_accept": 4,
+          "far": 0.05,
+          "false_accept_intent_distribution": {
+            "PLAY_MUSIC": 4
+          }
+        },
+        "change the temperature": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to eighteen": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to twenty six": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to twenty two": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "countdown": {
+          "n": 80,
+          "n_false_accept": 4,
+          "far": 0.05,
+          "false_accept_intent_distribution": {
+            "STOP": 4
+          }
+        },
+        "countdown for": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "countdown for one": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "countdown for ten": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "countdown for thirty": {
+          "n": 80,
+          "n_false_accept": 3,
+          "far": 0.0375,
+          "false_accept_intent_distribution": {
+            "STOP": 3
+          }
+        },
+        "create": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "CALL": 2
+          }
+        },
+        "create a": {
+          "n": 80,
+          "n_false_accept": 3,
+          "far": 0.0375,
+          "false_accept_intent_distribution": {
+            "CALL": 2,
+            "PAUSE": 1
+          }
+        },
+        "create a reminder": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "create a reminder to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "create a reminder to drink": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "end": {
+          "n": 72,
+          "n_false_accept": 34,
+          "far": 0.4722222222222222,
+          "false_accept_intent_distribution": {
+            "STOP": 34
+          }
+        },
+        "increase": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "TIME": 1
+          }
+        },
+        "increase the": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "kill": {
+          "n": 80,
+          "n_false_accept": 34,
+          "far": 0.425,
+          "false_accept_intent_distribution": {
+            "STOP": 34
+          }
+        },
+        "kill the": {
+          "n": 80,
+          "n_false_accept": 19,
+          "far": 0.2375,
+          "false_accept_intent_distribution": {
+            "CALL": 4,
+            "STOP": 14,
+            "TIME": 1
+          }
+        },
+        "lights": {
+          "n": 80,
+          "n_false_accept": 16,
+          "far": 0.2,
+          "false_accept_intent_distribution": {
+            "LIGHT_ON": 16
+          }
+        },
+        "list": {
+          "n": 80,
+          "n_false_accept": 6,
+          "far": 0.075,
+          "false_accept_intent_distribution": {
+            "CALL": 1,
+            "STOP": 4,
+            "WEATHER": 1
+          }
+        },
+        "list my": {
+          "n": 80,
+          "n_false_accept": 5,
+          "far": 0.0625,
+          "false_accept_intent_distribution": {
+            "LIGHT_OFF": 4,
+            "LIGHT_ON": 1
+          }
+        },
+        "lower": {
+          "n": 72,
+          "n_false_accept": 19,
+          "far": 0.2638888888888889,
+          "false_accept_intent_distribution": {
+            "PAUSE": 3,
+            "STOP": 16
+          }
+        },
+        "lower the": {
+          "n": 72,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "make": {
+          "n": 80,
+          "n_false_accept": 4,
+          "far": 0.05,
+          "false_accept_intent_distribution": {
+            "STOP": 2,
+            "TIME": 2
+          }
+        },
+        "make a": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "TIME": 2
+          }
+        },
+        "make a phone": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "next": {
+          "n": 80,
+          "n_false_accept": 3,
+          "far": 0.0375,
+          "false_accept_intent_distribution": {
+            "STOP": 3
+          }
+        },
+        "pause for": {
+          "n": 72,
+          "n_false_accept": 47,
+          "far": 0.6527777777777778,
+          "false_accept_intent_distribution": {
+            "PAUSE": 47
+          }
+        },
+        "place": {
+          "n": 80,
+          "n_false_accept": 4,
+          "far": 0.05,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1,
+            "STOP": 3
+          }
+        },
+        "place a": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1,
+            "STOP": 1
+          }
+        },
+        "play": {
+          "n": 80,
+          "n_false_accept": 3,
+          "far": 0.0375,
+          "false_accept_intent_distribution": {
+            "PAUSE": 2,
+            "STOP": 1
+          }
+        },
+        "play next": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "play some": {
+          "n": 80,
+          "n_false_accept": 6,
+          "far": 0.075,
+          "false_accept_intent_distribution": {
+            "PLAY_MUSIC": 6
+          }
+        },
+        "power": {
+          "n": 72,
+          "n_false_accept": 43,
+          "far": 0.5972222222222222,
+          "false_accept_intent_distribution": {
+            "CALL": 9,
+            "STOP": 34
+          }
+        },
+        "power on": {
+          "n": 72,
+          "n_false_accept": 13,
+          "far": 0.18055555555555555,
+          "false_accept_intent_distribution": {
+            "PAUSE": 7,
+            "STOP": 4,
+            "TIME": 1,
+            "VOLUME_UP": 1
+          }
+        },
+        "power on the": {
+          "n": 72,
+          "n_false_accept": 7,
+          "far": 0.09722222222222222,
+          "false_accept_intent_distribution": {
+            "PAUSE": 5,
+            "STOP": 2
+          }
+        },
+        "remind": {
+          "n": 80,
+          "n_false_accept": 5,
+          "far": 0.0625,
+          "false_accept_intent_distribution": {
+            "LIST_REMINDERS": 5
+          }
+        },
+        "remind me": {
+          "n": 80,
+          "n_false_accept": 23,
+          "far": 0.2875,
+          "false_accept_intent_distribution": {
+            "LIST_REMINDERS": 22,
+            "STOP": 1
+          }
+        },
+        "remind me to": {
+          "n": 80,
+          "n_false_accept": 17,
+          "far": 0.2125,
+          "false_accept_intent_distribution": {
+            "LIST_REMINDERS": 14,
+            "TIME": 3
+          }
+        },
+        "remind me to drink": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "reminder": {
+          "n": 80,
+          "n_false_accept": 15,
+          "far": 0.1875,
+          "false_accept_intent_distribution": {
+            "LIST_REMINDERS": 15
+          }
+        },
+        "reminder drink": {
+          "n": 80,
+          "n_false_accept": 12,
+          "far": 0.15,
+          "false_accept_intent_distribution": {
+            "LIST_REMINDERS": 12
+          }
+        },
+        "send": {
+          "n": 80,
+          "n_false_accept": 37,
+          "far": 0.4625,
+          "false_accept_intent_distribution": {
+            "STOP": 37
+          }
+        },
+        "send a": {
+          "n": 72,
+          "n_false_accept": 22,
+          "far": 0.3055555555555556,
+          "false_accept_intent_distribution": {
+            "CALL": 1,
+            "PAUSE": 1,
+            "STOP": 20
+          }
+        },
+        "send my": {
+          "n": 80,
+          "n_false_accept": 10,
+          "far": 0.125,
+          "false_accept_intent_distribution": {
+            "PAUSE": 2,
+            "STOP": 8
+          }
+        },
+        "set": {
+          "n": 80,
+          "n_false_accept": 31,
+          "far": 0.3875,
+          "false_accept_intent_distribution": {
+            "STOP": 31
+          }
+        },
+        "set an": {
+          "n": 80,
+          "n_false_accept": 31,
+          "far": 0.3875,
+          "false_accept_intent_distribution": {
+            "STOP": 31
+          }
+        },
+        "set an alarm": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set an alarm for": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set an alarm for eight": {
+          "n": 80,
+          "n_false_accept": 3,
+          "far": 0.0375,
+          "false_accept_intent_distribution": {
+            "ALARM": 3
+          }
+        },
+        "set an alarm for nine": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set an alarm for six": {
+          "n": 72,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set color": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set color to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the": {
+          "n": 80,
+          "n_false_accept": 30,
+          "far": 0.375,
+          "false_accept_intent_distribution": {
+            "STOP": 30
+          }
+        },
+        "set the temperature": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to eighteen": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to twenty six": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to twenty two": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "show": {
+          "n": 80,
+          "n_false_accept": 45,
+          "far": 0.5625,
+          "false_accept_intent_distribution": {
+            "STOP": 45
+          }
+        },
+        "show my": {
+          "n": 80,
+          "n_false_accept": 14,
+          "far": 0.175,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1,
+            "STOP": 13
+          }
+        },
+        "shut": {
+          "n": 80,
+          "n_false_accept": 50,
+          "far": 0.625,
+          "false_accept_intent_distribution": {
+            "STOP": 50
+          }
+        },
+        "shut off": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "shut off the": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "skip": {
+          "n": 80,
+          "n_false_accept": 35,
+          "far": 0.4375,
+          "false_accept_intent_distribution": {
+            "STOP": 35
+          }
+        },
+        "start": {
+          "n": 80,
+          "n_false_accept": 57,
+          "far": 0.7125,
+          "false_accept_intent_distribution": {
+            "STOP": 57
+          }
+        },
+        "start a": {
+          "n": 80,
+          "n_false_accept": 55,
+          "far": 0.6875,
+          "false_accept_intent_distribution": {
+            "STOP": 55
+          }
+        },
+        "start a timer": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1
+          }
+        },
+        "start a timer for": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "start a timer for one": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "start a timer for ten": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "start a timer for thirty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "switch": {
+          "n": 80,
+          "n_false_accept": 16,
+          "far": 0.2,
+          "false_accept_intent_distribution": {
+            "STOP": 16
+          }
+        },
+        "switch color": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "switch color to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "tell": {
+          "n": 80,
+          "n_false_accept": 48,
+          "far": 0.6,
+          "false_accept_intent_distribution": {
+            "CALL": 6,
+            "STOP": 42
+          }
+        },
+        "tell me": {
+          "n": 80,
+          "n_false_accept": 12,
+          "far": 0.15,
+          "false_accept_intent_distribution": {
+            "STOP": 1,
+            "TIME": 11
+          }
+        },
+        "tell me the": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "TIME": 1
+          }
+        },
+        "temperature": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1,
+            "TIME": 1
+          }
+        },
+        "temperature eighteen": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "temperature twenty": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "TIME": 1
+          }
+        },
+        "temperature twenty six": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "temperature twenty two": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "timer": {
+          "n": 80,
+          "n_false_accept": 51,
+          "far": 0.6375,
+          "false_accept_intent_distribution": {
+            "CALL": 6,
+            "STOP": 10,
+            "TIME": 33,
+            "VOLUME_UP": 2
+          }
+        },
+        "timer one": {
+          "n": 64,
+          "n_false_accept": 1,
+          "far": 0.015625,
+          "false_accept_intent_distribution": {
+            "TIME": 1
+          }
+        },
+        "timer ten": {
+          "n": 80,
+          "n_false_accept": 14,
+          "far": 0.175,
+          "false_accept_intent_distribution": {
+            "PLAY_MUSIC": 1,
+            "STOP": 2,
+            "TIME": 9,
+            "VOLUME_UP": 2
+          }
+        },
+        "timer thirty": {
+          "n": 80,
+          "n_false_accept": 17,
+          "far": 0.2125,
+          "false_accept_intent_distribution": {
+            "TIME": 17
+          }
+        },
+        "turn": {
+          "n": 80,
+          "n_false_accept": 38,
+          "far": 0.475,
+          "false_accept_intent_distribution": {
+            "STOP": 18,
+            "TIME": 20
+          }
+        },
+        "turn on": {
+          "n": 80,
+          "n_false_accept": 20,
+          "far": 0.25,
+          "false_accept_intent_distribution": {
+            "STOP": 20
+          }
+        },
+        "turn on the": {
+          "n": 80,
+          "n_false_accept": 11,
+          "far": 0.1375,
+          "false_accept_intent_distribution": {
+            "STOP": 9,
+            "TIME": 2
+          }
+        },
+        "turn the": {
+          "n": 80,
+          "n_false_accept": 28,
+          "far": 0.35,
+          "false_accept_intent_distribution": {
+            "STOP": 3,
+            "TIME": 25
+          }
+        },
+        "turn the volume": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "VOLUME_UP": 1
+          }
+        },
+        "volume": {
+          "n": 80,
+          "n_false_accept": 28,
+          "far": 0.35,
+          "false_accept_intent_distribution": {
+            "CALL": 13,
+            "PAUSE": 14,
+            "STOP": 1
+          }
+        },
+        "wake": {
+          "n": 80,
+          "n_false_accept": 3,
+          "far": 0.0375,
+          "false_accept_intent_distribution": {
+            "LIGHT_OFF": 1,
+            "LIGHT_ON": 1,
+            "WEATHER": 1
+          }
+        },
+        "wake me": {
+          "n": 80,
+          "n_false_accept": 6,
+          "far": 0.075,
+          "false_accept_intent_distribution": {
+            "LIGHT_ON": 2,
+            "VOLUME_UP": 2,
+            "WEATHER": 2
+          }
+        },
+        "wake me up": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "VOLUME_UP": 1
+          }
+        },
+        "wake me up at": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "wake me up at eight": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "ALARM": 2
+          }
+        },
+        "wake me up at nine": {
+          "n": 72,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "wake me up at six": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "what": {
+          "n": 80,
+          "n_false_accept": 14,
+          "far": 0.175,
+          "false_accept_intent_distribution": {
+            "STOP": 7,
+            "WEATHER": 7
+          }
+        },
+        "what time": {
+          "n": 80,
+          "n_false_accept": 8,
+          "far": 0.1,
+          "false_accept_intent_distribution": {
+            "LIGHT_OFF": 1,
+            "LIGHT_ON": 3,
+            "STOP": 4
+          }
+        },
+        "what time is": {
+          "n": 80,
+          "n_false_accept": 8,
+          "far": 0.1,
+          "false_accept_intent_distribution": {
+            "TIME": 8
+          }
+        },
+        "what's": {
+          "n": 80,
+          "n_false_accept": 32,
+          "far": 0.4,
+          "false_accept_intent_distribution": {
+            "MESSAGE": 1,
+            "STOP": 2,
+            "WEATHER": 29
+          }
+        },
+        "what's the": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "LIGHT_ON": 1
+          }
+        }
+      }
+    },
+    "probe_far_by_silence_source": {
+      "digital_zero": {
+        "n": 3390,
+        "n_false_accept": 614,
+        "far": 0.18112094395280237
+      },
+      "lead_in_room_tone": {
+        "n": 798,
+        "n_false_accept": 85,
+        "far": 0.10651629072681704
+      },
+      "none": {
+        "n": 2672,
+        "n_false_accept": 11,
+        "far": 0.004116766467065869
+      },
+      "tail_room_tone": {
+        "n": 3828,
+        "n_false_accept": 472,
+        "far": 0.12330198537095088
+      }
+    },
+    "character_overlap_prefixes": [
+      "countdown for 1",
+      "remind",
+      "reminder",
+      "start a timer for 1",
+      "timer 1",
+      "what"
+    ],
+    "frr_single_word_commands": {
+      "n": 16,
+      "n_rejected": 0,
+      "frr": 0.0
+    },
+    "frr_strict_prefix_commands": {
+      "n": 16,
+      "n_rejected": 0,
+      "frr": 0.0
+    },
+    "gate_caused_frr_by_competitor": {
+      "n_confidence_accepted": 114,
+      "n_gate_rejected": 0,
+      "gate_caused_frr": 0.0,
+      "by_competitor": {}
+    },
+    "reject_probe_far": {
+      "babble": {
+        "n": 255,
+        "false_accepts": 1,
+        "rate": 0.00392156862745098
+      },
+      "silence": {
+        "n": 324,
+        "false_accepts": 3,
+        "rate": 0.009259259259259259
+      }
+    },
+    "target_by_silence_bucket": {
+      "unknown": {
+        "n": 129,
+        "n_accepted": 114,
+        "accept_rate": 0.8837209302325582
+      }
+    },
+    "probe_by_silence_bucket": {
+      ">=2s": {
+        "n": 2672,
+        "n_accepted": 641,
+        "accept_rate": 0.23989520958083832
+      },
+      "[0, 0.2)s": {
+        "n": 2672,
+        "n_accepted": 11,
+        "accept_rate": 0.004116766467065869
+      },
+      "[0.2, 0.5)s": {
+        "n": 2672,
+        "n_accepted": 151,
+        "accept_rate": 0.05651197604790419
+      },
+      "[1, 2)s": {
+        "n": 2672,
+        "n_accepted": 379,
+        "accept_rate": 0.14184131736526945
+      }
+    }
+  },
+  "gated_metrics": {
+    "margin": 4.0,
+    "is_baseline": false,
+    "target_exact_accuracy": {
+      "n": 129,
+      "n_exact_correct": 112,
+      "exact_accuracy": 0.8682170542635659
+    },
+    "confusion_counts": {
+      "PLAY_MUSIC": {
+        "REJECTED": 1,
+        "PLAY_MUSIC": 8
+      },
+      "WEATHER": {
+        "WEATHER": 1,
+        "REJECTED": 1
+      },
+      "TIME": {
+        "TIME": 5,
+        "REJECTED": 1
+      },
+      "LIGHT_ON": {
+        "LIGHT_ON": 2,
+        "REJECTED": 1
+      },
+      "ALARM": {
+        "ALARM": 1,
+        "REJECTED": 9
+      },
+      "PAUSE": {
+        "PAUSE": 5
+      },
+      "STOP": {
+        "STOP": 11
+      },
+      "NEXT": {
+        "NEXT": 60
+      },
+      "VOLUME_UP": {
+        "VOLUME_UP": 11
+      },
+      "VOLUME_DOWN": {
+        "VOLUME_DOWN": 8,
+        "REJECTED": 4
+      }
+    },
+    "slot_accuracy": null,
+    "incomplete_prefix_far": {
+      "n": 10688,
+      "n_false_accept": 719,
+      "far": 0.06727170658682635,
+      "per_prefix": {
+        "adjust": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "STOP": 1
+          }
+        },
+        "adjust brightness": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to one": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to one hundred": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to sixty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "adjust brightness to twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "alarm": {
+          "n": 80,
+          "n_false_accept": 3,
+          "far": 0.0375,
+          "false_accept_intent_distribution": {
+            "PAUSE": 3
+          }
+        },
+        "alarm eight": {
+          "n": 64,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "alarm nine": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "alarm six": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness": {
+          "n": 80,
+          "n_false_accept": 4,
+          "far": 0.05,
+          "false_accept_intent_distribution": {
+            "TIME": 4
+          }
+        },
+        "brightness level": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness level one": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness level one hundred": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness level sixty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness level twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness one": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness one hundred": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "LIGHT_ON": 1
+          }
+        },
+        "brightness sixty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "brightness twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change": {
+          "n": 80,
+          "n_false_accept": 4,
+          "far": 0.05,
+          "false_accept_intent_distribution": {
+            "STOP": 4
+          }
+        },
+        "change color": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change color to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the": {
+          "n": 80,
+          "n_false_accept": 4,
+          "far": 0.05,
+          "false_accept_intent_distribution": {
+            "PLAY_MUSIC": 4
+          }
+        },
+        "change the temperature": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to eighteen": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to twenty six": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "change the temperature to twenty two": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "countdown": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "STOP": 1
+          }
+        },
+        "countdown for": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "countdown for one": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "countdown for ten": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "countdown for thirty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "create": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "CALL": 1
+          }
+        },
+        "create a": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "create a reminder": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "create a reminder to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "create a reminder to drink": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "end": {
+          "n": 72,
+          "n_false_accept": 25,
+          "far": 0.3472222222222222,
+          "false_accept_intent_distribution": {
+            "STOP": 25
+          }
+        },
+        "increase": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "TIME": 1
+          }
+        },
+        "increase the": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "kill": {
+          "n": 80,
+          "n_false_accept": 32,
+          "far": 0.4,
+          "false_accept_intent_distribution": {
+            "STOP": 32
+          }
+        },
+        "kill the": {
+          "n": 80,
+          "n_false_accept": 7,
+          "far": 0.0875,
+          "false_accept_intent_distribution": {
+            "STOP": 7
+          }
+        },
+        "lights": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "LIGHT_ON": 1
+          }
+        },
+        "list": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "WEATHER": 1
+          }
+        },
+        "list my": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "LIGHT_OFF": 2
+          }
+        },
+        "lower": {
+          "n": 72,
+          "n_false_accept": 16,
+          "far": 0.2222222222222222,
+          "false_accept_intent_distribution": {
+            "PAUSE": 2,
+            "STOP": 14
+          }
+        },
+        "lower the": {
+          "n": 72,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "make": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "STOP": 1
+          }
+        },
+        "make a": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "make a phone": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "next": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "STOP": 2
+          }
+        },
+        "pause for": {
+          "n": 72,
+          "n_false_accept": 34,
+          "far": 0.4722222222222222,
+          "false_accept_intent_distribution": {
+            "PAUSE": 34
+          }
+        },
+        "place": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "STOP": 1
+          }
+        },
+        "place a": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "STOP": 1
+          }
+        },
+        "play": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "play next": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "play some": {
+          "n": 80,
+          "n_false_accept": 6,
+          "far": 0.075,
+          "false_accept_intent_distribution": {
+            "PLAY_MUSIC": 6
+          }
+        },
+        "power": {
+          "n": 72,
+          "n_false_accept": 40,
+          "far": 0.5555555555555556,
+          "false_accept_intent_distribution": {
+            "CALL": 8,
+            "STOP": 32
+          }
+        },
+        "power on": {
+          "n": 72,
+          "n_false_accept": 4,
+          "far": 0.05555555555555555,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1,
+            "STOP": 2,
+            "VOLUME_UP": 1
+          }
+        },
+        "power on the": {
+          "n": 72,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "remind": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "remind me": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "STOP": 1
+          }
+        },
+        "remind me to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "remind me to drink": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "reminder": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "reminder drink": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "send": {
+          "n": 80,
+          "n_false_accept": 27,
+          "far": 0.3375,
+          "false_accept_intent_distribution": {
+            "STOP": 27
+          }
+        },
+        "send a": {
+          "n": 72,
+          "n_false_accept": 11,
+          "far": 0.1527777777777778,
+          "false_accept_intent_distribution": {
+            "STOP": 11
+          }
+        },
+        "send my": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1,
+            "STOP": 1
+          }
+        },
+        "set": {
+          "n": 80,
+          "n_false_accept": 20,
+          "far": 0.25,
+          "false_accept_intent_distribution": {
+            "STOP": 20
+          }
+        },
+        "set an": {
+          "n": 80,
+          "n_false_accept": 10,
+          "far": 0.125,
+          "false_accept_intent_distribution": {
+            "STOP": 10
+          }
+        },
+        "set an alarm": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set an alarm for": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set an alarm for eight": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set an alarm for nine": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set an alarm for six": {
+          "n": 72,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set color": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set color to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the": {
+          "n": 80,
+          "n_false_accept": 7,
+          "far": 0.0875,
+          "false_accept_intent_distribution": {
+            "STOP": 7
+          }
+        },
+        "set the temperature": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to eighteen": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to twenty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to twenty six": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "set the temperature to twenty two": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "show": {
+          "n": 80,
+          "n_false_accept": 44,
+          "far": 0.55,
+          "false_accept_intent_distribution": {
+            "STOP": 44
+          }
+        },
+        "show my": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "shut": {
+          "n": 80,
+          "n_false_accept": 42,
+          "far": 0.525,
+          "false_accept_intent_distribution": {
+            "STOP": 42
+          }
+        },
+        "shut off": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "shut off the": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "skip": {
+          "n": 80,
+          "n_false_accept": 28,
+          "far": 0.35,
+          "false_accept_intent_distribution": {
+            "STOP": 28
+          }
+        },
+        "start": {
+          "n": 80,
+          "n_false_accept": 54,
+          "far": 0.675,
+          "false_accept_intent_distribution": {
+            "STOP": 54
+          }
+        },
+        "start a": {
+          "n": 80,
+          "n_false_accept": 47,
+          "far": 0.5875,
+          "false_accept_intent_distribution": {
+            "STOP": 47
+          }
+        },
+        "start a timer": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1
+          }
+        },
+        "start a timer for": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "start a timer for one": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "start a timer for ten": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "start a timer for thirty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "switch": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "STOP": 2
+          }
+        },
+        "switch color": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "switch color to": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "tell": {
+          "n": 80,
+          "n_false_accept": 46,
+          "far": 0.575,
+          "false_accept_intent_distribution": {
+            "CALL": 6,
+            "STOP": 40
+          }
+        },
+        "tell me": {
+          "n": 80,
+          "n_false_accept": 7,
+          "far": 0.0875,
+          "false_accept_intent_distribution": {
+            "TIME": 7
+          }
+        },
+        "tell me the": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "temperature": {
+          "n": 80,
+          "n_false_accept": 2,
+          "far": 0.025,
+          "false_accept_intent_distribution": {
+            "PAUSE": 1,
+            "TIME": 1
+          }
+        },
+        "temperature eighteen": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "temperature twenty": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "TIME": 1
+          }
+        },
+        "temperature twenty six": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "temperature twenty two": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "timer": {
+          "n": 80,
+          "n_false_accept": 41,
+          "far": 0.5125,
+          "false_accept_intent_distribution": {
+            "CALL": 5,
+            "STOP": 8,
+            "TIME": 27,
+            "VOLUME_UP": 1
+          }
+        },
+        "timer one": {
+          "n": 64,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "timer ten": {
+          "n": 80,
+          "n_false_accept": 3,
+          "far": 0.0375,
+          "false_accept_intent_distribution": {
+            "PLAY_MUSIC": 1,
+            "STOP": 1,
+            "VOLUME_UP": 1
+          }
+        },
+        "timer thirty": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "turn": {
+          "n": 80,
+          "n_false_accept": 29,
+          "far": 0.3625,
+          "false_accept_intent_distribution": {
+            "STOP": 14,
+            "TIME": 15
+          }
+        },
+        "turn on": {
+          "n": 80,
+          "n_false_accept": 12,
+          "far": 0.15,
+          "false_accept_intent_distribution": {
+            "STOP": 12
+          }
+        },
+        "turn on the": {
+          "n": 80,
+          "n_false_accept": 5,
+          "far": 0.0625,
+          "false_accept_intent_distribution": {
+            "STOP": 5
+          }
+        },
+        "turn the": {
+          "n": 80,
+          "n_false_accept": 7,
+          "far": 0.0875,
+          "false_accept_intent_distribution": {
+            "STOP": 1,
+            "TIME": 6
+          }
+        },
+        "turn the volume": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "volume": {
+          "n": 80,
+          "n_false_accept": 22,
+          "far": 0.275,
+          "false_accept_intent_distribution": {
+            "CALL": 9,
+            "PAUSE": 12,
+            "STOP": 1
+          }
+        },
+        "wake": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "wake me": {
+          "n": 80,
+          "n_false_accept": 4,
+          "far": 0.05,
+          "false_accept_intent_distribution": {
+            "LIGHT_ON": 1,
+            "VOLUME_UP": 2,
+            "WEATHER": 1
+          }
+        },
+        "wake me up": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "VOLUME_UP": 1
+          }
+        },
+        "wake me up at": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "wake me up at eight": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "wake me up at nine": {
+          "n": 72,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "wake me up at six": {
+          "n": 80,
+          "n_false_accept": 0,
+          "far": 0.0,
+          "false_accept_intent_distribution": {}
+        },
+        "what": {
+          "n": 80,
+          "n_false_accept": 9,
+          "far": 0.1125,
+          "false_accept_intent_distribution": {
+            "STOP": 2,
+            "WEATHER": 7
+          }
+        },
+        "what time": {
+          "n": 80,
+          "n_false_accept": 8,
+          "far": 0.1,
+          "false_accept_intent_distribution": {
+            "LIGHT_OFF": 1,
+            "LIGHT_ON": 3,
+            "STOP": 4
+          }
+        },
+        "what time is": {
+          "n": 80,
+          "n_false_accept": 4,
+          "far": 0.05,
+          "false_accept_intent_distribution": {
+            "TIME": 4
+          }
+        },
+        "what's": {
+          "n": 80,
+          "n_false_accept": 28,
+          "far": 0.35,
+          "false_accept_intent_distribution": {
+            "MESSAGE": 1,
+            "STOP": 1,
+            "WEATHER": 26
+          }
+        },
+        "what's the": {
+          "n": 80,
+          "n_false_accept": 1,
+          "far": 0.0125,
+          "false_accept_intent_distribution": {
+            "LIGHT_ON": 1
+          }
+        }
+      }
+    },
+    "probe_far_by_silence_source": {
+      "digital_zero": {
+        "n": 3390,
+        "n_false_accept": 386,
+        "far": 0.11386430678466077
+      },
+      "lead_in_room_tone": {
+        "n": 798,
+        "n_false_accept": 36,
+        "far": 0.045112781954887216
+      },
+      "none": {
+        "n": 2672,
+        "n_false_accept": 5,
+        "far": 0.0018712574850299401
+      },
+      "tail_room_tone": {
+        "n": 3828,
+        "n_false_accept": 292,
+        "far": 0.07628004179728318
+      }
+    },
+    "character_overlap_prefixes": [
+      "countdown for 1",
+      "remind",
+      "reminder",
+      "start a timer for 1",
+      "timer 1",
+      "what"
+    ],
+    "frr_single_word_commands": {
+      "n": 16,
+      "n_rejected": 0,
+      "frr": 0.0
+    },
+    "frr_strict_prefix_commands": {
+      "n": 16,
+      "n_rejected": 0,
+      "frr": 0.0
+    },
+    "gate_caused_frr_by_competitor": {
+      "n_confidence_accepted": 114,
+      "n_gate_rejected": 2,
+      "gate_caused_frr": 0.017543859649122806,
+      "by_competitor": {
+        "play": {
+          "n": 1,
+          "char_overlap": false,
+          "rejected_true_label_distribution": {
+            "PLAY_MUSIC": 1
+          }
+        },
+        "turn the volume": {
+          "n": 1,
+          "char_overlap": false,
+          "rejected_true_label_distribution": {
+            "VOLUME_DOWN": 1
+          }
+        }
+      }
+    },
+    "reject_probe_far": {
+      "babble": {
+        "n": 255,
+        "false_accepts": 1,
+        "rate": 0.00392156862745098
+      },
+      "silence": {
+        "n": 324,
+        "false_accepts": 1,
+        "rate": 0.0030864197530864196
+      }
+    },
+    "target_by_silence_bucket": {
+      "unknown": {
+        "n": 129,
+        "n_accepted": 112,
+        "accept_rate": 0.8682170542635659
+      }
+    },
+    "probe_by_silence_bucket": {
+      ">=2s": {
+        "n": 2672,
+        "n_accepted": 352,
+        "accept_rate": 0.1317365269461078
+      },
+      "[0, 0.2)s": {
+        "n": 2672,
+        "n_accepted": 5,
+        "accept_rate": 0.0018712574850299401
+      },
+      "[0.2, 0.5)s": {
+        "n": 2672,
+        "n_accepted": 116,
+        "accept_rate": 0.04341317365269461
+      },
+      "[1, 2)s": {
+        "n": 2672,
+        "n_accepted": 246,
+        "accept_rate": 0.09206586826347306
+      }
+    }
+  },
+  "hashes_before": {
+    "checkpoint": "bdd99f37b911fd653128956c86d2abcfdc151e699bba1332daee8711eacab55a",
+    "vcm_model.fp32.onnx": "54c4b26bcae17d14969ed9604ec9c5e6aaa30c0240618c9b4120a936568762a2",
+    "vcm_model.fp32.preprocessed.onnx": "35473fc1a050cf385b1d435f5ae01ab1972943a5cd0fce2c49a78bcc8a8e2f6d",
+    "vcm_model.int8.onnx": "a8d3c648792f75ea57e14fbcdb8fe291c56eec010d827fb2bcf1e7889722f11f"
+  },
+  "hashes_after": {
+    "checkpoint": "bdd99f37b911fd653128956c86d2abcfdc151e699bba1332daee8711eacab55a",
+    "vcm_model.fp32.onnx": "54c4b26bcae17d14969ed9604ec9c5e6aaa30c0240618c9b4120a936568762a2",
+    "vcm_model.fp32.preprocessed.onnx": "35473fc1a050cf385b1d435f5ae01ab1972943a5cd0fce2c49a78bcc8a8e2f6d",
+    "vcm_model.int8.onnx": "a8d3c648792f75ea57e14fbcdb8fe291c56eec010d827fb2bcf1e7889722f11f"
+  },
+  "val_selection_path": "out/vcm/option-d-dataset-v2/metadata/incomplete_calibration_beam50_realtarget/val_selection.json"
+}

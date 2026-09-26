@@ -364,6 +364,30 @@ def test_check_group_id_disjoint_ignores_falsy_group_id():
     vx._check_group_id_disjoint(rows)  # must not raise
 
 
+def test_check_group_id_disjoint_ref_prefix_exempt_across_splits():
+    # Phase-1 scoped exception: `ref_`-prefixed group ids (accent-balance
+    # references voices, usable in every split) are exempt from the
+    # cross-split disjointness check, in any source_dataset family.
+    rows = [
+        {"source_dataset": "fil50_persona", "group_id": "ref_tagalog1", "split": "train"},
+        {"source_dataset": "fil50_persona", "group_id": "ref_tagalog1", "split": "test"},
+        {"source_dataset": "optionb", "group_id": "ref_stella", "split": "val"},
+        {"source_dataset": "optionb", "group_id": "ref_stella", "split": "train"},
+    ]
+    vx._check_group_id_disjoint(rows)  # must not raise
+
+
+@pytest.mark.parametrize("gid", ["fsc_1", "s68", "g1"])
+def test_check_group_id_disjoint_still_raises_for_non_ref_ids(gid):
+    # Regression guard: the exemption is scoped to the ref_ prefix only.
+    rows = [
+        {"source_dataset": "filipino_speech_corpus", "group_id": gid, "split": "train"},
+        {"source_dataset": "filipino_speech_corpus", "group_id": gid, "split": "test"},
+    ]
+    with pytest.raises(vx.VCMXMergeError, match="group_id"):
+        vx._check_group_id_disjoint(rows)
+
+
 def test_resolve_m0_group_splits_majority_and_tiebreak():
     rows = [
         # 1-1 tie between train and val -> tie-break picks val.

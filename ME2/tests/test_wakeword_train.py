@@ -18,9 +18,11 @@ from me2_voicegen.wakeword.model import LABELS, DSCNNConfig, DSCNN
 from me2_voicegen.wakeword.train import (
     LICENSE_NOTE,
     build_arg_parser,
+    classify_ww_row_is_filipino,
     main,
     per_class_metrics,
     run_eval,
+    wakeword_accent_recall,
 )
 
 FIELDS = [
@@ -34,6 +36,7 @@ FIELDS = [
     "source_relpath",
     "group_id",
     "split",
+    "ref_voice",
     "speech_start_s",
     "speech_end_s",
 ]
@@ -217,3 +220,102 @@ def test_main_runs_one_short_training_pass_and_writes_expected_outputs(tmp_path,
 
     md_text = eval_report_md.read_text()
     assert LICENSE_NOTE in md_text
+    assert "accent_recall" in eval_report
+    assert set(eval_report["accent_recall"]) == {"filipino", "non_filipino"}
+    assert "`_wakeword_` recall by voice accent" in md_text
+
+
+# ---------------------------------------------------------------------------
+# feature accent-balance-fil50 (.scratch/accent-balance-fil50/tickets/
+# 00-RECAP.md T6): classify_ww_row_is_filipino / wakeword_accent_recall /
+# --eval-only.
+# ---------------------------------------------------------------------------
+
+
+def test_classify_ww_row_is_filipino_by_ref_voice():
+    assert classify_ww_row_is_filipino({"ref_voice": "tagalog3"}) is True
+    assert classify_ww_row_is_filipino({"ref_voice": "ilonggo1"}) is True
+    assert classify_ww_row_is_filipino({"ref_voice": "picovoice"}) is False
+    assert classify_ww_row_is_filipino({"ref_voice": ""}) is False
+    assert classify_ww_row_is_filipino({}) is False
+
+
+def test_classify_ww_row_is_filipino_by_source_dataset():
+    assert classify_ww_row_is_filipino({"source_dataset": "fil50_persona", "ref_voice": ""}) is True
+    assert classify_ww_row_is_filipino({"source_dataset": "fil50_persona_noisy", "ref_voice": ""}) is True
+    assert classify_ww_row_is_filipino({"source_dataset": "picovoice", "ref_voice": ""}) is False
+
+
+def _accent_manifest(tmp_path, vcm_wav_factory) -> Path:
+    root = tmp_path / "wakeword_accent"
+    rows = []
+
+    def add(filename, label, group_id, ref_voice, source_dataset="positives_real"):
+        rel = f"positives_real/audio/{filename}"
+        vcm_wav_factory(root / rel, duration_s=1.5, freq_hz=440.0 if label != "_silence_" else 0.0, silence=(label == "_silence_"))
+        rows.append({
+            "filename": filename, "path": rel, "label": label, "duration": "1.500000", "sample_rate": "16000",
+            "resampled": "False", "source_dataset": source_dataset, "source_relpath": filename, "group_id": group_id,
+            "split": "val", "ref_voice": ref_voice,
+            "speech_start_s": "0.200000" if label != "_silence_" else "", "speech_end_s": "1.300000" if label != "_silence_" else "",
+        })
+
+    add("wk_fil_0.wav", "_wakeword_", "g0", "tagalog3")
+    add("wk_fil_1.wav", "_wakeword_", "g1", "ilonggo1")
+    add("wk_nonfil_0.wav", "_wakeword_", "g2", "")
+    add("adv_0.wav", "_unknown_", "g3", "")  # non-_wakeword_ row -- must not count toward either bucket
+
+    manifest_path = root / "manifest.csv"
+    _write_manifest(manifest_path, rows)
+    return manifest_path
+
+
+def test_wakeword_accent_recall_splits_by_ref_voice(tmp_path, vcm_wav_factory):
+    from me2_voicegen.wakeword.dataset import WakewordDataset
+
+    manifest_path = _accent_manifest(tmp_path, vcm_wav_factory)
+    dataset = WakewordDataset(manifest_path, split="val", augmenter=None, shift=False)
+    config = DSCNNConfig(n_blocks=1, channels=8, kernel_sizes=[5], prologue_channels=8)
+    model = DSCNN(config)
+
+    result = wakeword_accent_recall(model, dataset, torch.device("cpu"))
+
+    assert set(result) == {"filipino", "non_filipino"}
+    assert result["filipino"]["total"] == 2  # the two tagalog/ilonggo _wakeword_ rows
+    assert result["non_filipino"]["total"] == 1  # the one ref_voice="" _wakeword_ row
+    for bucket in result.values():
+        assert 0 <= bucket["correct"] <= bucket["total"]
+        assert bucket["recall"] is None or 0.0 <= bucket["recall"] <= 1.0
+
+
+def test_eval_only_scores_an_existing_checkpoint_without_training(tmp_path, vcm_wav_factory):
+    manifest_path = _tiny_manifest(tmp_path, vcm_wav_factory)
+    train_out_dir = tmp_path / "out_trained"
+    main([
+        "--manifest", str(manifest_path), "--out-dir", str(train_out_dir), "--max-epochs", "1",
+        "--max-minutes", "1", "--batch-size", "3", "--num-workers", "0", "--p-noise", "0.0",
+        "--p-specaugment", "0.0", "--seed", "0",
+    ])
+    checkpoint_path = train_out_dir / "checkpoints" / "checkpoint.pt"
+    assert checkpoint_path.is_file()
+
+    eval_out_dir = tmp_path / "out_eval_only"
+    main([
+        "--manifest", str(manifest_path), "--out-dir", str(eval_out_dir), "--eval-only",
+        "--checkpoint", str(checkpoint_path), "--num-workers", "0",
+    ])
+
+    eval_report_json = eval_out_dir / "metadata" / "eval_report.json"
+    assert eval_report_json.is_file()
+    assert not (eval_out_dir / "checkpoints" / "checkpoint.pt").exists()  # eval-only never trains/writes a checkpoint
+
+    eval_report = json.loads(eval_report_json.read_text())
+    assert eval_report["checkpoint_path"] == str(checkpoint_path)
+    assert "accent_recall" in eval_report
+
+
+def test_eval_only_without_checkpoint_raises():
+    import pytest
+
+    with pytest.raises(SystemExit):
+        main(["--eval-only"])

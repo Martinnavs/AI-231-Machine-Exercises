@@ -23,6 +23,7 @@ from __future__ import annotations
 import argparse
 import dataclasses
 import json
+import re
 import time
 from pathlib import Path
 
@@ -113,6 +114,120 @@ def per_class_metrics(model: nn.Module, loader: DataLoader, device: torch.device
     return {"confusion_matrix": confusion, "labels": list(LABELS), "per_class": per_class}
 
 
+_FILIPINO_REF_VOICE_RE = re.compile(r"^(tagalog|ilonggo)")
+_FILIPINO_SOURCE_DATASETS = frozenset({"fil50_persona", "fil50_persona_noisy"})
+
+
+def classify_ww_row_is_filipino(row: dict) -> bool:
+    """Same "what counts as Filipino" definition
+    `accent_balance.plan_jobs`/`accent_balance.collate` use for `_wakeword_`
+    rows -- kept as a local copy rather than an import so this module (which
+    every `wakeword-train`/`wakeword-bench` Makefile recipe touches) doesn't
+    pick up a dependency on the `accent-balance-fil50` feature package for a
+    two-line check."""
+    if row.get("source_dataset") in _FILIPINO_SOURCE_DATASETS:
+        return True
+    return bool(_FILIPINO_REF_VOICE_RE.match(row.get("ref_voice") or ""))
+
+
+@torch.no_grad()
+def wakeword_accent_recall(model: nn.Module, dataset: WakewordDataset, device: torch.device) -> dict:
+    """`_wakeword_`-label recall split by Filipino- vs non-Filipino-voiced
+    row (feature `accent-balance-fil50`,
+    .scratch/accent-balance-fil50/tickets/00-RECAP.md T6) -- there was
+    previously no accent breakdown for the wakeword model at all, only the
+    pooled per-class table `per_class_metrics` already reports. Iterates
+    `dataset` directly (not shuffled) so batch order lines up with
+    `dataset.rows` one-to-one, the same assumption `WakewordDataset.rows`'s
+    own docstring establishes for `__getitem__`."""
+    model.eval()
+    feature_extractor = LogMelFeatureExtractor()
+    loader = DataLoader(dataset, batch_size=64, shuffle=False, collate_fn=build_train_collate(feature_extractor))
+    wakeword_idx = LABELS.index("_wakeword_")
+    counts = {"filipino": [0, 0], "non_filipino": [0, 0]}  # [correct, total]
+
+    row_idx = 0
+    for batch in loader:
+        features = batch["features"].to(device)
+        labels = batch["labels"]
+        preds = model(features).argmax(dim=-1).cpu()
+        for i in range(labels.shape[0]):
+            row = dataset.rows[row_idx]
+            row_idx += 1
+            if labels[i].item() != wakeword_idx:
+                continue
+            bucket = "filipino" if classify_ww_row_is_filipino(row) else "non_filipino"
+            counts[bucket][1] += 1
+            if preds[i].item() == wakeword_idx:
+                counts[bucket][0] += 1
+
+    return {
+        bucket: {"correct": correct, "total": total, "recall": (correct / total) if total else None}
+        for bucket, (correct, total) in counts.items()
+    }
+
+
+def write_eval_report(
+    *,
+    model: nn.Module,
+    val_dataset: WakewordDataset,
+    val_loader: DataLoader,
+    device: torch.device,
+    checkpoint_meta: dict,
+    checkpoint_path: Path,
+    manifest_path: Path,
+    metadata_dir: Path,
+) -> dict:
+    """Shared by the end of a training run and `--eval-only` mode, so both
+    paths produce byte-for-byte the same report shape."""
+    metadata_dir.mkdir(parents=True, exist_ok=True)
+    metrics = per_class_metrics(model, val_loader, device)
+    accent_recall = wakeword_accent_recall(model, val_dataset, device)
+
+    eval_report = {
+        "license": LICENSE_NOTE,
+        "checkpoint_path": str(checkpoint_path),
+        "checkpoint_meta": checkpoint_meta,
+        "manifest_path": str(manifest_path),
+        "device": str(device),
+        **metrics,
+        "accent_recall": accent_recall,
+    }
+    with (metadata_dir / "eval_report.json").open("w") as f:
+        json.dump(eval_report, f, indent=2)
+
+    md_lines = [
+        "# Wakeword DS-CNN eval report",
+        "",
+        f"Checkpoint: `{eval_report['checkpoint_path']}` (preset={checkpoint_meta.get('preset')}, epoch={checkpoint_meta.get('epoch')}).",
+        "",
+        "| label | precision | recall | f1 | support |",
+        "|---|---|---|---|---|",
+    ]
+    for label in LABELS:
+        m = metrics["per_class"][label]
+        md_lines.append(f"| `{label}` | {m['precision']:.3f} | {m['recall']:.3f} | {m['f1']:.3f} | {m['support']} |")
+
+    md_lines += [
+        "",
+        "## `_wakeword_` recall by voice accent",
+        "",
+        "| group | recall | correct | total |",
+        "|---|---|---|---|",
+    ]
+    for bucket in ("filipino", "non_filipino"):
+        b = accent_recall[bucket]
+        recall_str = f"{b['recall']:.3f}" if b["recall"] is not None else "n/a"
+        md_lines.append(f"| {bucket} | {recall_str} | {b['correct']} | {b['total']} |")
+
+    md_lines += ["", eval_report["license"], ""]
+    (metadata_dir / "eval_report.md").write_text("\n".join(md_lines), encoding="utf-8")
+
+    print(f"wrote {metadata_dir / 'eval_report.json'}")
+    print(f"wrote {metadata_dir / 'eval_report.md'}")
+    return eval_report
+
+
 def build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
@@ -142,6 +257,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--time-check-every", type=int, default=50, help="check the wall-clock cap every N train batches")
     parser.add_argument("--grad-clip", type=float, default=5.0)
     parser.add_argument("--onecycle-epochs", type=int, default=None, help="defaults to --max-epochs")
+    parser.add_argument(
+        "--eval-only",
+        action="store_true",
+        help="load --checkpoint and write eval_report.json/.md against --eval-split, without training "
+        "(feature accent-balance-fil50: scores an existing checkpoint, e.g. out/wakeword, against a "
+        "new manifest without retraining)",
+    )
+    parser.add_argument("--checkpoint", type=Path, default=None, help="required with --eval-only")
+    parser.add_argument("--eval-split", default="val", help="split to evaluate in --eval-only mode (default: val, matching the end-of-training report)")
     return parser
 
 
@@ -159,6 +283,25 @@ def main(argv: list[str] | None = None) -> None:
     metadata_dir = args.out_dir / "metadata"
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
     metadata_dir.mkdir(parents=True, exist_ok=True)
+
+    if args.eval_only:
+        if args.checkpoint is None:
+            raise SystemExit("--eval-only requires --checkpoint")
+        ckpt = torch.load(args.checkpoint, map_location=device)
+        eval_model = build_model(ckpt["preset"]).to(device)
+        eval_model.load_state_dict(ckpt["model_state_dict"])
+        eval_feature_extractor = LogMelFeatureExtractor()
+        eval_dataset = WakewordDataset(args.manifest, split=args.eval_split, augmenter=None, shift=False)
+        eval_loader = DataLoader(
+            eval_dataset, batch_size=args.batch_size, shuffle=False,
+            num_workers=args.num_workers, collate_fn=build_train_collate(eval_feature_extractor),
+        )
+        write_eval_report(
+            model=eval_model, val_dataset=eval_dataset, val_loader=eval_loader, device=device,
+            checkpoint_meta={k: v for k, v in ckpt.items() if k != "model_state_dict"},
+            checkpoint_path=args.checkpoint, manifest_path=args.manifest, metadata_dir=metadata_dir,
+        )
+        return
 
     feature_extractor = LogMelFeatureExtractor()
     train_augmenter = Augmenter(p_noise=args.p_noise, p_specaugment=args.p_specaugment, seed=args.seed)
@@ -335,35 +478,11 @@ def main(argv: list[str] | None = None) -> None:
     ckpt = torch.load(checkpoints_dir / "checkpoint.pt", map_location=device)
     best_model = build_model(ckpt["preset"]).to(device)
     best_model.load_state_dict(ckpt["model_state_dict"])
-    metrics = per_class_metrics(best_model, val_loader, device)
-
-    eval_report = {
-        "license": LICENSE_NOTE,
-        "checkpoint_path": str(checkpoints_dir / "checkpoint.pt"),
-        "checkpoint_meta": {k: v for k, v in ckpt.items() if k != "model_state_dict"},
-        "manifest_path": str(args.manifest),
-        "device": str(device),
-        **metrics,
-    }
-    with (metadata_dir / "eval_report.json").open("w") as f:
-        json.dump(eval_report, f, indent=2)
-
-    md_lines = [
-        "# Wakeword DS-CNN eval report",
-        "",
-        f"Checkpoint: `{eval_report['checkpoint_path']}` (preset={ckpt['preset']}, epoch={ckpt['epoch']}).",
-        "",
-        "| label | precision | recall | f1 | support |",
-        "|---|---|---|---|---|",
-    ]
-    for label in LABELS:
-        m = metrics["per_class"][label]
-        md_lines.append(f"| `{label}` | {m['precision']:.3f} | {m['recall']:.3f} | {m['f1']:.3f} | {m['support']} |")
-    md_lines += ["", eval_report["license"], ""]
-    (metadata_dir / "eval_report.md").write_text("\n".join(md_lines), encoding="utf-8")
-
-    print(f"wrote {metadata_dir / 'eval_report.json'}")
-    print(f"wrote {metadata_dir / 'eval_report.md'}")
+    write_eval_report(
+        model=best_model, val_dataset=val_dataset, val_loader=val_loader, device=device,
+        checkpoint_meta={k: v for k, v in ckpt.items() if k != "model_state_dict"},
+        checkpoint_path=checkpoints_dir / "checkpoint.pt", manifest_path=args.manifest, metadata_dir=metadata_dir,
+    )
 
 
 if __name__ == "__main__":

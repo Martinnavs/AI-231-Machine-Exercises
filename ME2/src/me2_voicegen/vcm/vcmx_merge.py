@@ -549,11 +549,16 @@ def _check_group_id_disjoint(rows: list[dict]) -> None:
     (e.g. `common_voice_negative`'s, not a real per-speaker id) is still
     excluded, matching `vcm.evaluate.classify_speaker_group`'s own
     convention of excluding falsy group_id from grouping rather than
-    treating it as one giant group."""
+    treating it as one giant group.
+
+    `ref_`-prefixed group ids carry the Phase-1 scoped exception
+    (accent-balance references voices, usable in every split because their
+    timbre already spans every split via converted wakeword positives);
+    every other group id stays strictly enforced."""
     by_key: dict[tuple[str, str], set[str]] = defaultdict(set)
     for row in rows:
         gid = row["group_id"]
-        if not gid:
+        if not gid or gid.startswith("ref_"):
             continue
         by_key[(row["source_dataset"], gid)].add(row["split"])
     violations = {k: v for k, v in by_key.items() if len(v) > 1}

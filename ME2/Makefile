@@ -57,29 +57,36 @@ VCMX_SEED ?= 0
 # `vcmx-export` produces its INT8 ONNX export (not generated during
 # train/eval); `vcmx-serve` runs it through vcm.streaming with that export
 # plus this run's own calibrated operating threshold (-0.1, its
-# eval_report.md) and a full-grammar incomplete-prefix margin (=6.0) chosen
-# by `vcm.incomplete_calibration select --split val` against the pooled
-# VCMX_TREATMENT manifest (all designated prefixes, not just TIME/STOP) and
-# confirmed once on the disjoint `holdout --split test` split -- reports at
-# out/vcm/option-d-dataset-v2/metadata/incomplete_calibration_beam50/
-# {val_report,test_report}.md. Held-out: FAR 14.65%->6.46%, target exact
-# accuracy 97.92%->97.04% (0.88pp), gate-caused FRR 0.95%. Superseded the
-# earlier margin=4.5 in out/vcm/option-d-dataset-v2-FALSE-ACCEPT-ANALYSIS.md,
-# which only scoped TIME/STOP and understated the margin the full grammar
-# actually needs. That margin was measured at beam-width 50 --
-# VCMX_SERVE_BEAM_WIDTH must stay 50 (not vcm.streaming's own default of 25)
-# or the calibration doesn't transfer. Open caveat: the pooled val/test
-# manifest is ~90% voice-cloned Option B commands and the incomplete-prefix
-# probes are cut from Option B only (source_dataset=="optionb") -- the
-# margin is not yet independently confirmed against just the real-recording
-# subset (source_dataset=="vcm_balanced"); a per-source breakdown
-# (.scratch/optionb-v3-vcmx/margin_by_source.py) is in progress to close
-# that gap before this stops being a documented starting point.
+# eval_report.md) and a full-grammar incomplete-prefix margin (=4.0) chosen
+# by `vcm.incomplete_calibration select --split val`, regression-budget
+# check scored against real-recording (source_dataset=="vcm_balanced")
+# target rows only -- out/conversions/v2/optionb-v3-vcmx/
+# manifest.realtarget.csv, the same VCMX_TREATMENT manifest with its ~90%
+# voice-cloned Option B target-command rows stripped out (babble/silence
+# rows, already mostly real, are unchanged) -- and confirmed once on the
+# disjoint `holdout --split test` split, same filter. Reports at
+# out/vcm/option-d-dataset-v2/metadata/incomplete_calibration_beam50_realtarget/
+# {val_report,test_report}.md. Held-out (real commands only): FAR
+# 11.06%->6.73%, target exact accuracy 88.37%->86.82% (1.55pp), gate-caused
+# FRR 1.75%. Supersedes margin=6.0, which the *pooled* (90% synthetic)
+# calibration picked -- checked against real commands alone, margin=6.0's
+# val accuracy drop is 1.54pp, already over the 1pp regression budget, so it
+# was not actually safe for real speech despite passing the pooled check.
+# margin=6.0 does reach a slightly lower FAR (6.46% vs 6.73% held-out) but
+# not by enough to justify the extra real-command risk. Both margins were
+# measured at beam-width 50 -- VCMX_SERVE_BEAM_WIDTH must stay 50 (not
+# vcm.streaming's own default of 25) or the calibration doesn't transfer.
+# Remaining caveat: the incomplete-prefix probes themselves are still cut
+# from Option B clips only (source_dataset=="optionb") -- Dataset B's real
+# recordings don't cover enough of the designated-prefix vocabulary to
+# generate a real-only probe set from (see incomplete_probes.py's
+# per-prefix speaker counts), so the FAR side of this number, unlike the
+# accuracy side, is still a synthetic-audio measurement.
 VCMX_TRAINED_OUT_DIR ?= out/vcm/option-d-dataset-v2
 VCMX_SERVE_MANIFEST ?= $(VCMX_TREATMENT)/manifest.csv
 VCMX_SERVE_VARIANT ?= int8
 VCMX_SERVE_THRESHOLD ?= -0.1
-VCMX_SERVE_MARGIN ?= 6.0
+VCMX_SERVE_MARGIN ?= 4.0
 VCMX_SERVE_BEAM_WIDTH ?= 50
 VCMX_SERVE_GATE ?= none
 VCMX_SERVE_SOURCE ?= mic

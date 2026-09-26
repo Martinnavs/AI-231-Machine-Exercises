@@ -1,23 +1,49 @@
-# ME2 — CosyVoice 2 zero-shot TTS spike
+# ME2 — Spoken-command voice assistant (grammar-constrained VCM + wakeword DS-CNN)
 
-Phase-1 spike proving that CosyVoice2 zero-shot voice-cloning synthesis runs end-to-end on this
-HPC node (3x idle A100-SXM4-40GB, no root/sudo). It is **not** the synthetic-data-generation
-pipeline itself.
+A Raspberry-Pi-targeted, zero-cloud spoken-command system: a DS-CNN wake-word detector
+("computer") gates a ~1M-parameter grammar-constrained CTC acoustic model (the "VCM") that
+decodes speech into one of a fixed set of intents/slots. The training data for both models is
+synthetic-plus-real audio produced by a CosyVoice2 zero-shot TTS / voice-conversion pipeline that
+this repo also owns end to end.
+
+This repo started (see "Setup: the four `make` steps, in order" below) as a Phase-1 spike proving
+CosyVoice2 zero-shot voice-cloning synthesis runs end-to-end on this HPC node (3x idle
+A100-SXM4-40GB, no root/sudo), and grew from there into the full pipeline described here —
+training data generation, the VCM model and grammar/decode, the wakeword DS-CNN, and a live
+streaming runtime. That history is still visible in the section ordering below (synthesis setup
+first, everything built on top of it after); the "VCM toy" section onward is the current state of
+the project, not a later add-on to a still-scoped-down spike.
 
 > **New here?** Read the process documentation first: an end-to-end, human-readable
-> walkthrough of the whole process — raw audio → TTS conversion → QA'd test set →
-> CTC training → grammar decode → ONNX export → live streaming — with the command
-> for each stage, the modelling core (architecture, training recipe, grammar-to-trie
-> compile, decode threshold), and the real results. It lives in the second-brain vault
-> at `/mnt/Obsidian/Claude/second-brain/resources/AI-222/machine-exercise-implem/ME2/`
-> as a set of four paired documents: `PROCESS-OVERVIEW.md` (pipeline hub),
-> `VCM-MODEL.md` (architecture + training + results), `GRAMMAR-TO-DECODE.md`
-> (grammar → trie → decode), and `STREAMING.md` (live runner); each has its
-> evidence record alongside it in `evidence/`.
+> walkthrough of the whole project — raw audio → TTS/voice-conversion → dataset build →
+> CTC training → grammar decode → wakeword DS-CNN → ONNX export → live streaming — with
+> the command for each stage, the modelling core (architecture, training recipe,
+> grammar-to-trie compile, decode/rejection gating), and the real, honestly-framed
+> results. It's committed in this repo as five paired documents:
+> `docs/PROCESS-OVERVIEW.md` (pipeline hub), `docs/PROCESS-DATA-GENERATION.md`,
+> `docs/PROCESS-VCM-MODEL.md`, `docs/PROCESS-WAKEWORD.md`, and
+> `docs/PROCESS-STREAMING-SERVING.md`. Start at `PROCESS-OVERVIEW.md`.
+
+## Project status (2026-09-26, branch `optionb-grammar-v2`)
+
+| Area | Status | Key number |
+|---|---|---|
+| VCM (Option B grammar, `optiond` preset) | trained, calibrated | test exact-intent accuracy 97.04% pre-gate / 86.82% real-audio-scored post-gate (incomplete-prefix margin=4.0) |
+| Wakeword DS-CNN | trained, wired into `ListeningGate` | val F1 0.997 (`_wakeword_`); fixed threshold 0.9 (no FAR/FRR calibration pipeline yet) |
+| Streaming runtime | shipped | fp32 ONNX is the serving default (INT8 needs its own threshold re-tuning pass) |
+| VCMX (combined VCM+wakeword export/serve) | shipped, tech-lead reviewed, approved | treatment 25,231 rows / control 21,055 rows, speaker-disjoint |
+| `accent-balance-fil50` (50/50 Filipino/non-Filipino rebalance) | **complete, all criteria met** | wakeword Filipino-accent recall gap 13.0pts → 0.4pts; VCM exact accuracy 0.956 → 0.979 |
+
+Everything in this table is landed and working end to end. `accent-balance-fil50`'s full run
+(references-only path, per the decision in `docs/PROCESS-DATA-GENERATION.md`'s "Current status"
+section) is complete; results in `docs/MLOPS-PROJECTS.md`'s Iteration 1. Promoting the new
+checkpoints to production (`make vcmx-serve` / `make vcmx-serve-wakeword`) is a separate,
+not-yet-made decision.
 
 ## Scope
 
-**In scope (this phase):**
+**In scope for the original Phase-1 spike** (this foundation is still exactly how synthesis
+happens today — nothing below replaces it, later work only builds on top of it):
 - Vendoring upstream CosyVoice at a pinned commit and getting it importable under `uv`.
 - Downloading the CosyVoice2-0.5B checkpoint.
 - A swappable synthesis interface (`Synthesizer` ABC + factory) with one real backend
@@ -34,7 +60,7 @@ pipeline itself.
 - A second backend implementation (the interface is designed to make one easy to add later —
   see `docs/adding-a-tts-backend.md` — but none is implemented here).
 
-**Now in scope (added after the initial spike):**
+**Added after the initial spike, and since grown into the current pipeline:**
 - Batching one text over multiple *personas* (multiple reference voices/manifests) in a single
   run, sharing one backend construction — see "Batch generation over personas" below. This is a
   different axis from the phrase-list batching above (personas vary, not text) and does not
@@ -46,8 +72,17 @@ pipeline itself.
   `.scratch/wakeword-computer-dataset/HANDOFF.md` (build narrative + current state). Note: this
   dataset is CC-BY-NC-SA-4.0-encumbered (non-commercial, share-alike) once its noise-augmented
   rows are included — see the contract doc's licensing section before using or redistributing it.
-  Picking/training an actual KWS model (e.g. DS-CNN) on this dataset remains its own follow-up,
-  not done here.
+  A DS-CNN has since been trained on this dataset and wired into the live streaming runtime as a
+  `ListeningGate` — see "Wakeword DS-CNN" below, this is no longer a follow-up.
+- **A real DS-CNN wake-word model** (`src/me2_voicegen/wakeword/model.py`), trained, benchmarked,
+  and wired into the streaming runtime's `ListeningGate` seam — see "Wakeword DS-CNN" below.
+- **Option B**: a second, real-dataset spoken-command grammar (19 intents) with its own trained
+  VCM checkpoint, a combined VCM+wakeword export/serve pipeline ("VCMX"), and a calibrated
+  incomplete-prefix rejection gate — see "Option B spoken-command grammar", "VCMX" and the
+  "Streaming inference" sections below.
+- **`accent-balance-fil50`** (complete): a 50/50 Filipino/non-Filipino speaker rebalancing pass
+  for both the VCM and wakeword datasets — full run done, all pre-committed criteria met (see
+  "Project status" above and `docs/PROCESS-DATA-GENERATION.md`).
 
 See `docs/raw_requirements/sources.md`, `docs/raw_requirements/potential_model_approach.md`,
 `docs/raw_requirements/voice_generation_approach.md`, and
@@ -572,6 +607,71 @@ VCM's equivalent is named `SET_REMINDER`. Do not attempt to map one taxonomy ont
 reuse `vcm` decoder/model code against `OPTIONB_GRAMMAR`, or vice versa — see
 `OPTIONB-GRAMMAR-CONTRACT.md` section 5 for the full divergence list.
 
+**Training + evaluation on Option B** uses the same `vcm` model/training code as the toy VCM
+above, just pointed at the `optiond` preset (~1.01M params, 5 TCS blocks, 128 channels — the
+config actually shipped downstream, not the toy `default` preset) and the Option B manifest:
+
+```bash
+make optionb-train
+make optionb-eval
+```
+
+Real numbers (`optiond`, epoch 71, against the Option B test split): 1,717/1,766 (97.2%) target
+commands accepted, 1,715/1,766 (97.1%) exact-intent-correct, false-accept rate 1/56 (1.8%) on
+babble and 0/22 (0.0%) on silence, 1,022/1,023 slot values correct on intent-correct slot-bearing
+clips. Full architecture, training recipe, and the incomplete-prefix rejection-gate calibration
+history (margin 5.0 → 6.0 → 4.0, with the real-vs-synthetic-audio pitfall that drove the final
+recalibration) are in [`docs/PROCESS-VCM-MODEL.md`](docs/PROCESS-VCM-MODEL.md).
+
+## Wakeword DS-CNN
+
+A depthwise-separable CNN ("computer"-only keyword spotter, `src/me2_voicegen/wakeword/model.py`,
+≈50K params) trained on the dataset-build pipeline described above, sized to gate the VCM the way
+a real always-on device would: cheap enough to run continuously, so the expensive grammar-
+constrained beam search only wakes up once the wake word is heard.
+
+```bash
+make wakeword-train
+make wakeword-bench     # ONNX export + INT8 quantization + CPU latency/size benchmark
+```
+
+Real numbers (val split, checkpoint epoch=20): F1 0.997 (`_wakeword_`), 0.997 (`_unknown_`),
+0.998 (`_silence_`). Benchmark (AMD EPYC 7742 — **not** RPi hardware, which doesn't exist on this
+node): fp32 ONNX 0.119MB / 0.256ms p50 latency; INT8 ONNX ~48.4KB / 0.148ms p50 latency, inside
+the MLPerf Tiny reference range for this model class. Because the dataset's noise augmentation
+mixes in ESC-50 (CC-BY-NC-SA-4.0), **this checkpoint — and anything trained on this dataset — is
+CC-BY-NC-SA-4.0-encumbered** (non-commercial, share-alike), same restriction as the VCM-toy
+checkpoint above.
+
+The trained checkpoint is wired into the streaming runtime as a `WakeWordGate`, satisfying the
+same `ListeningGate` protocol the manual `SpacebarGate` does — see "Streaming inference" below.
+Full dataset-build stage-by-stage detail, architecture, and benchmark numbers are in
+[`docs/PROCESS-WAKEWORD.md`](docs/PROCESS-WAKEWORD.md).
+
+## VCMX — combined VCM + wakeword export & serving
+
+`vcmx_merge.py` merges Option B (refreshed to live upstream grammar) with a second balanced
+dataset ("VCM Dataset B") into speaker-disjoint **treatment** (25,231 rows) vs. **control**
+(21,055 rows) manifests with byte-identical val/test splits, so the two training arms are a fair
+before/after comparison. This is the manifest `optionb-train`/`optionb-eval` above actually run
+against in production, and it's the export/serve path that ships both the VCM and wakeword
+checkpoints together for live use:
+
+```bash
+make optionb-refresh   # pull the latest upstream Option B grammar/dataset
+make vcmx-build         # build the treatment/control manifests
+make vcmx-export        # fp32 + INT8 ONNX export of the trained VCM
+make vcmx-serve          # live streaming, always-listening (gate=none)
+make vcmx-serve-wakeword # live streaming, gated by the trained wakeword DS-CNN
+```
+
+`vcmx-serve-wakeword` is the actual "wake word gates the VCM, not both always running" deployment
+shape: the DS-CNN runs continuously and cheaply, and the grammar-constrained beam search — the
+expensive part — only executes once a listening period is open. Tech-lead review of the VCMX
+merge: approved, no blocking findings. Full merge numbers, the fp32-vs-INT8 serving-default
+rationale, and known gaps are in
+[`docs/PROCESS-STREAMING-SERVING.md`](docs/PROCESS-STREAMING-SERVING.md).
+
 ## Streaming inference
 
 A live, continuous spoken-command runner — `me2_voicegen.vcm.streaming` — that consumes a
@@ -590,6 +690,7 @@ make stream STREAM_SOURCE=path/to/clip.wav     # deterministic file replay inste
 make stream STREAM_ARGS="--policy mode_period --gate spacebar"      # gated run: SPACE opens a 5.0 s listening period
 make stream STREAM_ARGS="--policy mode_period --gate spacebar --gate-period 10"
 make stream-single-period                         # one exact 3.0 s inference per SPACE press
+make stream-wakeword                              # gated by the trained wakeword DS-CNN instead of SPACE
 ```
 
 or directly:
