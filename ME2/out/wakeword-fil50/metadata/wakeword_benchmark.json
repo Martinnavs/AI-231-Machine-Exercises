@@ -1,0 +1,46 @@
+{
+  "hardware_label": "AMD EPYC 7742 (256-thread node) estimate",
+  "not_measured_on": "Raspberry Pi 4/5 (no such hardware exists on this node)",
+  "window_seconds": 1.5,
+  "n_frames": 151,
+  "onnxruntime_threads": {
+    "intra_op": 1,
+    "inter_op": 1
+  },
+  "checkpoint": "out/wakeword-fil50/checkpoints/checkpoint.pt",
+  "preset": "default",
+  "fp32": {
+    "onnx_size_bytes": 124542,
+    "onnx_size_mb": 0.11877250671386719,
+    "hardware_label": "AMD EPYC 7742 (256-thread node) estimate",
+    "not_measured_on": "Raspberry Pi 4/5 (no such hardware exists on this node)",
+    "n_warmup": 10,
+    "n_iters": 100,
+    "p50_latency_ms": 0.25208829902112484,
+    "p95_latency_ms": 0.26140734553337097,
+    "process_peak_rss_kb": 442472,
+    "process_peak_rss_mb": 432.1015625,
+    "inference_rss_delta_kb": 0
+  },
+  "spec_budgets_indicative_only": {
+    "latency_ms_per_100ms_frame_le": 20.0,
+    "int8_model_mb_le": 5.0,
+    "peak_ram_mb_le": 25.0,
+    "note": "Original spec budgets for real RPi 4/5 hardware -- shown here as indicative context only, NOT as a pass/fail claim about this node's numbers (which are all AMD EPYC 7742 (256-thread node) estimate)."
+  },
+  "target_device": "Raspberry Pi 4 (2018), 4GB RAM (Broadcom BCM2711, quad-core Cortex-A72) -- confirmed target, not yet measured on this node",
+  "int8": {
+    "measured": true,
+    "onnx_size_bytes": 49576,
+    "onnx_size_mb": 0.04727935791015625,
+    "hardware_label": "AMD EPYC 7742 (256-thread node) estimate",
+    "not_measured_on": "Raspberry Pi 4/5 (no such hardware exists on this node)",
+    "n_warmup": 10,
+    "n_iters": 100,
+    "p50_latency_ms": 0.14412845484912395,
+    "p95_latency_ms": 0.1547541469335556,
+    "process_peak_rss_kb": 483432,
+    "process_peak_rss_mb": 472.1015625,
+    "inference_rss_delta_kb": 0
+  }
+}

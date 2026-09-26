@@ -1,0 +1,87 @@
+{
+  "license": "Checkpoint trained on out/conversions/v2/wakeword/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into adversaries_noisy/positives_converted_noisy. Per docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution.",
+  "checkpoint_path": "out/wakeword/checkpoints/checkpoint.pt",
+  "checkpoint_meta": {
+    "preset": "default",
+    "config": {
+      "n_mels": 40,
+      "n_classes": 3,
+      "n_blocks": 4,
+      "channels": 64,
+      "kernel_sizes": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "prologue_channels": 32
+    },
+    "labels": [
+      "_wakeword_",
+      "_unknown_",
+      "_silence_"
+    ],
+    "seed": 0,
+    "epoch": 20,
+    "val_loss": 0.01252965535719519,
+    "val_acc": 0.9971613949716139,
+    "window_seconds": 1.5,
+    "license": "Checkpoint trained on out/conversions/v2/wakeword/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into adversaries_noisy/positives_converted_noisy. Per docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution."
+  },
+  "manifest_path": "out/conversions/v2/wakeword/manifest.fil50.csv",
+  "device": "cuda:4",
+  "confusion_matrix": [
+    [
+      1323,
+      101,
+      0
+    ],
+    [
+      1,
+      1097,
+      1
+    ],
+    [
+      0,
+      0,
+      270
+    ]
+  ],
+  "labels": [
+    "_wakeword_",
+    "_unknown_",
+    "_silence_"
+  ],
+  "per_class": {
+    "_wakeword_": {
+      "precision": 0.9992447129909365,
+      "recall": 0.9290730337078652,
+      "f1": 0.9628820960698691,
+      "support": 1424
+    },
+    "_unknown_": {
+      "precision": 0.9156928213689483,
+      "recall": 0.9981801637852593,
+      "f1": 0.955158902916848,
+      "support": 1099
+    },
+    "_silence_": {
+      "precision": 0.996309963099631,
+      "recall": 1.0,
+      "f1": 0.9981515711645101,
+      "support": 270
+    }
+  },
+  "accent_recall": {
+    "filipino": {
+      "correct": 615,
+      "total": 712,
+      "recall": 0.8637640449438202
+    },
+    "non_filipino": {
+      "correct": 708,
+      "total": 712,
+      "recall": 0.9943820224719101
+    }
+  }
+}
