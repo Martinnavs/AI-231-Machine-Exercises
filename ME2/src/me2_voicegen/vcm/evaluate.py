@@ -46,6 +46,7 @@ rejection/false-accept probes decision (B) intended them to be.
 from __future__ import annotations
 
 import argparse
+import csv
 import dataclasses
 import json
 import math
@@ -428,12 +429,40 @@ def _wilson_interval(successes: int, n: int, z: float = 1.96) -> tuple[float, fl
     return (max(0.0, lower), min(1.0, upper))
 
 
-def speaker_group_breakdown(results: list[RowResult], threshold: float) -> dict | None:
+def _train_split_group_ids(manifest_path: Path) -> dict[str, set[str]]:
+    """`{"filipino_reference": {group_ids...}, "foreign_reference": {...}}`
+    for the manifest's `train`-split rows only -- a cheap CSV read (no
+    model decode) so `speaker_group_breakdown` can report real train/test
+    voice overlap instead of a number frozen at whatever the dataset
+    looked like when some caveat sentence was last hand-written."""
+    groups: dict[str, set[str]] = {"filipino_reference": set(), "foreign_reference": set()}
+    with manifest_path.open(newline="", encoding="utf-8") as f:
+        for row in csv.DictReader(f):
+            if row.get("split") != "train":
+                continue
+            group = classify_speaker_group(row.get("source_dataset"), row.get("group_id"))
+            if group is not None:
+                groups[group].add(row["group_id"])
+    return groups
+
+
+def speaker_group_breakdown(
+    results: list[RowResult], threshold: float, manifest_path: Path | None = None
+) -> dict | None:
     """Filipino-reference vs. foreign-reference exact-accuracy comparison on
     `TARGET_BUCKET` rows only, mirroring `false_accept_stats`/
     `confusion_counts`'s shape. `None` when no classifiable Option B target
     row exists at all (e.g. a `spec`/`toy` run against the vcm-toy
-    manifest, which has no `optionb` rows)."""
+    manifest, which has no `optionb` rows).
+
+    `manifest_path`, when given, is read once (cheap -- `split == "train"`
+    rows only, no model decode) to compute each group's real train/test
+    voice overlap, so the eval-report caveat this feeds
+    (`render_markdown`) reflects the manifest actually being scored rather
+    than a caveat written for a since-changed dataset (see the
+    accent-balance-fil50 finding: the original "single held-out speaker"
+    caveat was hardcoded prose that went stale the moment `fil50_persona`
+    rows started landing in `filipino_reference` too)."""
     target_rows = [r for r in results if r.bucket == TARGET_BUCKET]
     groups: dict[str, list[RowResult]] = {"filipino_reference": [], "foreign_reference": []}
     n_unclassified = 0
@@ -447,11 +476,23 @@ def speaker_group_breakdown(results: list[RowResult], threshold: float) -> dict 
     if not groups["filipino_reference"] and not groups["foreign_reference"]:
         return None
 
+    train_group_ids = (
+        _train_split_group_ids(manifest_path) if manifest_path is not None else None
+    )
+
     per_group: dict[str, dict] = {}
     for group_name, rows in groups.items():
         n = len(rows)
         n_accepted = sum(1 for r in rows if _accepted(r, threshold))
         n_exact_correct = sum(1 for r in rows if _accepted(r, threshold) and r.intent == r.label)
+        distinct_ids = sorted({r.group_id for r in rows if r.group_id})
+        overlap = None
+        if train_group_ids is not None:
+            train_ids = train_group_ids[group_name]
+            overlap = {
+                "n_distinct_in_train": sum(1 for gid in distinct_ids if gid in train_ids),
+                "n_distinct_total": len(distinct_ids),
+            }
         per_group[group_name] = {
             "n": n,
             "n_accepted": n_accepted,
@@ -459,6 +500,9 @@ def speaker_group_breakdown(results: list[RowResult], threshold: float) -> dict 
             "accept_rate": n_accepted / n if n else None,
             "exact_accuracy": n_exact_correct / n if n else None,
             "exact_accuracy_ci95": _wilson_interval(n_exact_correct, n),
+            "n_distinct_speakers": len(distinct_ids),
+            "distinct_speaker_ids": distinct_ids,
+            "train_overlap": overlap,
         }
 
     filipino_acc = per_group["filipino_reference"]["exact_accuracy"]
@@ -621,7 +665,9 @@ def evaluate_grammar(
             "per_intent_confusion": confusion,
             "false_accept_rate_babble": false_accept_stats(test_results, threshold, "babble"),
             "false_accept_rate_silence": false_accept_stats(test_results, threshold, "silence"),
-            "speaker_group_breakdown": speaker_group_breakdown(test_results, threshold),
+            "speaker_group_breakdown": speaker_group_breakdown(
+                test_results, threshold, manifest_path=test_dataset.manifest_path
+            ),
             "slot_accuracy": slot_accuracy_breakdown(test_results, test_dataset.rows, grammar, threshold),
         },
     }
@@ -828,13 +874,45 @@ def render_markdown(report: dict) -> str:
         if breakdown is not None:
             lines.append("### Speaker-group breakdown")
             lines.append("")
-            lines.append(
-                "> **Caveat:** the test-split Filipino group is a single "
-                "held-out speaker (`s100`, 180 clips), so a gap here "
-                "confounds accent with speaker identity. 13 of the 16 "
-                "Filipino speakers (2,146 clips) are in the train split, "
-                "so this checkpoint is not accent-naive."
-            )
+            # Computed from THIS run's real manifest (speaker_group_breakdown's
+            # n_distinct_speakers/train_overlap), not a caveat sentence
+            # hand-written for whatever the dataset looked like at some past
+            # commit -- that staleness is exactly the bug this replaced (an
+            # accent-balance-fil50 checkpoint's report was still claiming "a
+            # single held-out speaker" for a group that by then spanned 18
+            # distinct voices). `.get`-based throughout: a report rendered
+            # from an older saved JSON without these keys still renders, just
+            # without a caveat line, rather than crashing.
+            for group_name in ("filipino_reference", "foreign_reference"):
+                g = breakdown[group_name]
+                n_distinct = g.get("n_distinct_speakers")
+                if not n_distinct:
+                    continue
+                overlap = g.get("train_overlap")
+                if n_distinct == 1:
+                    sole_id = g["distinct_speaker_ids"][0]
+                    caveat = (
+                        f"the test-split `{group_name}` group is a single "
+                        f"speaker/voice (`{sole_id}`, {g['n']} clips), so a "
+                        "gap here confounds accent with speaker/voice identity."
+                    )
+                else:
+                    caveat = (
+                        f"the test-split `{group_name}` group spans "
+                        f"{n_distinct} distinct speakers/voices ({g['n']} clips)."
+                    )
+                if overlap is not None and overlap["n_distinct_in_train"] > 0:
+                    caveat += (
+                        f" {overlap['n_distinct_in_train']}/{overlap['n_distinct_total']} "
+                        "of these also appear in the train split, so this "
+                        "checkpoint is not accent-naive for this group."
+                    )
+                elif overlap is not None:
+                    caveat += (
+                        " None of these appear in the train split -- a "
+                        "genuinely held-out comparison for this group."
+                    )
+                lines.append(f"> **Caveat ({group_name}):** {caveat}")
             lines.append("")
             lines.append("| group | n | accept_rate | exact_accuracy | 95% CI |")
             lines.append("|---|---|---|---|---|")
