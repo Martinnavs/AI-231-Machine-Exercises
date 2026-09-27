@@ -42,14 +42,20 @@ from me2_voicegen.wakeword.model import (
     param_count,
 )
 
-LICENSE_NOTE = (
-    "Checkpoint trained on out/conversions/v2/wakeword/, which includes "
-    "background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into "
-    "adversaries_noisy/positives_converted_noisy. Per "
-    "docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on "
-    "this data inherits CC-BY-NC-SA-4.0: non-commercial use only, "
-    "share-alike on redistribution."
-)
+def license_note(manifest_path: Path) -> str:
+    """Report-prose license note, naming the dataset root actually used for
+    this run (manifest_path's parent) rather than a hardcoded "computer"
+    path -- this repo now trains more than one wakeword phrase-instance
+    (see docs/WAKEWORD-DATASET-CONTRACT.md section 1) against this same
+    module, so the note must reflect whichever manifest was passed."""
+    return (
+        f"Checkpoint trained on {manifest_path.parent}/, which includes "
+        "background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into "
+        "adversaries_noisy/positives_converted_noisy. Per "
+        "docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on "
+        "this data inherits CC-BY-NC-SA-4.0: non-commercial use only, "
+        "share-alike on redistribution."
+    )
 
 DEFAULT_MANIFEST = (
     Path(__file__).resolve().parents[3] / "out" / "conversions" / "v2" / "wakeword" / "manifest.csv"
@@ -185,7 +191,7 @@ def write_eval_report(
     accent_recall = wakeword_accent_recall(model, val_dataset, device)
 
     eval_report = {
-        "license": LICENSE_NOTE,
+        "license": license_note(manifest_path),
         "checkpoint_path": str(checkpoint_path),
         "checkpoint_meta": checkpoint_meta,
         "manifest_path": str(manifest_path),
@@ -433,7 +439,7 @@ def main(argv: list[str] | None = None) -> None:
                     "val_loss": val_loss,
                     "val_acc": val_acc,
                     "window_seconds": WAKEWORD_WINDOW_SECONDS,
-                    "license": LICENSE_NOTE,
+                    "license": license_note(args.manifest),
                 },
                 checkpoints_dir / "checkpoint.pt",
             )
@@ -446,7 +452,7 @@ def main(argv: list[str] | None = None) -> None:
 
     total_wall_s = time.monotonic() - start_time
     loss_history = {
-        "license": LICENSE_NOTE,
+        "license": license_note(args.manifest),
         "seed": args.seed,
         "preset": args.preset,
         "device": str(device),

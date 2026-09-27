@@ -16,9 +16,9 @@ from torch import nn
 
 from me2_voicegen.wakeword.model import LABELS, DSCNNConfig, DSCNN
 from me2_voicegen.wakeword.train import (
-    LICENSE_NOTE,
     build_arg_parser,
     classify_ww_row_is_filipino,
+    license_note,
     main,
     per_class_metrics,
     run_eval,
@@ -205,24 +205,44 @@ def test_main_runs_one_short_training_pass_and_writes_expected_outputs(tmp_path,
     assert eval_report_json.exists()
     assert eval_report_md.exists()
 
+    expected_license = license_note(manifest_path)
+
     ckpt = torch.load(checkpoint_path, map_location="cpu")
-    assert ckpt["license"] == LICENSE_NOTE
+    assert ckpt["license"] == expected_license
     assert ckpt["preset"] == "default"
     assert set(ckpt["labels"]) == set(LABELS)
 
     loss_history = json.loads(loss_history_path.read_text())
-    assert loss_history["license"] == LICENSE_NOTE
+    assert loss_history["license"] == expected_license
     assert loss_history["epochs_run"] >= 1
 
     eval_report = json.loads(eval_report_json.read_text())
-    assert eval_report["license"] == LICENSE_NOTE
+    assert eval_report["license"] == expected_license
     assert set(eval_report["per_class"].keys()) == set(LABELS)
 
     md_text = eval_report_md.read_text()
-    assert LICENSE_NOTE in md_text
+    assert expected_license in md_text
     assert "accent_recall" in eval_report
     assert set(eval_report["accent_recall"]) == {"filipino", "non_filipino"}
     assert "`_wakeword_` recall by voice accent" in md_text
+
+
+def test_license_note_names_the_actual_manifest_root_not_a_hardcoded_one():
+    """Regression for the "computer"-hardcoded prose bug: two different
+    phrase-instances' manifests must each get their own root named in the
+    note, not a fixed 'out/conversions/v2/wakeword/' string. Caught live
+    against out/wakeword-sesame-ambient's eval report, which was trained on
+    out/conversions/v2/wakeword-sesame/manifest.ambient.csv but still
+    claimed "out/conversions/v2/wakeword/" -- this module hadn't received
+    the fix already applied on iteration3-negatives-timestretch."""
+    computer_note = license_note(Path("out/conversions/v2/wakeword/manifest.csv"))
+    sesame_note = license_note(Path("out/conversions/v2/wakeword-sesame/manifest.ambient.csv"))
+    assert "out/conversions/v2/wakeword" in computer_note
+    assert "wakeword-sesame" not in computer_note
+    assert "out/conversions/v2/wakeword-sesame" in sesame_note
+    # both still carry the actual license terms, unchanged
+    assert "CC-BY-NC-SA-4.0" in computer_note
+    assert "CC-BY-NC-SA-4.0" in sesame_note
 
 
 # ---------------------------------------------------------------------------
