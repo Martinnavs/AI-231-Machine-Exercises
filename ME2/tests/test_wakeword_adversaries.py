@@ -83,6 +83,29 @@ def test_adversary_phrases_only_keyword_is_computer():
     assert not any("alexa" in p.lower() or "jarvis" in p.lower() for p, _ in ga.ADVERSARY_PHRASES)
 
 
+def test_sesame_adversary_phrases_contain_no_hey_token():
+    for phrase, _justification in ga.SESAME_ADVERSARY_PHRASES:
+        assert not re.search(r"\bhey\b", phrase, re.IGNORECASE), phrase
+
+
+def test_sesame_adversary_phrases_shape():
+    assert len(ga.SESAME_ADVERSARY_PHRASES) == 9
+    seen = set()
+    for phrase, justification in ga.SESAME_ADVERSARY_PHRASES:
+        assert phrase and isinstance(phrase, str)
+        assert justification and isinstance(justification, str)
+        assert phrase not in seen
+        seen.add(phrase)
+
+
+def test_phrase_sets_registry_maps_names_to_tuple_lists():
+    assert set(ga.PHRASE_SETS) == {"computer", "sesame"}
+    assert ga.PHRASE_SETS["computer"] is ga.ADVERSARY_PHRASES
+    assert ga.PHRASE_SETS["sesame"] is ga.SESAME_ADVERSARY_PHRASES
+    assert "K AH M P Y UW T ER" in ga.PHRASE_SET_TARGETS["computer"]
+    assert "S EH1 S AH0 M IY0" in ga.PHRASE_SET_TARGETS["sesame"]
+
+
 # ---------------------------------------------------------------------------
 # Reference-voice pool discovery / selection
 # ---------------------------------------------------------------------------
@@ -274,6 +297,122 @@ def test_resolve_prompt_wav_trims_long_clip(tmp_path):
     # cached on second call, no re-trim
     trimmed_again = ga.resolve_prompt_wav(path, cache_dir)
     assert trimmed_again == trimmed
+
+
+# ---------------------------------------------------------------------------
+# CLI: --phrase-set backward-compat regression + sesame
+# ---------------------------------------------------------------------------
+
+
+def test_dry_run_default_plans_seven_times_pool_without_loading_model(tmp_path, monkeypatch, capsys):
+    refs_dir = make_refs_dir(tmp_path, ["a.wav", "b.wav", "c.wav"])
+
+    def _boom(*args, **kwargs):
+        raise AssertionError("create_synthesizer must not be called on --dry-run")
+
+    monkeypatch.setattr(ga, "create_synthesizer", _boom)
+    monkeypatch.setattr(ga, "transcribe_cached", _boom)
+
+    exit_code = ga.main(["--refs-dir", str(refs_dir), "--out-root", str(tmp_path / "out"), "--dry-run"])
+    assert exit_code == 0
+    out = capsys.readouterr().out
+    assert "21 clips" in out  # 7 computer phrases x 3 reference voices
+    assert "7 phrases" in out
+
+
+def test_dry_run_default_is_identical_to_explicit_computer(tmp_path, capsys):
+    refs_dir = make_refs_dir(tmp_path, ["a.wav", "b.wav"])
+    default_out = ga.main(["--refs-dir", str(refs_dir), "--out-root", str(tmp_path / "o1"), "--dry-run"])
+    default_text = capsys.readouterr().out
+    explicit_out = ga.main(
+        ["--refs-dir", str(refs_dir), "--out-root", str(tmp_path / "o1"), "--phrase-set", "computer", "--dry-run"]
+    )
+    explicit_text = capsys.readouterr().out
+    assert default_out == explicit_out == 0
+    assert default_text == explicit_text  # byte-identical pre-change behavior
+
+
+def test_dry_run_sesame_plans_nine_times_pool_without_loading_model(tmp_path, monkeypatch, capsys):
+    refs_dir = make_refs_dir(tmp_path, ["a.wav", "b.wav", "c.wav", "d.wav", "e.wav"])
+
+    def _boom(*args, **kwargs):
+        raise AssertionError("create_synthesizer must not be called on --dry-run")
+
+    monkeypatch.setattr(ga, "create_synthesizer", _boom)
+    monkeypatch.setattr(ga, "transcribe_cached", _boom)
+
+    exit_code = ga.main(
+        ["--refs-dir", str(refs_dir), "--out-root", str(tmp_path / "out"), "--phrase-set", "sesame", "--dry-run"]
+    )
+    assert exit_code == 0
+    out = capsys.readouterr().out
+    assert "45 clips" in out  # 9 sesame phrases x 5 reference voices
+    assert "9 phrases" in out
+    assert not (tmp_path / "out").exists()
+
+
+def test_dry_run_rejects_unknown_phrase_set(tmp_path, capsys):
+    refs_dir = make_refs_dir(tmp_path, ["a.wav"])
+    with pytest.raises(SystemExit):
+        ga.main(["--refs-dir", str(refs_dir), "--out-root", str(tmp_path / "out"), "--phrase-set", "alexa", "--dry-run"])
+
+
+def test_main_computer_summary_phrase_list_unchanged_by_registry(tmp_path, monkeypatch):
+    """Backward-compat: the default (computer) summary.md phrase list is the
+    same 7 phrases with the same justifications as before PHRASE_SETS
+    existed -- and no sesame phrase leaks into it."""
+    refs_dir = make_refs_dir(tmp_path, ["voice1.wav"])
+    out_root = tmp_path / "out" / "adversaries"
+
+    stub = StubSynthesizer(sample_rate=16000)
+    monkeypatch.setattr(ga, "create_synthesizer", lambda name, **config: stub)
+    monkeypatch.setattr(ga, "transcribe_cached", lambda path, model: "a fake transcript")
+
+    exit_code = ga.main(["--refs-dir", str(refs_dir), "--out-root", str(out_root)])
+    assert exit_code == 0
+
+    summary = (out_root / "summary.md").read_text(encoding="utf-8")
+    assert '## Phrase list (phonetic justification against "computer" = K AH M P Y UW T ER)' in summary
+    for phrase, justification in ga.ADVERSARY_PHRASES:
+        assert f"- **{phrase!r}**: {justification}" in summary
+    for phrase, _ in ga.SESAME_ADVERSARY_PHRASES:
+        assert phrase not in summary
+    assert "S EH1 S AH0 M IY0" not in summary
+
+
+def test_main_sesame_full_flow_writes_sesame_rows_and_summary(tmp_path, monkeypatch):
+    refs_dir = make_refs_dir(tmp_path, ["voice1.wav", "voice2.wav"])
+    out_root = tmp_path / "out" / "adversaries"
+
+    stub = StubSynthesizer(sample_rate=16000)
+    monkeypatch.setattr(ga, "create_synthesizer", lambda name, **config: stub)
+    monkeypatch.setattr(ga, "transcribe_cached", lambda path, model: "a fake transcript")
+
+    exit_code = ga.main(["--refs-dir", str(refs_dir), "--out-root", str(out_root), "--phrase-set", "sesame"])
+    assert exit_code == 0
+
+    import csv
+
+    with (out_root / "manifest.csv").open(newline="", encoding="utf-8") as f:
+        rows = list(csv.DictReader(f))
+    assert list(rows[0].keys()) == fp.MANIFEST_FIELDS
+    assert len(rows) == len(ga.SESAME_ADVERSARY_PHRASES) * 2
+    assert {r["label"] for r in rows} == {ga.LABEL_UNKNOWN}
+    assert {r["source_dataset"] for r in rows} == {ga.SOURCE_DATASET}
+    assert {r["group_id"] for r in rows} == {p for p, _ in ga.SESAME_ADVERSARY_PHRASES}
+    for r in rows:
+        assert (out_root / r["path"]).is_file()
+        assert r["split"] == ""
+
+    # synthesize() was driven with the sesame phrases, never the computer ones
+    assert {text for text, _ in stub.calls} == {p for p, _ in ga.SESAME_ADVERSARY_PHRASES}
+
+    summary = (out_root / "summary.md").read_text(encoding="utf-8")
+    assert '## Phrase list (phonetic justification against "sesame" = S EH1 S AH0 M IY0)' in summary
+    for phrase, _ in ga.SESAME_ADVERSARY_PHRASES:
+        assert phrase in summary
+    for phrase, _ in ga.ADVERSARY_PHRASES:
+        assert phrase not in summary
 
 
 # ---------------------------------------------------------------------------

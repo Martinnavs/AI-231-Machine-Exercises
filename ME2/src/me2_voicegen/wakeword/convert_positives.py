@@ -6,13 +6,31 @@ the same way that module does, so a backend without it fails loudly).
 
 Deliberately NOT a full cartesian product (468 positives x 35 reference
 voices = 16,380 conversions -- measured-infeasible, see the owning
-ticket's `Established` note) and NOT the probabilistic zero-shot
-RESYNTHESIS branch `generate_conversions.py` also offers: resynthesis
-re-types content through Whisper transcription + the TTS LLM, which for a
-single-word wakeword risks the word itself changing. Only the
-content-preserving `convert_voice` path is used here. This module adapts
-that mechanism for K-sampling; it does not modify
-`generate_conversions.py` itself.
+ticket's `Established` note). `convert` mode (the default) is NOT the
+probabilistic zero-shot RESYNTHESIS branch `generate_conversions.py`
+also offers: that branch re-types content through Whisper transcription
++ the TTS LLM, which for a single-word wakeword risks the word itself
+changing, so `convert` mode uses only the content-preserving
+`convert_voice` path and is byte-identical to this module's pre-sesame
+behavior. `--mode resynthesize` (the wakeword-sesame ticket's T3; see
+`ME2/.scratch/wakeword-sesame/tickets/00-RECAP.md`) reuses this exact
+pairing plan but swaps the per-pair audio operation: it zero-shot
+synthesizes the fixed `--resynth-text` (default "Sesame.") from each
+reference voice, with the reference clip + its Whisper transcript as the
+voice prompt. The spoken content is a constant chosen by the operator,
+never re-derived from the source clip, which is what removes the
+word-drift risk the probabilistic branch had. Why it exists: the
+established facts in that ticket show no upstream real-recording
+"sesame" corpus exists, and the raw `positives_real` clips (2.0-3.07s)
+are too short to be safe zero-shot prompts. In this mode `group_id`
+becomes the reference voice (the only speaker-like identity left once
+the source clip's audio is discarded -- a shared ref voice must not
+straddle train and val/test), the filename becomes
+`audio/{ref_voice}/{source_clip_group_id}.wav` (the original real clip's
+id becomes a per-job disambiguator + `source_relpath` provenance only),
+and `source_dataset` is `cosyvoice_resynth`. This module adapts that
+mechanism for K-sampling; it does not modify `generate_conversions.py`
+itself.
 
 Output: `out/conversions/v2/wakeword/positives_converted/{audio/,manifest.csv,summary.md}`,
 schema = `docs/WAKEWORD-DATASET-CONTRACT.md` section 2's 10 columns plus one
@@ -37,12 +55,13 @@ import wave
 from collections import Counter
 from pathlib import Path
 
+from me2_voicegen.dataset_tools.transcribe import transcribe_cached
 from me2_voicegen.generation.cli_common import DEFAULT_BACKEND, build_config
 from me2_voicegen.generation.generate_conversions import (
     _list_audio_files,
     _resolve_prompt_wav,
 )
-from me2_voicegen.synthesis.base import save_wav
+from me2_voicegen.synthesis.base import VoicePrompt, save_wav
 from me2_voicegen.synthesis.factory import create_synthesizer, get_backend_class, list_backends
 from me2_voicegen.wakeword.fetch_positives import (
     MANIFEST_FIELDS as POSITIVES_REAL_FIELDS,
@@ -56,12 +75,27 @@ from me2_voicegen.wakeword.fetch_positives import (
     resolve_under,
     sanitize_component,
 )
+from me2_voicegen.wakeword.generate_adversaries import DEFAULT_WHISPER_MODEL
 
 logger = logging.getLogger(__name__)
 
 LABEL_WAKEWORD = "_wakeword_"
 SOURCE_DATASET = "cosyvoice_conversion"
+SOURCE_DATASET_RESYNTH = "cosyvoice_resynth"
 DEFAULT_K = 8
+DEFAULT_RESYNTH_TEXT = "Sesame."
+
+# Resynthesis-mode seconds/pair, re-derived for resynthesis by this
+# module's own timed pilot (the same convention PILOT_SECONDS_PER_PAIR
+# follows for convert_voice). Real measurement, NOT the conversion value
+# assumed to transfer (T3 of the wakeword-sesame ticket forbids that
+# assumption): 20-pair timed pilot, 2026-09-26 21:25, real CosyVoice2
+# backend on one A100 (GPU 7), real reference-clip trimming + format
+# finalization included, 20 ok / 0 failed, wall-clock 145.891s / 20 pairs
+# = 7.295s/pair (log: ME2/.scratch/wakeword-sesame/resynth_pilot.log). The
+# pilot also Whisper-transcribed its fresh refs (now sidecar-cached), so
+# the full 3,744-pair run should land at or slightly under this rate.
+RESYNTH_PILOT_SECONDS_PER_PAIR: float = 7.295
 
 MANIFEST_FIELDS = POSITIVES_REAL_FIELDS + ["ref_voice"]
 
@@ -263,6 +297,31 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     )
     parser.add_argument("--k", type=int, default=DEFAULT_K, help=f"reference voices sampled per source clip (default: {DEFAULT_K})")
     parser.add_argument("--seed", type=int, required=True, help="seed for deterministic (source, ref) pairing and ordering")
+    parser.add_argument(
+        "--mode",
+        default="convert",
+        choices=["convert", "resynthesize"],
+        help=(
+            "convert (default): content-preserving convert_voice timbre transfer of the "
+            "source clip -- byte-identical to this module's pre-sesame behavior. "
+            "resynthesize: zero-shot synthesize --resynth-text from each reference voice "
+            "(the wakeword-sesame ticket's T3); group_id becomes the ref voice, filename "
+            "audio/{ref_voice}/{source_clip_group_id}.wav, source_dataset cosyvoice_resynth"
+        ),
+    )
+    parser.add_argument(
+        "--resynth-text",
+        default=DEFAULT_RESYNTH_TEXT,
+        help=f"text synthesized per pair in resynthesize mode (default: {DEFAULT_RESYNTH_TEXT!r})",
+    )
+    parser.add_argument(
+        "--whisper-model",
+        default=DEFAULT_WHISPER_MODEL,
+        help=(
+            "Whisper model for reference-clip transcription, resynthesize mode only "
+            f"(default: {DEFAULT_WHISPER_MODEL!r}, matching generate_adversaries.DEFAULT_WHISPER_MODEL)"
+        ),
+    )
     parser.add_argument("--backend", default=DEFAULT_BACKEND, choices=list_backends())
     parser.add_argument("--device", default="auto", choices=["auto", "cuda", "cpu"])
     parser.add_argument(
@@ -304,11 +363,32 @@ def write_summary(
     n_failed: int,
     ref_voice_counts: Counter,
     elapsed_seconds: float,
+    mode: str = "convert",
+    resynth_text: str | None = None,
 ) -> None:
+    if mode == "resynthesize":
+        header = "# Wakeword resynthesized positives (zero-shot TTS, K-sampled) summary"
+        mode_line = (
+            f"mode=resynthesize: each pair zero-shot synthesizes {resynth_text!r} from its "
+            "reference voice (voice prompt = the reference clip + its Whisper transcript); "
+            "the source clip's audio is not used -- provenance only. `group_id` is the "
+            "reference voice (the only speaker-like identity left once the source audio is "
+            "discarded; a shared ref voice must not straddle train and val/test), the "
+            "filename is `audio/{ref_voice}/{source_clip_group_id}.wav`, and "
+            "`source_dataset` is `cosyvoice_resynth`."
+        )
+    else:
+        header = "# Wakeword converted positives (voice-conversion, K-sampled) summary"
+        mode_line = None
+
     lines = [
-        "# Wakeword converted positives (voice-conversion, K-sampled) summary",
+        header,
         "",
         f"seed={seed}, k={k}, source clips={n_source_clips}, planned pairs={n_planned_pairs}.",
+    ]
+    if mode_line is not None:
+        lines.append(mode_line)
+    lines += [
         f"This run: {n_ok} ok, {n_failed} failed, wall-clock {elapsed_seconds:.1f}s "
         f"({(elapsed_seconds / n_ok) if n_ok else float('nan'):.3f}s/pair realized).",
         "",
@@ -351,17 +431,38 @@ def main(argv: list[str] | None = None) -> int:
     ref_voice_planned = Counter(job["ref_voice"] for job in jobs)
 
     if args.dry_run:
-        projected_seconds = len(jobs) * PILOT_SECONDS_PER_PAIR
-        print(
-            f"dry-run: {len(positive_rows)} source clips x k={args.k} -> {len(jobs)} planned pairs "
-            f"to {args.out_root}"
-        )
-        print(
-            f"dry-run: projected wall-clock ~{projected_seconds:.0f}s "
-            f"(~{projected_seconds / 3600:.2f}h) at {PILOT_SECONDS_PER_PAIR:.3f}s/pair "
-            "(real pilot measurement, see module docstring/summary.md -- not the "
-            "generate_conversions.py baseline)"
-        )
+        if args.mode == "convert":
+            projected_seconds = len(jobs) * PILOT_SECONDS_PER_PAIR
+            print(
+                f"dry-run: {len(positive_rows)} source clips x k={args.k} -> {len(jobs)} planned pairs "
+                f"to {args.out_root}"
+            )
+            print(
+                f"dry-run: projected wall-clock ~{projected_seconds:.0f}s "
+                f"(~{projected_seconds / 3600:.2f}h) at {PILOT_SECONDS_PER_PAIR:.3f}s/pair "
+                "(real pilot measurement, see module docstring/summary.md -- not the "
+                "generate_conversions.py baseline)"
+            )
+        else:
+            print(
+                f"dry-run: {len(positive_rows)} source clips x k={args.k} -> {len(jobs)} planned pairs "
+                f"to {args.out_root} (mode=resynthesize, text={args.resynth_text!r})"
+            )
+            if RESYNTH_PILOT_SECONDS_PER_PAIR is None:
+                print(
+                    "dry-run: resynthesis wall-clock not projected -- this module has no "
+                    "resynthesis seconds/pair measurement yet (the conversion "
+                    "PILOT_SECONDS_PER_PAIR is a convert_voice measurement and does NOT "
+                    "transfer to synthesize); re-derive it with a small timed "
+                    "--max-conversions pilot, per this module's pilot-measurement convention"
+                )
+            else:
+                projected_seconds = len(jobs) * RESYNTH_PILOT_SECONDS_PER_PAIR
+                print(
+                    f"dry-run: projected wall-clock ~{projected_seconds:.0f}s "
+                    f"(~{projected_seconds / 3600:.2f}h) at {RESYNTH_PILOT_SECONDS_PER_PAIR:.3f}s/pair "
+                    "(real resynthesis pilot measurement, see module docstring/summary.md)"
+                )
         print(f"dry-run: planned per-reference-voice counts: {dict(sorted(ref_voice_planned.items()))}")
         return 0
 
@@ -369,10 +470,16 @@ def main(argv: list[str] | None = None) -> int:
     config = build_config(backend_cls, args.backend, args.device, args.opt)
     synthesizer = create_synthesizer(args.backend, **config)
 
-    convert_voice = getattr(synthesizer, "convert_voice", None)
-    if convert_voice is None:
-        logger.error("backend %r does not support voice conversion (no convert_voice method)", args.backend)
-        return 1
+    if args.mode == "convert":
+        convert_voice = getattr(synthesizer, "convert_voice", None)
+        if convert_voice is None:
+            logger.error("backend %r does not support voice conversion (no convert_voice method)", args.backend)
+            return 1
+    else:
+        synthesize = getattr(synthesizer, "synthesize", None)
+        if synthesize is None:
+            logger.error("backend %r does not support zero-shot synthesis (no synthesize method)", args.backend)
+            return 1
 
     staging_root = args.out_root.parent / f".{args.out_root.name}.staging"
     if staging_root.exists():
@@ -391,7 +498,20 @@ def main(argv: list[str] | None = None) -> int:
     if args.max_conversions is not None:
         logger.info("--max-conversions=%d: converting %d of %d planned pairs", args.max_conversions, len(active_jobs), len(jobs))
 
+    if args.mode == "resynthesize":
+        planned_dests = [f"audio/{j['ref_voice']}/{j['group_id']}.wav" for j in active_jobs]
+        if len(set(planned_dests)) != len(planned_dests):
+            dupes = sorted({d for d in set(planned_dests) if planned_dests.count(d) > 1})
+            print(
+                f"error: resynthesize filename-scheme collision on {len(dupes)} planned job(s), "
+                f"e.g. {dupes[0]!r} -- refusing to run (a collision would silently overwrite a pair)",
+                file=sys.stderr,
+            )
+            shutil.rmtree(staging_root, ignore_errors=True)
+            return 1
+
     start = time.perf_counter()
+    ref_transcripts: dict[Path, str] = {}
     for i, job in enumerate(active_jobs):
         pair_label = f"[{i + 1}/{len(active_jobs)}] {job['group_id']!r} x {job['ref_voice']!r}"
         try:
@@ -400,11 +520,28 @@ def main(argv: list[str] | None = None) -> int:
                 effective_ref_paths[ref_path] = _resolve_prompt_wav(ref_path, trimmed_cache_dir)
             effective_ref_path = effective_ref_paths[ref_path]
 
-            dest = resolve_under(
-                staging_root,
-                staging_root / "audio" / job["group_id"] / f"{job['ref_voice']}.wav",
-            )
-            result = convert_voice(str(job["source_path"]), str(effective_ref_path))
+            if args.mode == "convert":
+                dest = resolve_under(
+                    staging_root,
+                    staging_root / "audio" / job["group_id"] / f"{job['ref_voice']}.wav",
+                )
+                result = convert_voice(str(job["source_path"]), str(effective_ref_path))
+                row_group_id = job["group_id"]
+                row_source_dataset = SOURCE_DATASET
+            else:
+                if effective_ref_path not in ref_transcripts:
+                    ref_transcripts[effective_ref_path] = transcribe_cached(effective_ref_path, args.whisper_model)
+                dest = resolve_under(
+                    staging_root,
+                    staging_root / "audio" / job["ref_voice"] / f"{job['group_id']}.wav",
+                )
+                result = synthesize(
+                    args.resynth_text,
+                    prompt=VoicePrompt(wav_path=effective_ref_path, text=ref_transcripts[effective_ref_path]),
+                )
+                row_group_id = job["ref_voice"]
+                row_source_dataset = SOURCE_DATASET_RESYNTH
+
             save_wav(result, dest)
             duration, sample_rate, resampled = _finalize_wav_format(dest)
 
@@ -416,19 +553,28 @@ def main(argv: list[str] | None = None) -> int:
                     "duration": f"{duration:.6f}",
                     "sample_rate": str(sample_rate),
                     "resampled": "True" if resampled else "False",
-                    "source_dataset": SOURCE_DATASET,
+                    "source_dataset": row_source_dataset,
                     "source_relpath": job["source_relpath"],
-                    "group_id": job["group_id"],
+                    "group_id": row_group_id,
                     "split": "",
                     "ref_voice": job["ref_voice"],
                 }
             )
             n_ok += 1
             ref_voice_ok[job["ref_voice"]] += 1
-            logger.info("%s: converted -> %s", pair_label, dest.name)
+            logger.info(
+                "%s: %s -> %s",
+                pair_label,
+                "converted" if args.mode == "convert" else "resynthesized",
+                dest.name,
+            )
         except Exception:
             n_failed += 1
-            logger.exception("%s: voice conversion failed", pair_label)
+            logger.exception(
+                "%s: %s failed",
+                pair_label,
+                "voice conversion" if args.mode == "convert" else "resynthesis",
+            )
     elapsed = time.perf_counter() - start
 
     try:
@@ -443,6 +589,8 @@ def main(argv: list[str] | None = None) -> int:
             n_failed=n_failed,
             ref_voice_counts=ref_voice_ok,
             elapsed_seconds=elapsed,
+            mode=args.mode,
+            resynth_text=args.resynth_text,
         )
     except OSError as exc:
         print(f"error: {exc}", file=sys.stderr)
@@ -453,7 +601,10 @@ def main(argv: list[str] | None = None) -> int:
         shutil.rmtree(args.out_root)
     staging_root.rename(args.out_root)
 
-    print(f"conversions: {n_ok} ok, {n_failed} failed (of {len(active_jobs)} attempted, {len(jobs)} planned)")
+    print(
+        f"{'conversions' if args.mode == 'convert' else 'resyntheses'}: {n_ok} ok, "
+        f"{n_failed} failed (of {len(active_jobs)} attempted, {len(jobs)} planned)"
+    )
     print(f"output dir: {args.out_root}")
     print(f"wall-clock: {elapsed:.3f}s")
 

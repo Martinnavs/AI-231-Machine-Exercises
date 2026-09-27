@@ -30,6 +30,7 @@ from pathlib import Path
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
+from torch.utils.data.sampler import WeightedRandomSampler
 
 from me2_voicegen.common.augment import Augmenter
 from me2_voicegen.common.features import LogMelFeatureExtractor
@@ -42,14 +43,20 @@ from me2_voicegen.wakeword.model import (
     param_count,
 )
 
-LICENSE_NOTE = (
-    "Checkpoint trained on out/conversions/v2/wakeword/, which includes "
-    "background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into "
-    "adversaries_noisy/positives_converted_noisy. Per "
-    "docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on "
-    "this data inherits CC-BY-NC-SA-4.0: non-commercial use only, "
-    "share-alike on redistribution."
-)
+def license_note(manifest_path: Path) -> str:
+    """Report-prose license note, naming the dataset root actually used for
+    this run (manifest_path's parent) rather than a hardcoded "computer"
+    path -- this repo now trains more than one wakeword phrase-instance
+    (see docs/WAKEWORD-DATASET-CONTRACT.md section 1) against this same
+    module, so the note must reflect whichever manifest was passed."""
+    return (
+        f"Checkpoint trained on {manifest_path.parent}/, which includes "
+        "background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into "
+        "adversaries_noisy/positives_converted_noisy. Per "
+        "docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on "
+        "this data inherits CC-BY-NC-SA-4.0: non-commercial use only, "
+        "share-alike on redistribution."
+    )
 
 DEFAULT_MANIFEST = (
     Path(__file__).resolve().parents[3] / "out" / "conversions" / "v2" / "wakeword" / "manifest.csv"
@@ -115,7 +122,37 @@ def per_class_metrics(model: nn.Module, loader: DataLoader, device: torch.device
 
 
 _FILIPINO_REF_VOICE_RE = re.compile(r"^(tagalog|ilonggo)")
-_FILIPINO_SOURCE_DATASETS = frozenset({"fil50_persona", "fil50_persona_noisy"})
+_FILIPINO_SOURCE_DATASETS = frozenset(
+    {"fil50_persona", "fil50_persona_noisy", "accent_mined_unknown", "accent_mined_conversion"}
+)
+
+# Iteration-3 accent-matched negatives (docs/20260925_suggestions.md "Wakeword
+# Training Shift"): rows mined by `accent_balance.ww_negatives` -- the exact
+# 17 reference + 124 sapinsapin voices speaking conversational Tagalog as
+# `_unknown_`. `--oversample-accent-unknown` up-samples exactly these rows.
+_ACCENT_MINED_SOURCE_DATASETS = frozenset({"accent_mined_unknown", "accent_mined_conversion"})
+
+
+def build_accent_unknown_sampler(dataset: WakewordDataset, factor: float):
+    """Per-epoch weighted sampler for the TRAIN split only.
+
+    Returns None when `factor == 1.0` so the DataLoader keeps today's exact
+    `shuffle=True` behavior (byte-identical sample order for a given seed);
+    otherwise a `WeightedRandomSampler` that draws `len(dataset)` items per
+    epoch with each accent-mined row weighted `factor` vs 1.0 for every other
+    row (weighted sampling WITH replacement -- the minimal correct weighted
+    epoch sampler: without replacement, drawing N items from N is just a
+    reordering and cannot up-sample at all). Epoch length is unchanged, so the
+    OneCycleLR step count is untouched."""
+    if factor == 1.0:
+        return None
+    if factor < 1.0:
+        raise ValueError(f"--oversample-accent-unknown must be >= 1.0, got {factor}")
+    weights = torch.tensor(
+        [factor if row.get("source_dataset") in _ACCENT_MINED_SOURCE_DATASETS else 1.0 for row in dataset.rows],
+        dtype=torch.double,
+    )
+    return WeightedRandomSampler(weights, num_samples=len(dataset), replacement=True)
 
 
 def classify_ww_row_is_filipino(row: dict) -> bool:
@@ -185,7 +222,7 @@ def write_eval_report(
     accent_recall = wakeword_accent_recall(model, val_dataset, device)
 
     eval_report = {
-        "license": LICENSE_NOTE,
+        "license": license_note(manifest_path),
         "checkpoint_path": str(checkpoint_path),
         "checkpoint_meta": checkpoint_meta,
         "manifest_path": str(manifest_path),
@@ -244,6 +281,15 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--patience", type=int, default=10, help="epochs without val-loss improvement before early stop")
     parser.add_argument("--amp", action="store_true", default=None, help="default: on for cuda, off for cpu")
     parser.add_argument("--no-amp", dest="amp", action="store_false")
+    parser.add_argument(
+        "--oversample-accent-unknown",
+        type=float,
+        default=1.0,
+        help="iteration-3 'Wakeword Training Shift': up-sample the accent-mined negative rows "
+        "(source_dataset accent_mined_unknown/accent_mined_conversion) by this factor during TRAINING "
+        "(train split only, weighted per-epoch sampling). Default 1.0 = off, byte-identical to the "
+        "existing shuffle.",
+    )
     parser.add_argument("--p-noise", type=float, default=0.5, help="dynamic SNR-mixing probability (handoff doc's requirement)")
     parser.add_argument("--p-specaugment", type=float, default=0.5)
     parser.add_argument("--noise-root", type=Path, default=DEFAULT_NOISE_ROOT)
@@ -317,10 +363,13 @@ def main(argv: list[str] | None = None) -> None:
     )
     val_dataset = WakewordDataset(args.manifest, split="val", augmenter=None, shift=False)
 
+    # None when --oversample-accent-unknown == 1.0 (today's exact shuffle).
+    train_sampler = build_accent_unknown_sampler(train_dataset, args.oversample_accent_unknown)
     train_loader = DataLoader(
         train_dataset,
         batch_size=args.batch_size,
-        shuffle=True,
+        shuffle=(train_sampler is None),
+        sampler=train_sampler,
         num_workers=args.num_workers,
         collate_fn=build_train_collate(feature_extractor),
         drop_last=False,
@@ -429,11 +478,12 @@ def main(argv: list[str] | None = None) -> None:
                     "config": dataclasses.asdict(config),
                     "labels": list(LABELS),
                     "seed": args.seed,
+                    "oversample_accent_unknown": args.oversample_accent_unknown,
                     "epoch": epoch,
                     "val_loss": val_loss,
                     "val_acc": val_acc,
                     "window_seconds": WAKEWORD_WINDOW_SECONDS,
-                    "license": LICENSE_NOTE,
+                    "license": license_note(args.manifest),
                 },
                 checkpoints_dir / "checkpoint.pt",
             )
@@ -446,8 +496,9 @@ def main(argv: list[str] | None = None) -> None:
 
     total_wall_s = time.monotonic() - start_time
     loss_history = {
-        "license": LICENSE_NOTE,
+        "license": license_note(args.manifest),
         "seed": args.seed,
+        "oversample_accent_unknown": args.oversample_accent_unknown,
         "preset": args.preset,
         "device": str(device),
         "max_minutes": args.max_minutes,

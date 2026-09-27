@@ -1,9 +1,11 @@
-"""Scrub `out/conversions/v2/common_voice_negative` for any "computer" token
-(never done on this corpus before -- it was previously only scrubbed
-against the 20 VCM command phrases, which don't include "computer"), then
-seeded-random sample the remainder down to `--target-count`, copy+resample
-each selected clip to this feature's 16kHz/mono/16-bit invariant, and write
-a self-contained subset:
+"""Scrub `out/conversions/v2/common_voice_negative` for any token of the
+target wakeword (default "computer"; parameterized via `--scrub-word` for
+parallel phrase instances such as the comparison-only "sesame" dataset) --
+never done for that word on this corpus before, which was previously only
+scrubbed against the 20 VCM command phrases -- then seeded-random sample
+the remainder down to `--target-count`, copy+resample each selected clip to
+this feature's 16kHz/mono/16-bit invariant, and write a self-contained
+subset:
 `out/conversions/v2/wakeword/common_voice_negative_sample/{audio/,manifest.csv,summary.md}`.
 
 This exists to broaden the `_unknown_` class beyond `adversaries`' 320
@@ -42,15 +44,27 @@ SOURCE_DATASET = "common_voice_negative"
 DEFAULT_COMMON_VOICE_ROOT = Path("out/conversions/v2/common_voice_negative")
 DEFAULT_OUT_ROOT = Path("out/conversions/v2/wakeword/common_voice_negative_sample")
 
-# Word-boundary, case-insensitive; catches "computer", "computers",
-# "computer's" (ticket 04's own stated requirement -- a bare-word match
-# without the possessive/plural forms would silently under-scrub).
-COMPUTER_TOKEN_RE = re.compile(r"\bcomputer(?:'s|s)?\b", re.IGNORECASE)
+DEFAULT_SCRUB_WORD = "computer"
+
+
+def _scrub_token_re(word: str) -> re.Pattern[str]:
+    """Word-boundary, case-insensitive scrub regex for `word`, catching the
+    bare word plus its possessive/plural forms (`word's`/`words`) -- a
+    bare-word match without those forms would silently under-scrub (ticket
+    04's stated requirement for "computer"; generalized to any scrub word).
+    Built at runtime from the CLI-provided word so each phrase instance
+    scrubs independently for its own word, never OR'd with another's."""
+    return re.compile(rf"\b{re.escape(word)}(?:'s|s)?\b", re.IGNORECASE)
+
+
+def contains_scrub_token(row: dict, word: str = DEFAULT_SCRUB_WORD) -> bool:
+    text = f"{row.get('transcript', '')} {row.get('sentence', '')}"
+    return bool(_scrub_token_re(word).search(text))
 
 
 def contains_computer_token(row: dict) -> bool:
-    text = f"{row.get('transcript', '')} {row.get('sentence', '')}"
-    return bool(COMPUTER_TOKEN_RE.search(text))
+    """Backward-compatible default-word wrapper (pre-`--scrub-word` API)."""
+    return contains_scrub_token(row, DEFAULT_SCRUB_WORD)
 
 
 def load_common_voice_manifest(root: Path) -> list[dict]:
@@ -68,20 +82,23 @@ def load_common_voice_manifest(root: Path) -> list[dict]:
     return rows
 
 
-def scrub_and_sample(rows: list[dict], target_count: int, seed: int) -> tuple[list[dict], int]:
+def scrub_and_sample(
+    rows: list[dict], target_count: int, seed: int, scrub_word: str = DEFAULT_SCRUB_WORD
+) -> tuple[list[dict], int]:
     """Returns (sampled rows, dropped-by-scrub count). Sampling is seeded,
     without replacement, over rows sorted by filename first (determinism
     independent of on-disk manifest row order). Raises if the scrubbed pool
-    can't supply `target_count` -- never silently clips."""
+    can't supply `target_count` -- never silently clips. `scrub_word`
+    defaults to "computer" (the pre-`--scrub-word` behavior)."""
     scrubbed = sorted(
-        (r for r in rows if not contains_computer_token(r)), key=lambda r: r["filename"]
+        (r for r in rows if not contains_scrub_token(r, scrub_word)), key=lambda r: r["filename"]
     )
     dropped = len(rows) - len(scrubbed)
 
     if target_count > len(scrubbed):
         raise ManifestValidationError(
             f"requested target_count={target_count} exceeds the scrubbed pool "
-            f"({len(scrubbed)} of {len(rows)} rows survive the 'computer'-token scrub)"
+            f"({len(scrubbed)} of {len(rows)} rows survive the '{scrub_word}'-token scrub)"
         )
 
     rng = random.Random(seed)
@@ -141,15 +158,18 @@ def write_manifest(out_root: Path, rows: list[dict]) -> Path:
     return manifest_path
 
 
-def write_summary(out_root: Path, *, seed: int, target_count: int, total_pool: int, dropped: int) -> None:
+def write_summary(
+    out_root: Path, *, seed: int, target_count: int, total_pool: int, dropped: int, scrub_word: str = DEFAULT_SCRUB_WORD
+) -> None:
     group_counts: dict[str, int] = {}
     lines = [
         "# `common_voice_negative_sample` -- scrubbed/sampled negative-speech summary",
         "",
         f"seed={seed}. {total_pool} rows in `common_voice_negative`, {dropped} dropped by the "
-        "'computer'-token scrub (case-insensitive, catches 'computer'/'computers'/\"computer's\", "
-        "never applied to this corpus before -- it was previously only scrubbed against the 20 "
-        "VCM command phrases), {remaining} survive, {target_count} sampled without replacement.".format(
+        f"'{scrub_word}'-token scrub (word-boundary, case-insensitive, catches "
+        f"'{scrub_word}'/'{scrub_word}s'/'{scrub_word}'s -- never applied to this corpus before "
+        "for this word; it was previously only scrubbed against the 20 VCM command phrases), "
+        "{remaining} survive, {target_count} sampled without replacement.".format(
             remaining=total_pool - dropped, target_count=target_count
         ),
         "",
@@ -169,6 +189,11 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--out-root", type=Path, default=DEFAULT_OUT_ROOT)
     parser.add_argument("--target-count", type=int, required=True)
     parser.add_argument("--seed", type=int, required=True)
+    parser.add_argument(
+        "--scrub-word",
+        default=DEFAULT_SCRUB_WORD,
+        help=f"wakeword token to scrub before sampling (default: {DEFAULT_SCRUB_WORD!r})",
+    )
     parser.add_argument("--dry-run", action="store_true")
     return parser.parse_args(argv)
 
@@ -179,14 +204,14 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         rows = load_common_voice_manifest(common_voice_root)
-        sampled, dropped = scrub_and_sample(rows, args.target_count, args.seed)
+        sampled, dropped = scrub_and_sample(rows, args.target_count, args.seed, scrub_word=args.scrub_word)
     except ManifestValidationError as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
     if args.dry_run:
         print(
-            f"dry-run: {len(rows)} rows, {dropped} dropped by scrub, "
+            f"dry-run: {len(rows)} rows, {dropped} dropped by the '{args.scrub_word}' scrub, "
             f"{len(rows) - dropped} survive, {len(sampled)} would be sampled -> {args.out_root}"
         )
         return 0
@@ -207,6 +232,7 @@ def main(argv: list[str] | None = None) -> int:
             target_count=len(sampled),
             total_pool=len(rows),
             dropped=dropped,
+            scrub_word=args.scrub_word,
         )
     except (ManifestValidationError, PathTraversalError, RuntimeError, OSError) as exc:
         print(f"error: {exc}", file=sys.stderr)

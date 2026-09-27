@@ -1,7 +1,13 @@
-"""Generate phonetic near-miss TTS adversaries of "computer" for the
-`_unknown_` class (docs/WAKEWORD-DATASET-CONTRACT.md sections 2-3), across
-this project's existing reference-voice pool (`$HOME/cosy-voice-data/References`
+"""Generate phonetic near-miss TTS adversaries of a wakeword phrase set for
+the `_unknown_` class (docs/WAKEWORD-DATASET-CONTRACT.md sections 2-3),
+across this project's existing reference-voice pool (`$HOME/cosy-voice-data/References`
 by default -- same pool `generate_conversions.py` already drives).
+
+Phrase sets (`--phrase-set`, default `computer`): `PHRASE_SETS` maps a set
+name to its (phrase, justification) tuples. `computer` is the production
+wakeword and the default -- with it (or no flag) this module behaves exactly
+as before this registry existed. `sesame` is a parallel, comparison-only
+instance (its own dataset root; not a production cutover).
 
 Dispatch is direct through `synthesis.factory` rather than
 `generation/generate_personas.py`'s manifest-driven persona flow:
@@ -111,6 +117,75 @@ ADVERSARY_PHRASES: tuple[tuple[str, str], ...] = (
         "speech after the wakeword still triggers a false positive.",
     ),
 )
+
+# Phonetic near-misses of "sesame" (S EH1 S AH0 M IY0) for the parallel,
+# comparison-only sesame wakeword instance. Every phrase is chosen to
+# overlap that sequence in onset, stress pattern, or syllable
+# count/coda; none may ever be "hey sesame" or contain a "hey" token
+# (same contract as ADVERSARY_PHRASES; guarded by a unit test).
+SESAME_ADVERSARY_PHRASES: tuple[tuple[str, str], ...] = (
+    (
+        "Assess me",
+        "AH S EH S M IY -- same phoneme inventory as \"sesame\" (S, EH, S, "
+        "AH, M, IY), differing mainly in AH's position and the word split "
+        "-- tests order- vs. bag-of-phoneme sensitivity.",
+    ),
+    (
+        "Says me",
+        "S EH Z M IY -- shares the stressed onset S EH and the coda M IY; "
+        "the medial S AH collapses to Z, dropping a syllable.",
+    ),
+    (
+        "System",
+        "S IH S T AH M -- shares the initial S, the second medial S, and "
+        "AH M immediately pre-coda; differs in the first vowel and an "
+        "inserted T.",
+    ),
+    (
+        "Assembly",
+        "AH S EH M B L IY -- shares the stressed EH and the M...IY coda "
+        "tail; diverges via the inserted B L cluster.",
+    ),
+    (
+        "Session",
+        "S EH SH AH N -- shares the onset S EH and the following AH; a "
+        "near-minimal pair (SH for S, N for M).",
+    ),
+    (
+        "Cesium",
+        "S IY Z IY AH M -- shares the initial S and the terminal AH M; an "
+        "orthographic near-miss confirmed phonetically.",
+    ),
+    (
+        "Recipe",
+        "R EH S AH P IY -- shares the exact medial EH-S-AH and the final "
+        "IY, plus the 3-syllable stress-initial cadence.",
+    ),
+    (
+        "Sicily",
+        "S IH S AH L IY -- shares the onset S, the medial S-AH, the final "
+        "IY, and the syllable/stress shape; differs in the first vowel and "
+        "L for M.",
+    ),
+    (
+        "Sensory",
+        "S EH N S ER IY -- shares the stressed onset S EH, the second S, "
+        "and the final IY; an inserted N, with ER replacing M.",
+    ),
+)
+
+# Phrase-set registry: set name -> (phrase, justification) tuples.
+PHRASE_SETS: dict[str, tuple[tuple[str, str], ...]] = {
+    "computer": ADVERSARY_PHRASES,
+    "sesame": SESAME_ADVERSARY_PHRASES,
+}
+
+# Target-word label (word + ARPABET) for summary.md's phrase-list header --
+# the word each set's phrases are near-misses of.
+PHRASE_SET_TARGETS: dict[str, str] = {
+    "computer": '"computer" = K AH M P Y UW T ER',
+    "sesame": '"sesame" = S EH1 S AH0 M IY0',
+}
 
 
 def _phrase_slug(phrase: str) -> str:
@@ -269,6 +344,8 @@ def write_manifest(out_root: Path, rows: list[dict]) -> Path:
 def write_summary(
     out_root: Path,
     *,
+    phrases: tuple[tuple[str, str], ...],
+    target: str,
     refs_dir: Path,
     backend: str,
     whisper_model: str,
@@ -286,10 +363,10 @@ def write_summary(
         f"Seed: {seed}. Max voices per phrase: "
         f"{max_voices_per_phrase if max_voices_per_phrase is not None else 'all (full pool)'}.",
         "",
-        "## Phrase list (phonetic justification against \"computer\" = K AH M P Y UW T ER)",
+        f"## Phrase list (phonetic justification against {target})",
         "",
     ]
-    for phrase, justification in ADVERSARY_PHRASES:
+    for phrase, justification in phrases:
         lines.append(f"- **{phrase!r}**: {justification}")
     lines += [
         "",
@@ -316,9 +393,16 @@ def write_summary(
 def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(
         description=(
-            "Generate phonetic near-miss TTS adversaries of \"computer\" for "
-            "the _unknown_ class, across a reference-voice pool."
+            "Generate phonetic near-miss TTS adversaries of the selected "
+            "wakeword phrase set (default: \"computer\") for the _unknown_ "
+            "class, across a reference-voice pool."
         )
+    )
+    parser.add_argument(
+        "--phrase-set",
+        default="computer",
+        choices=sorted(PHRASE_SETS),
+        help="adversary phrase set to generate (default: computer; the production wakeword)",
     )
     parser.add_argument("--refs-dir", type=Path, default=DEFAULT_REFS_DIR)
     parser.add_argument(
@@ -360,10 +444,13 @@ def main(argv: list[str] | None = None) -> int:
     out_root: Path = args.out_root
     refs_dir: Path = args.refs_dir
 
+    phrases = PHRASE_SETS[args.phrase_set]
+    target = PHRASE_SET_TARGETS[args.phrase_set]
+
     try:
         ref_files = list_reference_voices(refs_dir)
         selected = select_reference_voices(ref_files, args.max_voices_per_phrase, args.seed)
-        jobs = build_jobs(ADVERSARY_PHRASES, selected, refs_dir)
+        jobs = build_jobs(phrases, selected, refs_dir)
     except (ValueError, ManifestValidationError, PathTraversalError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
@@ -371,7 +458,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.dry_run:
         print(
             f"dry-run: would synthesize {len(jobs)} clips "
-            f"({len(ADVERSARY_PHRASES)} phrases x {len(selected)} reference voices) "
+            f"({len(phrases)} phrases x {len(selected)} reference voices) "
             f"to {out_root} (model not loaded)"
         )
         return 0
@@ -420,6 +507,8 @@ def main(argv: list[str] | None = None) -> int:
     write_manifest(staging_root, rows)
     write_summary(
         staging_root,
+        phrases=phrases,
+        target=target,
         refs_dir=refs_dir,
         backend=args.backend,
         whisper_model=args.whisper_model,

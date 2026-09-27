@@ -49,6 +49,55 @@ def test_contains_computer_token(text, expected):
     assert bue.contains_computer_token(row) is expected
 
 
+@pytest.mark.parametrize(
+    "text,expected",
+    [
+        ("open sesame now", True),
+        ("the sesames are ready", True),
+        ("that is sesame's fault", True),
+        ("SESAME, open", True),
+        ("turn on the computer", False),
+        ("sesamean does not contain the bare word", False),
+        ("", False),
+    ],
+)
+def test_contains_scrub_token_sesame_scoping(text, expected):
+    row = {"transcript": text, "sentence": ""}
+    assert bue.contains_scrub_token(row, "sesame") is expected
+
+
+def test_scrub_words_are_independently_scoped_never_ored():
+    """A 'sesame' scrub drops only sesame variants (a computer-only row
+    survives it) and the default 'computer' scrub drops only computer
+    variants (a sesame-only row survives it) -- the two scrubs must never
+    be OR'd together."""
+    rows = [
+        _row(0, sentence="open sesame please"),
+        _row(1, sentence="turn on the computer"),
+    ]
+    sampled_sesame, dropped_sesame = bue.scrub_and_sample(rows, target_count=1, seed=0, scrub_word="sesame")
+    assert dropped_sesame == 1
+    assert sampled_sesame[0]["sentence"] == "turn on the computer"
+
+    sampled_default, dropped_default = bue.scrub_and_sample(rows, target_count=1, seed=0)
+    assert dropped_default == 1
+    assert sampled_default[0]["sentence"] == "open sesame please"
+
+
+def test_scrub_and_sample_sesame_drops_all_three_forms():
+    rows = [
+        _row(0, sentence="sesame"),
+        _row(1, sentence="sesames"),
+        _row(2, sentence="sesame's"),
+        _row(3, sentence="plain speech"),
+        _row(4, sentence="turn on the computer"),
+    ]
+    sampled, dropped = bue.scrub_and_sample(rows, target_count=2, seed=0, scrub_word="sesame")
+    assert dropped == 3
+    sentences = {r["sentence"] for r in sampled}
+    assert sentences == {"plain speech", "turn on the computer"}
+
+
 def test_scrub_and_sample_drops_and_samples_deterministically():
     rows = [_row(i, transcript="turn on the computer" if i % 5 == 0 else "hello there") for i in range(20)]
     sampled_a, dropped_a = bue.scrub_and_sample(rows, target_count=5, seed=1)
@@ -104,6 +153,46 @@ def test_main_end_to_end_resamples_and_groups(tmp_path, vcm_wav_factory):
         assert (out_root / row["path"]).is_file()
         assert row["group_id"] == row["group_id"]  # non-empty, derived from source_file
         assert row["group_id"]
+
+
+def test_main_sesame_scrub_end_to_end_and_summary_reports_real_word(tmp_path, vcm_wav_factory):
+    root = tmp_path / "common_voice_negative"
+    rows = [
+        _row(0, sentence="open sesame now"),
+        _row(1, sentence="hello there"),
+        _row(2, sentence="the sesames are great"),
+        _row(3, sentence="turn on the computer"),
+    ]
+    _write_common_voice(root, vcm_wav_factory, rows)
+
+    out_root = tmp_path / "common_voice_negative_sample"
+    exit_code = bue.main(
+        [
+            "--common-voice-root",
+            str(root),
+            "--out-root",
+            str(out_root),
+            "--target-count",
+            "2",
+            "--seed",
+            "0",
+            "--scrub-word",
+            "sesame",
+        ]
+    )
+
+    assert exit_code == 0
+    with (out_root / "manifest.csv").open(newline="") as f:
+        out_rows = list(csv.DictReader(f))
+    # exactly the two non-sesame rows survived and were sampled (the
+    # computer-only row is NOT scrubbed by a sesame scrub)
+    assert {r["filename"] for r in out_rows} == {"cv0001.wav", "cv0003.wav"}
+    for r in out_rows:
+        assert (out_root / r["path"]).is_file()
+    summary = (out_root / "summary.md").read_text(encoding="utf-8")
+    assert "'sesame'-token scrub" in summary
+    assert "catches 'sesame'/'sesames'/'sesame's" in summary
+    assert "2 dropped by the" in summary  # the two sesame rows, not the computer row
 
 
 def test_dry_run_writes_nothing(tmp_path, vcm_wav_factory):
