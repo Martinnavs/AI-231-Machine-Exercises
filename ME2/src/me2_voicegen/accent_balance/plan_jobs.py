@@ -13,7 +13,9 @@ Job text:
     target-command row, sampled with replacement -- the synthetic Filipino
     half then mirrors the real intent/phrasing distribution instead of
     inventing its own.
-  - wakeword: every job is the literal wakeword utterance, "Computer.".
+  - wakeword: every job is the literal wakeword utterance passed via
+    `--wakeword-text` (default "Computer."; override for a different
+    wakeword phrase-instance, e.g. "Sesame.").
 
 Voice pool (`--voice-sources`):
   - `all` (default): each split's own voices.csv rows, unchanged.
@@ -143,6 +145,9 @@ def noisy_fraction_ww(manifest_path: Path) -> dict[str, float]:
     return {s: (sum(v) / len(v) if v else 0.0) for s, v in by_split.items()}
 
 
+DEFAULT_WAKEWORD_TEXT = "Computer."
+
+
 def build_jobs(
     *,
     model: str,
@@ -153,6 +158,7 @@ def build_jobs(
     text_source: list[dict] | None,
     noisy_fraction: float,
     job_id_start: int,
+    wakeword_text: str = DEFAULT_WAKEWORD_TEXT,
 ) -> list[dict]:
     if n_jobs <= 0:
         return []
@@ -171,7 +177,7 @@ def build_jobs(
             src = rng.choice(text_source)
             text, label, ref = src["transcript"], src["label"], src["filename"]
         else:
-            text, label, ref = "Computer.", "_wakeword_", ""
+            text, label, ref = wakeword_text, "_wakeword_", ""
         jobs.append(
             {
                 "job_id": f"{model}_{split}_{job_id_start + i:06d}",
@@ -196,6 +202,7 @@ def plan(
     seed: int,
     pilot: int | None,
     voice_sources: str = "all",
+    wakeword_text: str = DEFAULT_WAKEWORD_TEXT,
 ) -> tuple[list[dict], dict]:
     if voice_sources not in VOICE_SOURCES:
         raise ValueError(f"unknown voice_sources {voice_sources!r}, expected one of {VOICE_SOURCES}")
@@ -251,6 +258,7 @@ def plan(
                 text_source=text_source,
                 noisy_fraction=noisy_frac,
                 job_id_start=0,
+                wakeword_text=wakeword_text,
             )
             jobs.extend(model_jobs)
         return jobs, stats
@@ -273,6 +281,7 @@ def plan(
                 text_source=text_source,
                 noisy_fraction=noisy_frac_by_split[split],
                 job_id_start=job_id_counter,
+                wakeword_text=wakeword_text,
             )
             job_id_counter += len(model_jobs)
             jobs.extend(model_jobs)
@@ -301,6 +310,10 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
                         help="voice pool per split: 'all' (default, today's behavior), "
                         "'references' (every ref_ voice in every split, split column ignored), "
                         "'sapinsapin' (only the split's own fsc_ voices)")
+    parser.add_argument("--wakeword-text", default=DEFAULT_WAKEWORD_TEXT,
+                        help=f"literal wakeword utterance every wakeword job synthesizes "
+                        f"(default: {DEFAULT_WAKEWORD_TEXT!r} -- override for a different "
+                        "wakeword phrase-instance, e.g. 'Sesame.')")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("-v", "--verbose", action="store_true")
     return parser.parse_args(argv)
@@ -318,6 +331,7 @@ def main(argv: list[str] | None = None) -> int:
         seed=args.seed,
         pilot=args.pilot,
         voice_sources=args.voice_sources,
+        wakeword_text=args.wakeword_text,
     )
     dest = write_jobs_csv(args.out, jobs)
 

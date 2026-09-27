@@ -5,6 +5,11 @@ and its integration into the streaming `ListeningGate` seam. See `PROCESS-OVERVI
 this fits into the whole pipeline, and `WAKEWORD-DATASET-CONTRACT.md` for the exact schema/
 licensing contract this doc doesn't repeat.
 
+A parallel, comparison-only **"sesame" phrase instance** (same pipeline modules, its own
+dataset root and checkpoint) is documented in the section
+["Parallel "sesame" phrase instance (comparison-only)"](#parallel-sesame-phrase-instance-comparison-only)
+below.
+
 ## Dataset build pipeline
 
 Ordered Makefile stages, run from `ME2/` (`WAKEWORD_ROOT = out/conversions/v2/wakeword/`):
@@ -39,6 +44,87 @@ intelligibility; most flags are the QA tool's own ratio-scoring quirk, not real 
 `adversaries_noisy` 45.3%, `common_voice_negative_sample` ~53–55% — this asymmetry is why span
 precomputation is applied only to the `_wakeword_` chain + `common_voice_negative_sample`, while
 `adversaries`/`adversaries_noisy` stay on a live-VAD-with-fallback path.
+
+## Parallel "sesame" phrase instance (comparison-only)
+
+Built 2026-09-27 (ticket: `ME2/.scratch/wakeword-sesame/tickets/00-RECAP.md`
+in the main tree). Motivation: "computer" has too much pronunciation variance
+as a wakeword. It is a **parallel, comparison-only** dataset
+(`out/conversions/v2/wakeword-sesame/`) + DS-CNN checkpoint
+(`out/wakeword-sesame/`), reusing this doc's pipeline modules unchanged
+(`generate_adversaries.py` gained a `--phrase-set` switch in T1,
+`build_unknown_external.py` a `--scrub-word` switch in T2 — both
+backward-compatible, default behavior byte-identical). **Not a production
+cutover**: the shipped "computer" checkpoints (`out/wakeword/`,
+`out/wakeword-fil50/`) and the original `out/conversions/v2/wakeword/`
+dataset are untouched; promotion of "sesame" is a separate later human
+decision (mirrors the fil50-promotion precedent).
+
+**Why the positive class had to be built differently (the part that isn't
+just re-running stages):** `positives_real`/`positives_converted` are
+"computer"-only by construction — voice conversion is content-preserving
+timbre transfer, and neither upstream real corpus (Picovoice, Mycroft) has
+a "sesame" directory (verified live against both repos). So the sesame
+positives come from in-repo TTS, in two QA-gated batches (dual-transcriber
+QA, faster-whisper EN+TL small, threshold 0.80, same tool/threshold as
+fil50 stage 3):
+
+| batch | content | QA result |
+|---|---|---|
+| `positives_seed_resynth/` (renamed from `positives_converted/` at the combine) | 329 QA-passed zero-shot resyntheses of "Sesame." across reference voices (`convert_positives.py --mode resynthesize`, T3) | 329/3,744 (8.8%) — CosyVoice's "synthesis text too short than prompt" warning line up with the failure mode |
+| `positives_converted_v2/` | 816 QA-passed voice-converted copies of the 329 verified seeds (unmodified `--mode convert`, k=8, per-seed-unique `group_id` remap to avoid output-path collisions) | 816/2,632 (31.0%), per-voice 12.2%–52.0% |
+
+**Combined positive class W = 1,145** (329 + 816, both used together).
+Because the unchanged `build_dataset.py` only sweeps in its fixed subset
+names, the combined class lives under the canonical `positives_converted/`
+name (physical copies of both batches' audio + merged manifest; the two
+original batch dirs stay intact as provenance), and `positives_real/` is an
+intentionally empty, documented placeholder (no upstream real corpus exists
+for "sesame"). Consequence: all sesame `_wakeword_` rows have no
+precomputed speech spans (nothing to join from) and train on the
+documented live-VAD-with-fallback path — the same supported state
+`adversaries`/`adversaries_noisy` always use.
+
+**Stage numbers (realized, all seeds 0, same conventions as the table
+above):** 9 sesame adversary phrases × 35 reference voices = **315/315**
+TTS renders (`adversaries/`); `unknown_target = max(1145 − 315, 100) =
+830` → **830 rows** in `common_voice_negative_sample/` (scrubbed for
+"sesame" — 0 of 28,186 corpus rows matched, so the full pool survived);
+`silence_target = round(1145 × 1220/5492) = 254` → **254 rows** in
+`silence_synthetic/`; noise mixing (p=0.35) → **102** `adversaries_noisy/`
++ **410** `positives_converted_noisy/` (CC-BY-NC-SA-4.0 note on both
+subsets' `summary.md`, same as the computer subsets).
+
+**Final assembled dataset (`build_dataset.py --seed 0`): 3,056 rows** —
+`_wakeword_` 1,555 (1,089/311/155 train/val/test), `_unknown_` 1,247
+(873/249/125), `_silence_` 254 (170/56/28); group-disjoint split verified
+(0 violations).
+
+**Training + eval (30-min budget, the computer instance's wall-clock
+convention; preset=default, seed 0, GPU):** 26 epochs (early stop,
+patience 10), best val_loss 0.0337 at epoch 16, 242 s wall-clock, no
+NaN/Inf. Val-split eval (`out/wakeword-sesame/metadata/eval_report.md`):
+
+| label | precision | recall | f1 | support |
+|---|---|---|---|---|
+| `_wakeword_` | 0.984 | 0.994 | 0.989 | 311 |
+| `_unknown_` | 0.992 | 0.980 | 0.986 | 249 |
+| `_silence_` | 1.000 | 1.000 | 1.000 | 56 |
+
+`_wakeword_` recall by voice accent: filipino 0.993 (150/151),
+non-filipino 0.994 (159/160) — a 0.1-pt gap, i.e. the accent-shortcut
+risk that motivated `accent-balance-fil50` for "computer" does not show up
+in the sesame comparison instance at this scale.
+
+**Export/benchmark** (same `--model-family wakeword` reuse of the VCM
+export/benchmark modules): fp32 ONNX 0.119 MB, p50 0.248 ms; INT8 (static,
+val-calibrated) 0.047 MB (49,576 bytes — same size as the computer model,
+same architecture), p50 0.143 ms. AMD EPYC 7742 estimates, not RPi
+hardware (`out/wakeword-sesame/metadata/wakeword_benchmark.md`).
+
+**Licensing:** pure in-repo TTS introduces no new license entry (contract
+§7); the `*_noisy` rows make the whole sesame dataset
+CC-BY-NC-SA-4.0-encumbered exactly like the computer dataset.
 
 ## Model architecture
 
