@@ -315,8 +315,40 @@ Fast suite: 5,637 tests green (2026-09-26).
   (WeightedRandomSampler with replacement; default **1.0 = byte-identical**).
 
 ### Results
-(pending — post-training ghost FAR + mined-negatives `_unknown_` F1, after the
-audited negatives are collated into the ww manifest)
+
+- **Collate (2026-09-26):** `manifest.fil50-wwneg.csv` (14,864 rows:
+  13,876 fil50 base + 819 raw + 169 audited converted; the 1 audited-out
+  clip `02323_c01.wav__ref_tagalog13.wav` excluded) — train 10,415 /
+  val 2,942 / test 1,507.
+- **Pilot (2026-09-26, 15 min, seed 0, `--oversample-accent-unknown 1.5`,
+  GPU 5):** 20 epochs, best val_loss 0.0142 (epoch 16), no NaN/Inf.
+  Same-test before/after on the NEW val (old fil50 ckpt vs pilot ckpt):
+  wakeword recall 0.9951→0.9930, `_unknown_` recall 0.9984→0.9952 (2→6
+  misfires), `_silence_` recall 1.0 both, accent fil/non-fil recall
+  0.9930/0.9972 → 0.9916/0.9944. Read: pipeline green end-to-end; the
+  small regressions are the half-budget under-annealed signature (20 vs
+  29 epochs, OneCycle shaped for 150), not a feature-harm signal — and
+  the old ckpt already handles the 149 new val negatives well (2
+  misfires), so val isn't where the accent-shortcut risk shows. The real
+  probe is the test split's 105 new rows. Full-scale recommendation:
+  30-min budget (like stage 5), oversample 1.5 (run 1.0/2.0 if a sweep
+  is wanted), optional `--onecycle-epochs` = expected epoch count,
+  before/after comparison on the new TEST split. Artifacts:
+  `me2-iteration3/ME2/out/wakeword-wwneg-pilot/`.
+- **Ghost FAR post-training: PENDING** — VCM-with-ghosts was excluded
+  from the pilot (pre-measurement already shows 0/58 test ghosts
+  false-accepted; a 15-min VCM run on the 39.6k-row manifest is a few
+  epochs, uninformative). `ghosts.py` merge is built; one command from a
+  ghosts-inclusive manifest when the 60–90 min VCM budget is OK'd.
+- **Noisy/reverb VCM eval gate (2026-09-26, separate human task, same
+  session):** new `vcm/noisy_eval.py` + `--noisy-eval-seed` on
+  `vcm.evaluate` — fixed-seed RIR+noise pass over val/test, scored at the
+  clean-val threshold. Production checkpoint (fil50 VCM, seed 0):
+  accept 0.979→0.905, exact 0.979→0.902, babble FAR 0.008→0.024, silence
+  FAR 0.000→0.015; loss is under-acceptance (REJECTED +34/+34/+32/+23
+  on NEXT/CREATE_REMINDER/TEMPERATURE/TIMER), not mis-recognition.
+  Artifacts: `me2-iteration3/ME2/out/vcm/noisy-eval-fil50-seed0/`, plan
+  `.scratch/vcm-noisy-eval-gate/00-PLAN.md` (worktree).
 
 ## Iteration 4 — decoding/deployment levers (PLANNED)
 
@@ -331,3 +363,59 @@ audited negatives are collated into the ww manifest)
 
 ### Results
 (pending)
+
+## wakeword-sesame — parallel "sesame" wakeword phrase-instance (COMPLETE, comparison-only)
+
+Separate initiative from the accent-balance-fil50 iterations above — motivated by
+"computer"'s pronunciation variance as a wakeword, not by accent balance. Ticket:
+`.scratch/wakeword-sesame/tickets/00-RECAP.md`. Built on
+`iteration3-negatives-timestretch` (commit `b50541a`); model artifacts committed on
+`optionb-grammar-v2` (commit `612f72b` — see that commit's message for why the split).
+**Not a production cutover**: the shipped "computer" checkpoint (`out/wakeword/`,
+`out/wakeword-fil50/`) is untouched throughout; this is a parallel, comparison-only
+dataset + checkpoint (`out/conversions/v2/wakeword-sesame/`, `out/wakeword-sesame/`).
+
+**Key finding:** today's "computer" positives (`positives_real` → `positives_converted`,
+~4,212 of 5,492 `_wakeword_` rows) are fundamentally computer-only — voice conversion is
+content-preserving timbre transfer and cannot change the spoken word, and neither
+upstream corpus (Picovoice `wake-word-benchmark`, Mycroft `Precise-Community-Data` — both
+checked live against the real repos via `gh api`) has a "sesame" directory. Sesame
+positives required zero-shot TTS instead of the real-recording pipeline.
+
+**Two-approach QA journey for the positive class** (the interesting part):
+1. Bare `"Sesame."` zero-shot resynthesis across the 35-voice reference pool
+   (`convert_positives.py --mode resynthesize`, new): 3,744 planned pairs → **8.8% QA
+   pass (329 clips)**. Root cause confirmed from CosyVoice2's own generation-time
+   warnings: target text far shorter than the ~8-12s reference prompts.
+2. Voice-converting those 329 verified seeds into new voices (`convert_positives.py
+   --mode convert`, the *existing, unmodified* mechanism — structurally immune to the
+   text-length failure since conversion never resynthesizes text): 2,632 planned pairs
+   → **31.0% QA pass (816 clips)**. Combined final positive class: **1,145 clips**.
+
+**Final dataset** (`out/conversions/v2/wakeword-sesame/manifest.csv`, gitignored generated
+data like every other wakeword subset): **3,056 rows** — `_wakeword_` 1,555
+(1,089/311/155 train/val/test), `_unknown_` 1,247 (873/249/125, incl. 315 new
+phonetically-justified sesame adversary phrases), `_silence_` 254 (170/56/28). Zero
+group-disjointness violations; zero "sesame" token leakage in `common_voice_negative`
+(checked corpus-wide: 0/28,186).
+
+**Checkpoint eval** (epoch 16 of 26, early-stopped): `_wakeword_` P0.984/R0.994/F1 0.989,
+`_unknown_` P0.992/R0.980/F1 0.986, `_silence_` 1.000/1.000/1.000. Accent recall filipino
+0.993 (150/151) vs non-filipino 0.994 (159/160) — a **0.1-point gap**, essentially at
+parity without any dedicated rebalancing pass (unlike "computer", which needed the full
+accent-balance-fil50 program above to close a 13-point gap). Export: fp32 0.119 MB, int8
+0.047 MB (identical size to the computer model); p50 latency 0.248 ms / 0.143 ms (EPYC
+estimate, not real RPi hardware).
+
+**Code changes** (both backward-compatible, each proven by a regression test):
+`generate_adversaries.py` gains a `--phrase-set {computer,sesame}` registry;
+`build_unknown_external.py` gains `--scrub-word` (was hardcoded to "computer");
+`convert_positives.py` gains `--mode {convert,resynthesize}`; `wakeword/train.py`'s
+`LICENSE_NOTE` (previously hardcoded to the computer dataset root) is now
+`license_note(manifest_path)`; `accent_balance/plan_jobs.py`'s wakeword text is now a
+`--wakeword-text` flag (default unchanged) instead of a bare `"Computer."` literal.
+
+**Open items, not addressed here (recorded, not fixed):** promoting this checkpoint to
+production; recalibrating the streaming gate's wakeword threshold for sesame (still the
+unchanged 0.9 "computer" default). Full numbers, per-voice QA tables, and the complete
+task-by-task history: the ticket's Execution Log.
