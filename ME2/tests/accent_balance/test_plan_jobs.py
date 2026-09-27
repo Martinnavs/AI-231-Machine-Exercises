@@ -176,6 +176,19 @@ def test_plan_wakeword_jobs_use_literal_wakeword_text(small_dataset):
     assert all(j["text"] == "Computer." and j["label"] == "_wakeword_" for j in ww_jobs)
 
 
+def test_plan_wakeword_text_is_overridable_for_a_different_phrase_instance(small_dataset):
+    """A different wakeword phrase-instance (e.g. a "sesame" build) must be
+    able to override the literal text without touching this module."""
+    jobs, _ = plan(
+        voices_csv=small_dataset["voices"], vcm_manifest=small_dataset["vcm"],
+        wakeword_manifest=small_dataset["ww"], overgen=1.0, seed=0, pilot=None,
+        wakeword_text="Sesame.",
+    )
+    ww_jobs = [j for j in jobs if j["model"] == "wakeword"]
+    assert ww_jobs
+    assert all(j["text"] == "Sesame." and j["label"] == "_wakeword_" for j in ww_jobs)
+
+
 def test_plan_jobs_only_use_that_splits_voice_pool(small_dataset):
     jobs, _ = plan(
         voices_csv=small_dataset["voices"], vcm_manifest=small_dataset["vcm"],

@@ -1,22 +1,39 @@
 # Wakeword Dataset Contract
 
-Shared contract for the `"computer"`-only wakeword-detector dataset-build
-feature (`src/me2_voicegen/wakeword/`). Every task in this feature (this
-ticket 01, plus 02/03/04/05) reads this doc instead of re-deriving the
-schema/taxonomy below. Source of truth for each section is the module
-named; if this doc and that module ever disagree, the module wins and this
-doc is stale and needs fixing.
+Shared contract for the wakeword-detector dataset-build feature
+(`src/me2_voicegen/wakeword/`). Every task in this feature (this ticket
+01, plus 02/03/04/05, plus the parallel "sesame" phrase instance added
+2026-09-27) reads this doc instead of re-deriving the schema/taxonomy
+below. Source of truth for each section is the module named; if this doc
+and that module ever disagree, the module wins and this doc is stale and
+needs fixing.
 
-## 1. Scope: single phrase, "computer" only
+## 1. Scope: one single spoken word per phrase instance
 
-This feature's `_wakeword_` class covers **only the single spoken word
-"computer"**. It explicitly does **not** cover "hey computer" or any other
-multi-word wake phrase — that is a deliberate scope exclusion (see
-Established/Non-Goals in ticket 01), not an oversight, and a possible
-separate follow-up feature later. No later ticket in this feature may add
-"hey computer" (or any other phrase) into `_wakeword_` without this
-sentence being updated first as a deliberate decision, not a silent scope
-creep.
+This feature's `_wakeword_` class covers, in any one dataset, **only the
+single spoken word of that dataset's phrase instance**. It explicitly does
+**not** cover multi-word wake phrases ("hey computer", "hey sesame", ...) —
+that is a deliberate scope exclusion (see Established/Non-Goals in ticket
+01), not an oversight, and a possible separate follow-up feature later.
+
+The repo now supports **multiple phrase instances** of `_wakeword_`, each
+its own parallel dataset under its own root, built by the same unchanged
+pipeline modules:
+
+- **`computer`** — `out/conversions/v2/wakeword/`, the original and
+  **shipped/production** instance (its checkpoint at `out/wakeword/`,
+  `out/wakeword-fil50/`).
+- **`sesame`** — `out/conversions/v2/wakeword-sesame/`, a **parallel,
+  comparison-only** instance built 2026-09-27 because "computer" has too
+  much pronunciation variance as a wakeword. Not a production cutover:
+  promoting "sesame" (or any instance) to production is a separate, later
+  human decision, same shape as the fil50-checkpoint-promotion precedent.
+
+No later ticket in this feature may add a new phrase instance (or
+"hey <word>" or any other multi-word phrase) into any `_wakeword_` class
+without this section being updated first as a deliberate decision, not a
+silent scope creep. Each new instance gets its own root directory, its own
+checkpoint out-dir, and its own row in this table.
 
 ## 2. Manifest schema
 
@@ -120,6 +137,23 @@ partitions.
   `group_id` unchanged -- all K converted variants of one real recording
   are one group, so a train/val/test split can never put one speaker's
   converted variants on both sides of a partition boundary.
+- **Zero-shot-TTS-only positives (added 2026-09-27 for the "sesame"
+  phrase instance; any phrase instance with no upstream real-recording
+  corpus):** there is no real source recording to inherit a `group_id`
+  from, so the only speaker-like identity axis that exists is the
+  **reference voice** whose timbre the TTS voice is cloned from. Rule:
+  group by the reference voice used (`group_id` = that reference voice's
+  name) -- distinct from `positives_converted`'s "inherit the source
+  clip's `group_id`" rule above. In the sesame instance the 329
+  QA-passed zero-shot-resynthesis seeds are grouped this way (25 groups),
+  while the 816 voice-converted copies of those seeds carry the
+  per-seed-unique `group_id` remap that prevented output-path collisions
+  in their generation run (see the ticket's Execution Log); both groupings
+  are leak-safe under the disjointness guard because the guard keys on
+  `group_id`, and the reference voice's timbre legitimately appears
+  across splits by this pipeline's existing, accepted design (the same
+  35 references convert/synthesize clips in every split in the computer
+  instance too).
 - **`_unknown_`/`_silence_` rows (tickets 02/04/05):** each sourcing path
   defines its own `group_id` convention appropriate to its own upstream
   corpus's available metadata; this section only binds the `_wakeword_`
@@ -218,10 +252,26 @@ its own).
   (`out/conversions/v2/README.md` section 4). No encumbrance of its own --
   it broadens `_unknown_`'s diversity beyond `adversaries`' phonetic
   near-misses without adding any new license obligation. Every row is
-  re-scrubbed by `build_unknown_external.py` for a "computer" token
-  (case-insensitive, catches "computer"/"computers"/"computer's") before
-  sampling -- this corpus had previously only ever been scrubbed against
-  the 20 VCM command phrases, never against "computer" itself.
+  re-scrubbed by `build_unknown_external.py` for its instance's wakeword
+  token (case-insensitive, word-boundary, catches the bare word plus its
+  plural/possessive forms -- "computer"/"computers"/"computer's" for the
+  computer instance, "sesame"/"sesames"/"sesame's" for the sesame
+  instance, via `--scrub-word`) before sampling -- this corpus had
+  previously only ever been scrubbed against the 20 VCM command phrases,
+  never against either wakeword token itself. (Recorded 2026-09-27: the
+  sesame scrub found zero matching rows in the 28,186-row corpus.)
+- **Pure in-repo TTS / voice-conversion output (stated explicitly
+  2026-09-27 for the "sesame" phrase instance, whose positives and
+  adversaries are 100% in-repo synthetic):** synthesis with this repo's
+  own `cosyvoice2` backend (zero-shot `synthesize` for the 329 sesame
+  resynthesis seeds and 315 sesame adversaries, `convert_voice` for the
+  816 sesame converted copies) redistributes nothing from any upstream
+  corpus -- the audio is generated locally, so **it introduces no new
+  license entry and no new encumbrance of its own**: same posture as the
+  pre-existing `adversaries_tts`/`fil50_persona` synthetic content in the
+  computer instance. The only licensing consequence for a phrase instance
+  remains the `*_noisy` rows' CC-BY-NC-SA-4.0 (ESC-50) mix-in described
+  above, which governs the whole dataset once those rows are included.
 
 ## 8. `speech_start_s`/`speech_end_s` extension columns (feature `wakeword-dscnn`)
 
