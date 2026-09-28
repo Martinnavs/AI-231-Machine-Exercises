@@ -47,6 +47,7 @@ def test_arg_parser_defaults():
     assert args.preset == "default"
     assert args.shift is True
     assert args.p_noise == 0.5
+    assert args.p_rir == 0.0
 
 
 def test_arg_parser_no_shift_flag():
@@ -339,3 +340,49 @@ def test_eval_only_without_checkpoint_raises():
 
     with pytest.raises(SystemExit):
         main(["--eval-only"])
+
+
+# ---------------------------------------------------------------------------
+# feature ambient-reverb-cooccurrence (.scratch/ambient-reverb-cooccurrence/
+# tickets/00-RECAP.md T1): --p-rir CLI flag, default 0.0 (every existing
+# invocation byte-unchanged), threaded into the train Augmenter.
+# ---------------------------------------------------------------------------
+
+
+def _run_main_capture_augmenter(tmp_path, vcm_wav_factory, monkeypatch, extra_args) -> dict:
+    from me2_voicegen.common.augment import Augmenter as RealAugmenter
+
+    captured: list[dict] = []
+    real_augmenter = RealAugmenter
+
+    class CapturingAugmenter(real_augmenter):
+        def __init__(self, *args, **kwargs):
+            captured.append(kwargs)
+            super().__init__(*args, **kwargs)
+
+    monkeypatch.setattr("me2_voicegen.wakeword.train.Augmenter", CapturingAugmenter)
+    manifest_path = _tiny_manifest(tmp_path, vcm_wav_factory)
+    main(
+        [
+            "--manifest", str(manifest_path),
+            "--out-dir", str(tmp_path / "out"),
+            "--max-epochs", "1", "--max-minutes", "1",
+            "--batch-size", "3", "--num-workers", "0",
+            "--p-noise", "0.0", "--p-specaugment", "0.0", "--seed", "0",
+            *extra_args,
+        ]
+    )
+    assert len(captured) == 1
+    return captured[0]
+
+
+def test_p_rir_flag_reaches_the_augmenter(tmp_path, vcm_wav_factory, monkeypatch):
+    kwargs = _run_main_capture_augmenter(tmp_path, vcm_wav_factory, monkeypatch, ["--p-rir", "0.3"])
+    assert kwargs["p_rir"] == 0.3
+
+
+def test_p_rir_defaults_to_zero_without_the_flag(tmp_path, vcm_wav_factory, monkeypatch):
+    # Regression: omitting --p-rir must keep today's behavior (class default 0.0)
+    # for every existing invocation (production wakeword, wakeword-fil50, ...).
+    kwargs = _run_main_capture_augmenter(tmp_path, vcm_wav_factory, monkeypatch, [])
+    assert kwargs["p_rir"] == 0.0

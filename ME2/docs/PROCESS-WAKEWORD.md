@@ -126,6 +126,62 @@ hardware (`out/wakeword-sesame/metadata/wakeword_benchmark.md`).
 §7); the `*_noisy` rows make the whole sesame dataset
 CC-BY-NC-SA-4.0-encumbered exactly like the computer dataset.
 
+### Ambient babble + reverb co-occurrence experiment (2026-09-28, comparison-only)
+
+Layered on the `ambient-noise-overlay` feature (its SPEC +
+`out/conversions/v2/wakeword-sesame/summary.md` are the canonical
+records): a derived `wakeword-sesame-ambient` dataset (3,056 base rows +
+1,620 ASR-gated offline babble `_ambient` rows, SNR U[0,30] dB; 1,620 of
+2,236 planned mixes passed the transcriber gate) and a **fixed-seed
+noisy/reverb eval gate for this model family**
+(`src/me2_voicegen/wakeword/noisy_eval.py`, new in the
+`ambient-reverb-cooccurrence` ticket — a wakeword port of
+iteration3's `vcm/noisy_eval.py`: every val/test row gets one
+deterministic RIR (RT60 U[0.1,0.5] s, 200-entry pool) + one ESC-50 noise
+clip at SNR U[5,25] dB, scored through the clean eval's argmax path;
+seed 0, reports under `out/wakeword-sesame*/noisy_eval/metadata/`). A
+`--p-rir` training flag was added to `wakeword/train.py` (default `0.0` —
+every existing invocation byte-unchanged; this model family previously
+had **no** RIR exposure at all) and drove one comparison checkpoint
+`out/wakeword-sesame-ambient-rir` (p_rir 0.3; every other flag identical
+to the ambient run).
+
+`_wakeword_` recall under the fixed noisy/reverb gate (seed 0):
+
+| checkpoint (training-time exposure) | val recall | test recall | test F1 |
+|---|---|---|---|
+| `out/wakeword-sesame` (clean + offline `_noisy` subsets) | 0.961 | 0.897 | 0.939 |
+| `out/wakeword-sesame-ambient` (offline babble rows; p_rir 0) | 0.931 | 0.899 | 0.944 |
+| `out/wakeword-sesame-ambient-rir` (offline babble + RIR p=0.3) | 0.936 | 0.856 | 0.913 |
+
+**Verdict (stated plainly): elevating RIR did not improve the
+noisy/reverb gate** — test-split `_wakeword_` recall 0.899 → 0.856 (F1
+0.944 → 0.913); val roughly flat (0.931 → 0.936). Confounds, in order of
+likely size: (a) under the same 30-min wall-clock budget the -rir run fit
+29 epochs vs 42 (RIR-convolution cost) and its clean val loss was worse
+(0.0267 vs 0.0203), so "more RIR" and "fewer epochs" moved together; (b)
+the gate applies RIR+noise to *all* rows of the ambient manifest,
+including rows that already carry baked-in babble — a double-condition
+stress, not a matched-condition measurement; (c) the plain
+`wakeword-sesame` row uses the base manifest (311/155 val/test
+`_wakeword_` rows) vs the ambient manifests (408/208), so the
+cross-manifest comparison is population-mixed. Comparison-only; no
+promotion (per the ticket's non-goals, mirroring this feature's
+"comparison, not cutover" framing).
+
+**Latent finding (flagged, not fixed — it affects all wakeword training,
+not just this experiment):** every wakeword run to date used
+`--noise-root out/conversions/v2/background_noise`, but
+`WakewordDataset._noise_pool()` globs `noise_root/*.wav`
+**non-recursively** and the wavs live under
+`.../background_noise/audio/` — so the online ESC-50 noise pool has been
+silently **empty** in every run (`Augmenter.augment_waveform` skips the
+noise step on an empty pool). The handoff doc's online noise probability
+never actually fired; wakeword noise exposure came only from the offline
+`*_noisy` subset rows. Baseline and -rir runs are equally affected, so
+the comparison above is valid within that frame; fixing the root (or the
+glob) is a separate decision with its own retraining cost.
+
 ## Model architecture
 
 `DSCNN` in `src/me2_voicegen/wakeword/model.py` — depthwise-separable CNN, 3-way classifier

@@ -251,6 +251,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--amp", action="store_true", default=None, help="default: on for cuda, off for cpu")
     parser.add_argument("--no-amp", dest="amp", action="store_false")
     parser.add_argument("--p-noise", type=float, default=0.5, help="dynamic SNR-mixing probability (handoff doc's requirement)")
+    parser.add_argument("--p-rir", type=float, default=0.0, help="RIR reverb probability, mirrors vcm/train.py's --p-rir")
     parser.add_argument("--p-specaugment", type=float, default=0.5)
     parser.add_argument("--noise-root", type=Path, default=DEFAULT_NOISE_ROOT)
     parser.add_argument(
@@ -310,7 +311,7 @@ def main(argv: list[str] | None = None) -> None:
         return
 
     feature_extractor = LogMelFeatureExtractor()
-    train_augmenter = Augmenter(p_noise=args.p_noise, p_specaugment=args.p_specaugment, seed=args.seed)
+    train_augmenter = Augmenter(p_rir=args.p_rir, p_noise=args.p_noise, p_specaugment=args.p_specaugment, seed=args.seed)
     train_generator = torch.Generator().manual_seed(args.seed)
 
     train_dataset = WakewordDataset(
