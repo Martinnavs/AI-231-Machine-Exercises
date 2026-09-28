@@ -1,0 +1,160 @@
+{
+  "license": "Checkpoint trained on out/conversions/v2/wakeword-sesame/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into adversaries_noisy/positives_converted_noisy. Per docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution.",
+  "checkpoint_path": "out/wakeword-sesame-ambient-rir-45m/checkpoints/checkpoint.pt",
+  "checkpoint_meta": {
+    "preset": "default",
+    "config": {
+      "n_mels": 40,
+      "n_classes": 3,
+      "n_blocks": 4,
+      "channels": 64,
+      "kernel_sizes": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "prologue_channels": 32
+    },
+    "labels": [
+      "_wakeword_",
+      "_unknown_",
+      "_silence_"
+    ],
+    "seed": 0,
+    "epoch": 16,
+    "val_loss": 0.024409796283788723,
+    "val_acc": 0.9937565036420395,
+    "window_seconds": 1.5,
+    "license": "Checkpoint trained on out/conversions/v2/wakeword-sesame/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into adversaries_noisy/positives_converted_noisy. Per docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution."
+  },
+  "manifest_path": "out/conversions/v2/wakeword-sesame/manifest.ambient.csv",
+  "device": "cpu",
+  "noise_root": "/mnt/jfs_hpc/home/anthony.martin.navarez/AI-222-Machine-Exercises/ME2/out/conversions/v2/background_noise",
+  "rir_pool_size": 200,
+  "rt60_range_s": [
+    0.1,
+    0.5
+  ],
+  "snr_range_db": [
+    5.0,
+    25.0
+  ],
+  "perturbation": "rir+additive_noise: every row gets one RIR (RT60 U[0.1,0.5]s randomized room from a fixed 200-entry pool) then one noise clip from the run's --noise-root at SNR U[5,25] dB, both always applied, in that order",
+  "threshold_rule": "scored through the same argmax per-class path as the clean eval (wakeword.train.per_class_metrics / wakeword_accent_recall); the DS-CNN has no operating threshold to sweep, so the vcm.noisy_eval rule (clean-val chosen threshold, never re-swept on noisy val) holds trivially \u2014 nothing is re-fit on the noisy split",
+  "seed": 0,
+  "val_split": {
+    "n_rows": 961,
+    "confusion_matrix": [
+      [
+        398,
+        10,
+        0
+      ],
+      [
+        5,
+        483,
+        9
+      ],
+      [
+        0,
+        2,
+        54
+      ]
+    ],
+    "labels": [
+      "_wakeword_",
+      "_unknown_",
+      "_silence_"
+    ],
+    "per_class": {
+      "_wakeword_": {
+        "precision": 0.9875930521091811,
+        "recall": 0.9754901960784313,
+        "f1": 0.9815043156596794,
+        "support": 408
+      },
+      "_unknown_": {
+        "precision": 0.9757575757575757,
+        "recall": 0.971830985915493,
+        "f1": 0.9737903225806452,
+        "support": 497
+      },
+      "_silence_": {
+        "precision": 0.8571428571428571,
+        "recall": 0.9642857142857143,
+        "f1": 0.9075630252100839,
+        "support": 56
+      }
+    },
+    "accent_recall": {
+      "filipino": {
+        "correct": 198,
+        "total": 202,
+        "recall": 0.9801980198019802
+      },
+      "non_filipino": {
+        "correct": 200,
+        "total": 206,
+        "recall": 0.970873786407767
+      }
+    }
+  },
+  "test_split": {
+    "n_rows": 487,
+    "confusion_matrix": [
+      [
+        198,
+        10,
+        0
+      ],
+      [
+        5,
+        241,
+        5
+      ],
+      [
+        0,
+        0,
+        28
+      ]
+    ],
+    "labels": [
+      "_wakeword_",
+      "_unknown_",
+      "_silence_"
+    ],
+    "per_class": {
+      "_wakeword_": {
+        "precision": 0.9753694581280788,
+        "recall": 0.9519230769230769,
+        "f1": 0.9635036496350364,
+        "support": 208
+      },
+      "_unknown_": {
+        "precision": 0.9601593625498008,
+        "recall": 0.9601593625498008,
+        "f1": 0.9601593625498008,
+        "support": 251
+      },
+      "_silence_": {
+        "precision": 0.8484848484848485,
+        "recall": 1.0,
+        "f1": 0.9180327868852458,
+        "support": 28
+      }
+    },
+    "accent_recall": {
+      "filipino": {
+        "correct": 98,
+        "total": 104,
+        "recall": 0.9423076923076923
+      },
+      "non_filipino": {
+        "correct": 100,
+        "total": 104,
+        "recall": 0.9615384615384616
+      }
+    }
+  }
+}
