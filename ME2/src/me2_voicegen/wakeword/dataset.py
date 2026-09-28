@@ -49,6 +49,7 @@ import torch
 import torchaudio
 from torch.utils.data import Dataset
 
+from me2_voicegen.common.ambient_mix import AMBIENT_SUFFIX
 from me2_voicegen.common.augment import Augmenter
 from me2_voicegen.common.features import LogMelFeatureExtractor
 from me2_voicegen.wakeword.augment import center_window, shift_waveform
@@ -104,8 +105,10 @@ class WakewordDataset(Dataset):
             `shift_waveform` (randomized fit / temporal-shift
             augmentation) instead of `center_window`.
         noise_root: directory of noise wavs for `augmenter`'s dynamic SNR
-            mixing (e.g. `out/conversions/v2/background_noise`). Loaded
-            and cached once, lazily, on first use -- never touched if
+            mixing (e.g. `out/conversions/v2/background_noise`, whose wavs
+            live under its `audio/` subdirectory -- searched recursively,
+            not just top-level, so this corpus layout resolves correctly).
+            Loaded and cached once, lazily, on first use -- never touched if
             `augmenter` is None or `augmenter.p_noise == 0`.
         generator: drives both windowing randomness and is handed to
             `augmenter`'s own calls; defaults to a fresh
@@ -164,7 +167,7 @@ class WakewordDataset(Dataset):
         if self._noise_pool_cache is None:
             pool: list[torch.Tensor] = []
             if self.noise_root is not None and self.noise_root.is_dir():
-                for wav_path in sorted(self.noise_root.glob("*.wav")):
+                for wav_path in sorted(self.noise_root.rglob("*.wav")):
                     waveform, _sr = torchaudio.load(str(wav_path))
                     if waveform.dim() == 2:
                         waveform = waveform.mean(dim=0)
@@ -229,7 +232,11 @@ class WakewordDataset(Dataset):
             windowed = center_window(content, window_samples)
 
         if self.augmenter is not None and self.split == "train":
-            noise_pool = self._noise_pool() if self.augmenter.p_noise > 0 else None
+            # Rows whose source_dataset ends in `_ambient` are already
+            # noised offline (ambient-noise-overlay feature): skip the
+            # online noise step so no row is double-noised.
+            is_ambient = row["source_dataset"].endswith(AMBIENT_SUFFIX)
+            noise_pool = None if is_ambient else (self._noise_pool() if self.augmenter.p_noise > 0 else None)
             windowed = self.augmenter.augment_waveform(windowed, noise_pool=noise_pool)
 
         return WakewordExample(waveform=windowed, label=label)

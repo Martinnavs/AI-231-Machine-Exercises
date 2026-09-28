@@ -94,8 +94,12 @@ def resolve_transcript(manifest_row: Mapping[str, str]) -> str | None:
       (noise is signaled via `_noisy` in `filename`, the same convention
       `optionb`'s own noisy rows use -- not a distinct source_dataset
       value the way wakeword's `_noisy` subsets are).
+    - optionb_ambient / vcm_balanced_ambient (feature `ambient-noise-overlay`):
+      mixed siblings of an `optionb`/`vcm_balanced` base row carrying its
+      `transcript` verbatim -> resolve through the base's branch (the
+      `_ambient` suffix is stripped before dispatch).
     """
-    source_dataset = manifest_row["source_dataset"]
+    source_dataset = manifest_row["source_dataset"].removesuffix("_ambient")
 
     if source_dataset == "sanitized_clean":
         return _OPTIONA_INTENT_PHRASES[manifest_row["label"]]
