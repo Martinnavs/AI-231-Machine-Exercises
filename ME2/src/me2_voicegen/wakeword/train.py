@@ -42,14 +42,20 @@ from me2_voicegen.wakeword.model import (
     param_count,
 )
 
-LICENSE_NOTE = (
-    "Checkpoint trained on out/conversions/v2/wakeword/, which includes "
-    "background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into "
-    "adversaries_noisy/positives_converted_noisy. Per "
-    "docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on "
-    "this data inherits CC-BY-NC-SA-4.0: non-commercial use only, "
-    "share-alike on redistribution."
-)
+def license_note(manifest_path: Path) -> str:
+    """Report-prose license note, naming the dataset root actually used for
+    this run (manifest_path's parent) rather than a hardcoded "computer"
+    path -- this repo now trains more than one wakeword phrase-instance
+    (see docs/WAKEWORD-DATASET-CONTRACT.md section 1) against this same
+    module, so the note must reflect whichever manifest was passed."""
+    return (
+        f"Checkpoint trained on {manifest_path.parent}/, which includes "
+        "background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into "
+        "adversaries_noisy/positives_converted_noisy. Per "
+        "docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on "
+        "this data inherits CC-BY-NC-SA-4.0: non-commercial use only, "
+        "share-alike on redistribution."
+    )
 
 DEFAULT_MANIFEST = (
     Path(__file__).resolve().parents[3] / "out" / "conversions" / "v2" / "wakeword" / "manifest.csv"
@@ -185,7 +191,7 @@ def write_eval_report(
     accent_recall = wakeword_accent_recall(model, val_dataset, device)
 
     eval_report = {
-        "license": LICENSE_NOTE,
+        "license": license_note(manifest_path),
         "checkpoint_path": str(checkpoint_path),
         "checkpoint_meta": checkpoint_meta,
         "manifest_path": str(manifest_path),
@@ -245,6 +251,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--amp", action="store_true", default=None, help="default: on for cuda, off for cpu")
     parser.add_argument("--no-amp", dest="amp", action="store_false")
     parser.add_argument("--p-noise", type=float, default=0.5, help="dynamic SNR-mixing probability (handoff doc's requirement)")
+    parser.add_argument("--p-rir", type=float, default=0.0, help="RIR reverb probability, mirrors vcm/train.py's --p-rir")
     parser.add_argument("--p-specaugment", type=float, default=0.5)
     parser.add_argument("--noise-root", type=Path, default=DEFAULT_NOISE_ROOT)
     parser.add_argument(
@@ -304,7 +311,7 @@ def main(argv: list[str] | None = None) -> None:
         return
 
     feature_extractor = LogMelFeatureExtractor()
-    train_augmenter = Augmenter(p_noise=args.p_noise, p_specaugment=args.p_specaugment, seed=args.seed)
+    train_augmenter = Augmenter(p_rir=args.p_rir, p_noise=args.p_noise, p_specaugment=args.p_specaugment, seed=args.seed)
     train_generator = torch.Generator().manual_seed(args.seed)
 
     train_dataset = WakewordDataset(
@@ -433,7 +440,7 @@ def main(argv: list[str] | None = None) -> None:
                     "val_loss": val_loss,
                     "val_acc": val_acc,
                     "window_seconds": WAKEWORD_WINDOW_SECONDS,
-                    "license": LICENSE_NOTE,
+                    "license": license_note(args.manifest),
                 },
                 checkpoints_dir / "checkpoint.pt",
             )
@@ -446,7 +453,7 @@ def main(argv: list[str] | None = None) -> None:
 
     total_wall_s = time.monotonic() - start_time
     loss_history = {
-        "license": LICENSE_NOTE,
+        "license": license_note(args.manifest),
         "seed": args.seed,
         "preset": args.preset,
         "device": str(device),

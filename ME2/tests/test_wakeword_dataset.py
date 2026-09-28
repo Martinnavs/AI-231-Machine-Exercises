@@ -4,6 +4,7 @@ from pathlib import Path
 import pytest
 import torch
 
+from me2_voicegen.common.augment import Augmenter
 from me2_voicegen.common.features import LogMelFeatureExtractor
 from me2_voicegen.wakeword.dataset import (
     PRECOMPUTED_SUBSETS,
@@ -200,3 +201,101 @@ def test_collate_fn_produces_batch_shaped_features_and_labels(wakeword_manifest)
     assert out["features"].shape[1] == 40
     assert out["labels"].shape == (len(batch),)
     assert out["labels"].dtype == torch.long
+
+
+def test_ambient_rows_skip_online_noise_step(tmp_path, vcm_wav_factory):
+    # SPEC Proof #2 (ambient-noise-overlay): a row whose source_dataset ends
+    # in `_ambient` is already noised offline, so the train-time augmenter
+    # must NOT apply the online noise step to it -- its waveform is invariant
+    # under a forced p_noise=1.0 -- while a non-ambient row is still noised.
+    # p_rir=0.0 isolates noise as the only waveform-level variable;
+    # shift=False + the same window makes the augment block the only
+    # difference between the plain and noised datasets.
+    root = tmp_path / "wakeword"
+    rows: list[dict] = []
+
+    def add(subset, filename, label, split, duration_s=1.0, span=None):
+        rel = f"{subset}/audio/{filename}"
+        vcm_wav_factory(root / rel, duration_s=duration_s)
+        rows.append(
+            {
+                "filename": filename,
+                "path": rel,
+                "label": label,
+                "duration": f"{duration_s:.6f}",
+                "sample_rate": "16000",
+                "resampled": "False",
+                "source_dataset": subset,
+                "source_relpath": filename,
+                "group_id": Path(filename).stem,
+                "split": split,
+                "speech_start_s": f"{span[0]:.6f}" if span else "",
+                "speech_end_s": f"{span[1]:.6f}" if span else "",
+            }
+        )
+
+    add("positives_real", "wk1.wav", "_wakeword_", "train", span=(0.2, 0.8))
+    add("positives_real_ambient", "wk2.wav", "_wakeword_", "train", span=(0.2, 0.8))
+    manifest_path = root / "manifest.csv"
+    _write_manifest(manifest_path, rows)
+
+    noise_dir = tmp_path / "noise"
+    noise_dir.mkdir()
+    vcm_wav_factory(noise_dir / "noise1.wav", duration_s=1.0)
+
+    augmenter = Augmenter(p_rir=0.0, p_noise=1.0, seed=42)
+    plain_ds = WakewordDataset(manifest_path, split="train", window_seconds=0.5, noise_root=noise_dir)
+    noised_ds = WakewordDataset(
+        manifest_path,
+        split="train",
+        window_seconds=0.5,
+        augmenter=augmenter,
+        noise_root=noise_dir,
+        shift=False,
+        generator=torch.Generator().manual_seed(0),
+    )
+
+    ambient_i = next(i for i, r in enumerate(noised_ds.rows) if r["source_dataset"].endswith("_ambient"))
+    # Already noised offline: the forced online noise step must be a no-op.
+    assert torch.equal(plain_ds[ambient_i].waveform, noised_ds[ambient_i].waveform)
+
+    normal_i = next(i for i, r in enumerate(noised_ds.rows) if r["source_dataset"] == "positives_real")
+    # A non-ambient row must still receive the online noise.
+    assert not torch.equal(plain_ds[normal_i].waveform, noised_ds[normal_i].waveform)
+
+
+def test_noise_pool_finds_wavs_nested_under_an_audio_subdirectory(tmp_path, vcm_wav_factory):
+    # Real-world bug (found 2026-09-28, ambient-reverb-cooccurrence T4): every
+    # wakeword training invocation's --noise-root default/Makefile value is
+    # out/conversions/v2/background_noise, whose wavs live under its own
+    # audio/ subdirectory (the same corpus-root/audio/ layout
+    # mix_background_noise.py already resolves correctly via
+    # noise_root/"audio"/filename) -- but `_noise_pool` globbed only
+    # noise_root's top level, so the pool was silently empty for every
+    # production and sesame run to date. This corpus layout, not a flat
+    # directory, is the real one always passed in practice.
+    noise_root = tmp_path / "background_noise"
+    (noise_root / "audio").mkdir(parents=True)
+    vcm_wav_factory(noise_root / "audio" / "noise1.wav", duration_s=1.0)
+    vcm_wav_factory(noise_root / "audio" / "noise2.wav", duration_s=1.0)
+
+    manifest_path = tmp_path / "wakeword" / "manifest.csv"
+    _write_manifest(manifest_path, [])  # empty manifest: only noise_root matters here
+    ds = WakewordDataset(manifest_path, split="train", window_seconds=0.5, noise_root=noise_root)
+    pool = ds._noise_pool()
+    assert len(pool) == 2
+
+
+def test_noise_pool_still_finds_flat_top_level_wavs(tmp_path, vcm_wav_factory):
+    # Backward-compat: a noise_root whose wavs sit directly at its top level
+    # (no nested subdirectory) must keep working after switching to a
+    # recursive glob.
+    noise_root = tmp_path / "flat_noise"
+    noise_root.mkdir()
+    vcm_wav_factory(noise_root / "noise1.wav", duration_s=1.0)
+
+    manifest_path = tmp_path / "wakeword2" / "manifest.csv"
+    _write_manifest(manifest_path, [])
+    ds = WakewordDataset(manifest_path, split="train", window_seconds=0.5, noise_root=noise_root)
+    pool = ds._noise_pool()
+    assert len(pool) == 1

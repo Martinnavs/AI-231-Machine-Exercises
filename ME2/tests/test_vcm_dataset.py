@@ -282,6 +282,39 @@ def test_augmenter_not_applied_outside_train_split(vcm_fake_manifest_factory):
     assert torch.equal(plain_wave, augmented_wave)
 
 
+def test_ambient_rows_skip_online_noise_step(vcm_fake_manifest_factory):
+    # SPEC Proof #2 (ambient-noise-overlay): a row whose source_dataset ends
+    # in `_ambient` is already noised offline, so the train-time augmenter
+    # must NOT apply the online noise step to it -- its waveform is invariant
+    # under a forced p_noise=1.0 -- while a non-ambient row is still noised.
+    # p_rir=0.0 isolates noise as the only waveform-level variable.
+    specs = [
+        {"bucket": "target_commands", "source_dataset": "optionb", "label": "PLAY_MUSIC",
+         "split": "train", "duration_s": 0.6, "transcript": "play music"},
+        {"bucket": "target_commands", "source_dataset": "optionb_ambient", "label": "PLAY_MUSIC",
+         "split": "train", "duration_s": 0.6, "transcript": "play music"},
+        {"bucket": "silence", "source_dataset": "background_noise", "label": "unknown",
+         "split": "train", "duration_s": 0.5},
+    ]
+    manifest_path = vcm_fake_manifest_factory(specs)
+    augmenter = Augmenter(p_rir=0.0, p_noise=1.0, seed=42)
+
+    plain_dataset = VCMDataset(manifest_path, split="train", augmenter=None)
+    noised_dataset = VCMDataset(manifest_path, split="train", augmenter=augmenter)
+
+    ambient_i = next(i for i, r in enumerate(noised_dataset.rows) if r["source_dataset"].endswith("_ambient"))
+    plain_ambient = plain_dataset[ambient_i].waveform
+    noised_ambient = noised_dataset[ambient_i].waveform
+    # Already noised offline: the forced online noise step must be a no-op.
+    assert torch.equal(plain_ambient, noised_ambient)
+
+    non_ambient_i = next(i for i, r in enumerate(noised_dataset.rows) if r["source_dataset"] == "optionb")
+    plain_normal = plain_dataset[non_ambient_i].waveform
+    noised_normal = noised_dataset[non_ambient_i].waveform
+    # A non-ambient row must still receive the online noise.
+    assert not torch.equal(plain_normal, noised_normal)
+
+
 def test_collate_fn_excludes_nothing_itself_caller_must_filter(vcm_fake_manifest_factory):
     # collate_fn operates on whatever VCMExamples it's given; filtering to
     # loss_bearing_indices is the caller's (e.g. a training Sampler's) job.

@@ -608,10 +608,71 @@ def test_render_markdown_speaker_group_breakdown_present_when_key_set():
     }
     md = render_markdown(report)
     assert "### Speaker-group breakdown" in md
-    assert "single held-out speaker (`s100`, 180 clips)" in md
-    assert "13 of the 16 Filipino speakers (2,146 clips)" in md
+    # No manifest_path was supplied to speaker_group_breakdown here, so the
+    # caveat falls back to just the distinct-speaker fact (no train-overlap
+    # sentence) -- this is the single-speaker-per-group shape.
+    assert "single speaker/voice (`s100`, 1 clips)" in md
+    assert "single speaker/voice (`s1`, 1 clips)" in md
     assert "filipino_reference" in md
     assert "foreign_reference" in md
+
+
+def test_render_markdown_speaker_group_caveat_reflects_the_real_manifest(tmp_path):
+    """Regression for the accent-balance-fil50 finding: the caveat used to
+    be a hardcoded sentence ("a single held-out speaker (s100, 180
+    clips)... 13 of the 16 Filipino speakers... are in the train split")
+    that stayed frozen even after a dataset changed shape underneath it
+    (fil50_persona rows started landing in filipino_reference too, making
+    the "single speaker" claim false for that manifest). The caveat must
+    instead be computed from the manifest actually being scored."""
+    manifest_path = tmp_path / "manifest.csv"
+    with manifest_path.open("w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=["split", "source_dataset", "group_id"])
+        writer.writeheader()
+        # Train split: three distinct Filipino-reference voices (one overlaps
+        # with what test will use, two don't), one foreign real speaker.
+        for gid in ("s100", "ref_tagalog1", "ref_tagalog2"):
+            writer.writerow({"split": "train", "source_dataset": "fil50_persona" if gid.startswith("ref_") else "optionb", "group_id": gid})
+        writer.writerow({"split": "train", "source_dataset": "optionb", "group_id": "s1"})
+
+    results = [
+        _row("target_commands", "CALL", "CALL", -0.1, group_id="s100", source_dataset="optionb"),
+        _row("target_commands", "CALL", "CALL", -0.1, group_id="ref_tagalog1", source_dataset="fil50_persona"),
+        _row("target_commands", "CALL", "CALL", -0.1, group_id="ref_tagalog3", source_dataset="fil50_persona"),
+        _row("target_commands", "CALL", "CALL", -0.1, group_id="s1", source_dataset="optionb"),
+    ]
+    breakdown = speaker_group_breakdown(results, threshold=-0.5, manifest_path=manifest_path)
+
+    fil = breakdown["filipino_reference"]
+    assert fil["n_distinct_speakers"] == 3
+    # s100 and ref_tagalog1 are in train; ref_tagalog3 is not.
+    assert fil["train_overlap"] == {"n_distinct_in_train": 2, "n_distinct_total": 3}
+
+    for_ = breakdown["foreign_reference"]
+    assert for_["n_distinct_speakers"] == 1
+    assert for_["train_overlap"] == {"n_distinct_in_train": 1, "n_distinct_total": 1}
+
+    section = _minimal_grammar_section("OPTIONB_GRAMMAR")
+    section["test_split"]["speaker_group_breakdown"] = breakdown
+    report = {
+        "license_note": "CC-BY-NC-SA-4.0",
+        "checkpoint_path": "out/vcm/checkpoint.pt",
+        "checkpoint_meta": {"preset": "default", "epoch": 1, "val_loss": 1.0},
+        "manifest_path": str(manifest_path),
+        "device": "cpu",
+        "beam_width": 50,
+        "grammar_sections": [section],
+        "slot_eval_sections": None,
+        "slot_eval_skipped_reason": None,
+    }
+    md = render_markdown(report)
+    assert "spans 3 distinct speakers/voices (3 clips)" in md
+    assert "2/3 of these also appear in the train split" in md
+    assert "single speaker/voice (`s1`, 1 clips)" in md
+    assert "1/1 of these also appear in the train split" in md
+    # The old hardcoded numbers must be gone entirely, not just supplemented.
+    assert "held-out speaker" not in md
+    assert "2,146 clips" not in md
 
 
 def test_render_markdown_slot_accuracy_absent_when_no_key():

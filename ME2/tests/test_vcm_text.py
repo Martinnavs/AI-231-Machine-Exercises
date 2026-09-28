@@ -208,6 +208,21 @@ def test_resolve_transcript_fil50_persona_matches_optionb_branch():
         assert text.resolve_transcript(row) == text.prepare_ctc_transcript("Alarm 6 AM")
 
 
+def test_resolve_transcript_ambient_variants_resolve_like_base():
+    """feature ambient-noise-overlay: an `_ambient` row is a mixed sibling
+    of a base row carrying its `transcript` verbatim, so
+    `optionb_ambient`/`vcm_balanced_ambient` resolve through the base's
+    branch (the suffix is stripped before dispatch) -- and an unknown
+    `_ambient` variant still raises."""
+    for base in ("optionb", "vcm_balanced"):
+        ambient = {"source_dataset": base + "_ambient", "filename": "x.wav", "transcript": "Alarm 6 AM"}
+        plain = {"source_dataset": base, "filename": "x.wav", "transcript": "Alarm 6 AM"}
+        assert text.resolve_transcript(ambient) == text.resolve_transcript(plain)
+        assert text.resolve_transcript(ambient) == text.prepare_ctc_transcript("Alarm 6 AM")
+    with pytest.raises(ValueError):
+        text.resolve_transcript({"source_dataset": "not_a_real_source_ambient", "transcript": "x"})
+
+
 # ---------------------------------------------------------------------------
 # slow drift-guard: re-derive INTENT_PHRASES from the real QA reports
 # ---------------------------------------------------------------------------

@@ -16,9 +16,9 @@ from torch import nn
 
 from me2_voicegen.wakeword.model import LABELS, DSCNNConfig, DSCNN
 from me2_voicegen.wakeword.train import (
-    LICENSE_NOTE,
     build_arg_parser,
     classify_ww_row_is_filipino,
+    license_note,
     main,
     per_class_metrics,
     run_eval,
@@ -47,6 +47,7 @@ def test_arg_parser_defaults():
     assert args.preset == "default"
     assert args.shift is True
     assert args.p_noise == 0.5
+    assert args.p_rir == 0.0
 
 
 def test_arg_parser_no_shift_flag():
@@ -205,24 +206,44 @@ def test_main_runs_one_short_training_pass_and_writes_expected_outputs(tmp_path,
     assert eval_report_json.exists()
     assert eval_report_md.exists()
 
+    expected_license = license_note(manifest_path)
+
     ckpt = torch.load(checkpoint_path, map_location="cpu")
-    assert ckpt["license"] == LICENSE_NOTE
+    assert ckpt["license"] == expected_license
     assert ckpt["preset"] == "default"
     assert set(ckpt["labels"]) == set(LABELS)
 
     loss_history = json.loads(loss_history_path.read_text())
-    assert loss_history["license"] == LICENSE_NOTE
+    assert loss_history["license"] == expected_license
     assert loss_history["epochs_run"] >= 1
 
     eval_report = json.loads(eval_report_json.read_text())
-    assert eval_report["license"] == LICENSE_NOTE
+    assert eval_report["license"] == expected_license
     assert set(eval_report["per_class"].keys()) == set(LABELS)
 
     md_text = eval_report_md.read_text()
-    assert LICENSE_NOTE in md_text
+    assert expected_license in md_text
     assert "accent_recall" in eval_report
     assert set(eval_report["accent_recall"]) == {"filipino", "non_filipino"}
     assert "`_wakeword_` recall by voice accent" in md_text
+
+
+def test_license_note_names_the_actual_manifest_root_not_a_hardcoded_one():
+    """Regression for the "computer"-hardcoded prose bug: two different
+    phrase-instances' manifests must each get their own root named in the
+    note, not a fixed 'out/conversions/v2/wakeword/' string. Caught live
+    against out/wakeword-sesame-ambient's eval report, which was trained on
+    out/conversions/v2/wakeword-sesame/manifest.ambient.csv but still
+    claimed "out/conversions/v2/wakeword/" -- this module hadn't received
+    the fix already applied on iteration3-negatives-timestretch."""
+    computer_note = license_note(Path("out/conversions/v2/wakeword/manifest.csv"))
+    sesame_note = license_note(Path("out/conversions/v2/wakeword-sesame/manifest.ambient.csv"))
+    assert "out/conversions/v2/wakeword" in computer_note
+    assert "wakeword-sesame" not in computer_note
+    assert "out/conversions/v2/wakeword-sesame" in sesame_note
+    # both still carry the actual license terms, unchanged
+    assert "CC-BY-NC-SA-4.0" in computer_note
+    assert "CC-BY-NC-SA-4.0" in sesame_note
 
 
 # ---------------------------------------------------------------------------
@@ -319,3 +340,49 @@ def test_eval_only_without_checkpoint_raises():
 
     with pytest.raises(SystemExit):
         main(["--eval-only"])
+
+
+# ---------------------------------------------------------------------------
+# feature ambient-reverb-cooccurrence (.scratch/ambient-reverb-cooccurrence/
+# tickets/00-RECAP.md T1): --p-rir CLI flag, default 0.0 (every existing
+# invocation byte-unchanged), threaded into the train Augmenter.
+# ---------------------------------------------------------------------------
+
+
+def _run_main_capture_augmenter(tmp_path, vcm_wav_factory, monkeypatch, extra_args) -> dict:
+    from me2_voicegen.common.augment import Augmenter as RealAugmenter
+
+    captured: list[dict] = []
+    real_augmenter = RealAugmenter
+
+    class CapturingAugmenter(real_augmenter):
+        def __init__(self, *args, **kwargs):
+            captured.append(kwargs)
+            super().__init__(*args, **kwargs)
+
+    monkeypatch.setattr("me2_voicegen.wakeword.train.Augmenter", CapturingAugmenter)
+    manifest_path = _tiny_manifest(tmp_path, vcm_wav_factory)
+    main(
+        [
+            "--manifest", str(manifest_path),
+            "--out-dir", str(tmp_path / "out"),
+            "--max-epochs", "1", "--max-minutes", "1",
+            "--batch-size", "3", "--num-workers", "0",
+            "--p-noise", "0.0", "--p-specaugment", "0.0", "--seed", "0",
+            *extra_args,
+        ]
+    )
+    assert len(captured) == 1
+    return captured[0]
+
+
+def test_p_rir_flag_reaches_the_augmenter(tmp_path, vcm_wav_factory, monkeypatch):
+    kwargs = _run_main_capture_augmenter(tmp_path, vcm_wav_factory, monkeypatch, ["--p-rir", "0.3"])
+    assert kwargs["p_rir"] == 0.3
+
+
+def test_p_rir_defaults_to_zero_without_the_flag(tmp_path, vcm_wav_factory, monkeypatch):
+    # Regression: omitting --p-rir must keep today's behavior (class default 0.0)
+    # for every existing invocation (production wakeword, wakeword-fil50, ...).
+    kwargs = _run_main_capture_augmenter(tmp_path, vcm_wav_factory, monkeypatch, [])
+    assert kwargs["p_rir"] == 0.0

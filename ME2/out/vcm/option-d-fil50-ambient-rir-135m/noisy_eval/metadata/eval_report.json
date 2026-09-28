@@ -1,0 +1,764 @@
+{
+  "license_note": "Checkpoint trained on out/conversions/v2/test_set/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) in the silence bucket. Per docs/VCM-CONTRACT.md section 8, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution.",
+  "checkpoint_path": "out/vcm/option-d-fil50-ambient-rir-135m/checkpoints/checkpoint.pt",
+  "checkpoint_meta": {
+    "preset": "optiond",
+    "config": {
+      "n_mels": 40,
+      "n_blocks": 5,
+      "channels": 128,
+      "kernel_sizes": [
+        11,
+        13,
+        15,
+        17,
+        19
+      ],
+      "prologue_channels": 64,
+      "epilogue_channels": 224,
+      "alphabet_size": 29
+    },
+    "alphabet_size": 29,
+    "seed": 0,
+    "epoch": 66,
+    "val_loss": 0.2520240666445887,
+    "license": "Checkpoint trained on out/conversions/v2/test_set/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) in the silence bucket. Per docs/VCM-CONTRACT.md section 8, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution."
+  },
+  "manifest_path": "out/conversions/v2/optionb-v3-vcmx-fil50/manifest.csv",
+  "device": "cuda:0",
+  "beam_width": 50,
+  "grammar_sections": [
+    {
+      "grammar": "OPTIONB_GRAMMAR",
+      "intent_labels": [
+        "ALARM",
+        "BRIGHTNESS",
+        "CALL",
+        "COLOR",
+        "CREATE_REMINDER",
+        "LIGHT_OFF",
+        "LIGHT_ON",
+        "LIST_REMINDERS",
+        "MESSAGE",
+        "NEXT",
+        "PAUSE",
+        "PLAY_MUSIC",
+        "STOP",
+        "TEMPERATURE",
+        "TIME",
+        "TIMER",
+        "VOLUME_DOWN",
+        "VOLUME_UP",
+        "WEATHER"
+      ],
+      "threshold_sweep_on_val": [
+        {
+          "threshold": 0.0,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.0,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0,
+          "youden_j": 0.0
+        },
+        {
+          "threshold": -0.01,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.866966966966967,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.8656119534168315
+        },
+        {
+          "threshold": -0.02,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9111111111111111,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.9097560975609756
+        },
+        {
+          "threshold": -0.03,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9330330330330331,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.9316780194828976
+        },
+        {
+          "threshold": -0.05,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9579579579579579,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0040650406504065045,
+          "youden_j": 0.9538929173075514
+        },
+        {
+          "threshold": -0.075,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9708708708708709,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.009485094850948509,
+          "youden_j": 0.9613857760199224
+        },
+        {
+          "threshold": -0.1,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9807807807807808,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.017615176151761516,
+          "youden_j": 0.9631656046290192
+        },
+        {
+          "threshold": -0.15,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9876876876876877,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.10569105691056911,
+          "youden_j": 0.8819966307771185
+        },
+        {
+          "threshold": -0.2,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9903903903903903,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.24119241192411925,
+          "youden_j": 0.7491979784662711
+        },
+        {
+          "threshold": -0.25,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9924924924924925,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.34146341463414637,
+          "youden_j": 0.6510290778583461
+        },
+        {
+          "threshold": -0.3,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9930930930930931,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.3997289972899729,
+          "youden_j": 0.5933640958031202
+        },
+        {
+          "threshold": -0.35,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.993993993993994,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.42276422764227645,
+          "youden_j": 0.5712297663517176
+        },
+        {
+          "threshold": -0.4,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.993993993993994,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4241192411924119,
+          "youden_j": 0.5698747528015822
+        },
+        {
+          "threshold": -0.5,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9948948948948949,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.5680656266022119
+        },
+        {
+          "threshold": -0.75,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9966966966966967,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.5698674284040137
+        },
+        {
+          "threshold": -1.0,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9972972972972973,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.5704680290046145
+        },
+        {
+          "threshold": -1.5,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9978978978978978,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.571068629605215
+        },
+        {
+          "threshold": -2.0,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9978978978978978,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.571068629605215
+        },
+        {
+          "threshold": -5.0,
+          "n_target_commands": 3330,
+          "target_accept_rate": 0.9978978978978978,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.571068629605215
+        }
+      ],
+      "chosen_operating_threshold": -0.1,
+      "chosen_operating_point_val_stats": {
+        "threshold": -0.1,
+        "n_target_commands": 3330,
+        "target_accept_rate": 0.9807807807807808,
+        "n_reject_probes": 738,
+        "false_accept_rate": 0.017615176151761516,
+        "youden_j": 0.9631656046290192
+      },
+      "required_command_margin": null,
+      "incomplete_prefix_rejections": {
+        "val": 0,
+        "test": 0
+      },
+      "test_split": {
+        "n_target_commands": 3494,
+        "n_accepted": 3450,
+        "n_exact_correct": 3448,
+        "accept_rate": 0.9874069834001145,
+        "exact_accuracy": 0.9868345735546652,
+        "per_intent_confusion": {
+          "ALARM": {
+            "ALARM": 327,
+            "REJECTED": 3
+          },
+          "BRIGHTNESS": {
+            "BRIGHTNESS": 267,
+            "REJECTED": 4
+          },
+          "CALL": {
+            "CALL": 92,
+            "REJECTED": 2
+          },
+          "COLOR": {
+            "COLOR": 341
+          },
+          "CREATE_REMINDER": {
+            "CREATE_REMINDER": 312,
+            "REJECTED": 5
+          },
+          "LIGHT_OFF": {
+            "LIGHT_ON": 2,
+            "LIGHT_OFF": 119,
+            "REJECTED": 2
+          },
+          "LIGHT_ON": {
+            "LIGHT_ON": 116
+          },
+          "LIST_REMINDERS": {
+            "LIST_REMINDERS": 105,
+            "REJECTED": 1
+          },
+          "MESSAGE": {
+            "MESSAGE": 112,
+            "REJECTED": 1
+          },
+          "NEXT": {
+            "REJECTED": 2,
+            "NEXT": 218
+          },
+          "PAUSE": {
+            "PAUSE": 100
+          },
+          "PLAY_MUSIC": {
+            "PLAY_MUSIC": 115,
+            "REJECTED": 2
+          },
+          "STOP": {
+            "STOP": 132,
+            "REJECTED": 2
+          },
+          "TEMPERATURE": {
+            "TEMPERATURE": 336,
+            "REJECTED": 2
+          },
+          "TIME": {
+            "TIME": 103,
+            "REJECTED": 4
+          },
+          "TIMER": {
+            "TIMER": 310,
+            "REJECTED": 11
+          },
+          "VOLUME_DOWN": {
+            "VOLUME_DOWN": 105,
+            "REJECTED": 2
+          },
+          "VOLUME_UP": {
+            "VOLUME_UP": 132
+          },
+          "WEATHER": {
+            "WEATHER": 106,
+            "REJECTED": 1
+          }
+        },
+        "false_accept_rate_babble": {
+          "n": 255,
+          "false_accepts": 3,
+          "rate": 0.011764705882352941
+        },
+        "false_accept_rate_silence": {
+          "n": 324,
+          "false_accepts": 1,
+          "rate": 0.0030864197530864196
+        },
+        "false_accept_rate_acoustic_ghost": {
+          "n": 0,
+          "false_accepts": 0,
+          "rate": null
+        },
+        "ghost_intent_breakdown": null,
+        "speaker_group_breakdown": {
+          "filipino_reference": {
+            "n": 1747,
+            "n_accepted": 1722,
+            "n_exact_correct": 1720,
+            "accept_rate": 0.9856897538637664,
+            "exact_accuracy": 0.9845449341728678,
+            "exact_accuracy_ci95": [
+              0.9776066661322652,
+              0.9893568787138249
+            ]
+          },
+          "foreign_reference": {
+            "n": 1618,
+            "n_accepted": 1605,
+            "n_exact_correct": 1605,
+            "accept_rate": 0.9919653893695921,
+            "exact_accuracy": 0.9919653893695921,
+            "exact_accuracy_ci95": [
+              0.9863016080371595,
+              0.9952985679602994
+            ]
+          },
+          "n_unclassified": 129,
+          "exact_accuracy_gap_foreign_minus_filipino": 0.007420455196724296
+        },
+        "slot_accuracy": {
+          "n_slot_bearing_target_rows": 1068,
+          "n_unparseable_ground_truth": 0,
+          "n_intent_correct": 1057,
+          "n_intent_and_slots_correct": 1057,
+          "slot_exact_match_rate_given_intent_correct": 1.0,
+          "per_slot_name_accuracy": {
+            "ALARM_TIME": {
+              "n": 172,
+              "n_correct": 172,
+              "accuracy": 1.0
+            },
+            "COLOR": {
+              "n": 180,
+              "n_correct": 180,
+              "accuracy": 1.0
+            },
+            "DEGREES": {
+              "n": 178,
+              "n_correct": 178,
+              "accuracy": 1.0
+            },
+            "DURATION": {
+              "n": 172,
+              "n_correct": 172,
+              "accuracy": 1.0
+            },
+            "PERCENT": {
+              "n": 176,
+              "n_correct": 176,
+              "accuracy": 1.0
+            },
+            "TASK": {
+              "n": 179,
+              "n_correct": 179,
+              "accuracy": 1.0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "slot_eval_sections": null,
+  "slot_eval_skipped_reason": "/mnt/jfs_hpc/home/anthony.martin.navarez/AI-222-Machine-Exercises/me2-iteration3/ME2/out/vcm/metadata/slot_eval/manifest.csv not found (Task 07 clips may not exist yet)",
+  "noisy_eval": {
+    "seed": 0,
+    "rir_pool_size": 200,
+    "snr_range_db": [
+      5.0,
+      25.0
+    ],
+    "rt60_range_s": [
+      0.1,
+      0.5
+    ],
+    "perturbation": "rir+additive_noise: every row gets one RIR (RT60 U[0.1,0.5]s randomized room from a fixed 200-entry pool) then one ESC-50 noise clip at SNR U[5,25] dB, both always applied, in that order",
+    "threshold_rule": "scored at the clean-val chosen operating threshold per grammar (choose_operating_threshold on the CLEAN val split); never re-swept on noisy val",
+    "sections": [
+      {
+        "grammar": "OPTIONB_GRAMMAR",
+        "seed": 0,
+        "threshold": -0.1,
+        "val_split": {
+          "n_target_commands": 3330,
+          "n_accepted": 3085,
+          "n_exact_correct": 3062,
+          "accept_rate": 0.9264264264264265,
+          "exact_accuracy": 0.9195195195195195,
+          "per_intent_confusion": {
+            "ALARM": {
+              "ALARM": 292,
+              "REJECTED": 22
+            },
+            "BRIGHTNESS": {
+              "BRIGHTNESS": 216,
+              "REJECTED": 23,
+              "PAUSE": 1
+            },
+            "CALL": {
+              "CALL": 90,
+              "REJECTED": 5,
+              "TIME": 1
+            },
+            "COLOR": {
+              "COLOR": 294,
+              "REJECTED": 5,
+              "STOP": 1
+            },
+            "CREATE_REMINDER": {
+              "CREATE_REMINDER": 235,
+              "REJECTED": 21,
+              "LIST_REMINDERS": 1
+            },
+            "LIGHT_OFF": {
+              "LIGHT_OFF": 92,
+              "REJECTED": 9,
+              "LIGHT_ON": 1
+            },
+            "LIGHT_ON": {
+              "LIGHT_ON": 112,
+              "REJECTED": 9
+            },
+            "LIST_REMINDERS": {
+              "LIST_REMINDERS": 101,
+              "REJECTED": 6,
+              "MESSAGE": 1
+            },
+            "MESSAGE": {
+              "MESSAGE": 87,
+              "REJECTED": 10
+            },
+            "NEXT": {
+              "NEXT": 272,
+              "REJECTED": 42,
+              "STOP": 9
+            },
+            "PAUSE": {
+              "PAUSE": 74,
+              "STOP": 1,
+              "REJECTED": 10
+            },
+            "PLAY_MUSIC": {
+              "PLAY_MUSIC": 124,
+              "REJECTED": 11,
+              "PAUSE": 1
+            },
+            "STOP": {
+              "STOP": 128,
+              "REJECTED": 5
+            },
+            "TEMPERATURE": {
+              "TEMPERATURE": 270,
+              "REJECTED": 26
+            },
+            "TIME": {
+              "TIME": 106,
+              "REJECTED": 3
+            },
+            "TIMER": {
+              "TIMER": 265,
+              "REJECTED": 18,
+              "TIME": 2
+            },
+            "VOLUME_DOWN": {
+              "VOLUME_DOWN": 119,
+              "REJECTED": 3,
+              "VOLUME_UP": 1
+            },
+            "VOLUME_UP": {
+              "VOLUME_UP": 106,
+              "STOP": 1,
+              "REJECTED": 9,
+              "VOLUME_DOWN": 1
+            },
+            "WEATHER": {
+              "WEATHER": 79,
+              "REJECTED": 8,
+              "TIME": 1
+            }
+          },
+          "false_accept_rate_babble": {
+            "n": 409,
+            "false_accepts": 30,
+            "rate": 0.07334963325183375
+          },
+          "false_accept_rate_silence": {
+            "n": 329,
+            "false_accepts": 4,
+            "rate": 0.0121580547112462
+          },
+          "false_accept_rate_acoustic_ghost": {
+            "n": 0,
+            "false_accepts": 0,
+            "rate": null
+          },
+          "ghost_intent_breakdown": null,
+          "speaker_group_breakdown": {
+            "filipino_reference": {
+              "n": 1665,
+              "n_accepted": 1520,
+              "n_exact_correct": 1510,
+              "accept_rate": 0.9129129129129129,
+              "exact_accuracy": 0.9069069069069069,
+              "exact_accuracy_ci95": [
+                0.8919979638656192,
+                0.9199424863245006
+              ]
+            },
+            "foreign_reference": {
+              "n": 1470,
+              "n_accepted": 1415,
+              "n_exact_correct": 1412,
+              "accept_rate": 0.9625850340136054,
+              "exact_accuracy": 0.9605442176870749,
+              "exact_accuracy_ci95": [
+                0.9493325241370236,
+                0.9693550743131762
+              ]
+            },
+            "n_unclassified": 195,
+            "exact_accuracy_gap_foreign_minus_filipino": 0.05363731078016798
+          },
+          "slot_accuracy": {
+            "n_slot_bearing_target_rows": 1068,
+            "n_unparseable_ground_truth": 0,
+            "n_intent_correct": 969,
+            "n_intent_and_slots_correct": 961,
+            "slot_exact_match_rate_given_intent_correct": 0.9917440660474717,
+            "per_slot_name_accuracy": {
+              "ALARM_TIME": {
+                "n": 160,
+                "n_correct": 160,
+                "accuracy": 1.0
+              },
+              "COLOR": {
+                "n": 177,
+                "n_correct": 172,
+                "accuracy": 0.9717514124293786
+              },
+              "DEGREES": {
+                "n": 156,
+                "n_correct": 156,
+                "accuracy": 1.0
+              },
+              "DURATION": {
+                "n": 158,
+                "n_correct": 156,
+                "accuracy": 0.9873417721518988
+              },
+              "PERCENT": {
+                "n": 157,
+                "n_correct": 156,
+                "accuracy": 0.9936305732484076
+              },
+              "TASK": {
+                "n": 161,
+                "n_correct": 161,
+                "accuracy": 1.0
+              }
+            }
+          }
+        },
+        "test_split": {
+          "n_target_commands": 3494,
+          "n_accepted": 3359,
+          "n_exact_correct": 3345,
+          "accept_rate": 0.9613623354321694,
+          "exact_accuracy": 0.957355466514024,
+          "per_intent_confusion": {
+            "ALARM": {
+              "ALARM": 316,
+              "REJECTED": 14
+            },
+            "BRIGHTNESS": {
+              "BRIGHTNESS": 265,
+              "REJECTED": 6
+            },
+            "CALL": {
+              "CALL": 88,
+              "REJECTED": 5,
+              "PAUSE": 1
+            },
+            "COLOR": {
+              "COLOR": 338,
+              "REJECTED": 3
+            },
+            "CREATE_REMINDER": {
+              "CREATE_REMINDER": 301,
+              "REJECTED": 14,
+              "LIST_REMINDERS": 1,
+              "TIME": 1
+            },
+            "LIGHT_OFF": {
+              "LIGHT_OFF": 113,
+              "LIGHT_ON": 3,
+              "REJECTED": 5,
+              "WEATHER": 2
+            },
+            "LIGHT_ON": {
+              "LIGHT_ON": 113,
+              "REJECTED": 3
+            },
+            "LIST_REMINDERS": {
+              "LIST_REMINDERS": 102,
+              "REJECTED": 4
+            },
+            "MESSAGE": {
+              "MESSAGE": 113
+            },
+            "NEXT": {
+              "NEXT": 194,
+              "REJECTED": 23,
+              "STOP": 3
+            },
+            "PAUSE": {
+              "PAUSE": 93,
+              "REJECTED": 7
+            },
+            "PLAY_MUSIC": {
+              "PLAY_MUSIC": 114,
+              "REJECTED": 2,
+              "STOP": 1
+            },
+            "STOP": {
+              "STOP": 133,
+              "REJECTED": 1
+            },
+            "TEMPERATURE": {
+              "TEMPERATURE": 324,
+              "REJECTED": 14
+            },
+            "TIME": {
+              "TIME": 99,
+              "REJECTED": 8
+            },
+            "TIMER": {
+              "TIMER": 302,
+              "STOP": 1,
+              "REJECTED": 17,
+              "NEXT": 1
+            },
+            "VOLUME_DOWN": {
+              "VOLUME_DOWN": 103,
+              "REJECTED": 4
+            },
+            "VOLUME_UP": {
+              "VOLUME_UP": 131,
+              "REJECTED": 1
+            },
+            "WEATHER": {
+              "WEATHER": 103,
+              "REJECTED": 4
+            }
+          },
+          "false_accept_rate_babble": {
+            "n": 255,
+            "false_accepts": 10,
+            "rate": 0.0392156862745098
+          },
+          "false_accept_rate_silence": {
+            "n": 324,
+            "false_accepts": 6,
+            "rate": 0.018518518518518517
+          },
+          "false_accept_rate_acoustic_ghost": {
+            "n": 0,
+            "false_accepts": 0,
+            "rate": null
+          },
+          "ghost_intent_breakdown": null,
+          "speaker_group_breakdown": {
+            "filipino_reference": {
+              "n": 1747,
+              "n_accepted": 1691,
+              "n_exact_correct": 1687,
+              "accept_rate": 0.9679450486548369,
+              "exact_accuracy": 0.9656554092730395,
+              "exact_accuracy_ci95": [
+                0.9560422561530186,
+                0.9732251315992486
+              ]
+            },
+            "foreign_reference": {
+              "n": 1618,
+              "n_accepted": 1568,
+              "n_exact_correct": 1561,
+              "accept_rate": 0.969097651421508,
+              "exact_accuracy": 0.9647713226205191,
+              "exact_accuracy_ci95": [
+                0.954630675711317,
+                0.972710194075227
+              ]
+            },
+            "n_unclassified": 129,
+            "exact_accuracy_gap_foreign_minus_filipino": -0.0008840866525203772
+          },
+          "slot_accuracy": {
+            "n_slot_bearing_target_rows": 1068,
+            "n_unparseable_ground_truth": 0,
+            "n_intent_correct": 1022,
+            "n_intent_and_slots_correct": 1020,
+            "slot_exact_match_rate_given_intent_correct": 0.9980430528375733,
+            "per_slot_name_accuracy": {
+              "ALARM_TIME": {
+                "n": 165,
+                "n_correct": 165,
+                "accuracy": 1.0
+              },
+              "COLOR": {
+                "n": 178,
+                "n_correct": 176,
+                "accuracy": 0.9887640449438202
+              },
+              "DEGREES": {
+                "n": 168,
+                "n_correct": 168,
+                "accuracy": 1.0
+              },
+              "DURATION": {
+                "n": 166,
+                "n_correct": 166,
+                "accuracy": 1.0
+              },
+              "PERCENT": {
+                "n": 175,
+                "n_correct": 175,
+                "accuracy": 1.0
+              },
+              "TASK": {
+                "n": 170,
+                "n_correct": 170,
+                "accuracy": 1.0
+              }
+            }
+          }
+        }
+      }
+    ]
+  }
+}

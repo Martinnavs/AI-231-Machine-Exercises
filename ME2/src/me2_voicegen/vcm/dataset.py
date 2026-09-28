@@ -33,6 +33,7 @@ import torch
 import torchaudio
 from torch.utils.data import Dataset
 
+from me2_voicegen.common.ambient_mix import AMBIENT_SUFFIX
 from me2_voicegen.common.augment import Augmenter
 from me2_voicegen.common.features import LogMelFeatureExtractor
 from me2_voicegen.vcm import alphabet
@@ -129,7 +130,12 @@ class VCMDataset(Dataset):
         transcript = self._resolved[index]
 
         if self.augmenter is not None and self.split == "train":
-            noise_pool = self._noise_pool() if self.augmenter.p_noise > 0 else None
+            # Rows whose source_dataset ends in `_ambient` are already
+            # noised offline (ambient-noise-overlay feature): skip the
+            # online noise step so no row is double-noised (RIR +
+            # SpecAugment still apply).
+            is_ambient = row["source_dataset"].endswith(AMBIENT_SUFFIX)
+            noise_pool = None if is_ambient else (self._noise_pool() if self.augmenter.p_noise > 0 else None)
             waveform = self.augmenter.augment_waveform(waveform, noise_pool=noise_pool)
 
         if transcript is None:
