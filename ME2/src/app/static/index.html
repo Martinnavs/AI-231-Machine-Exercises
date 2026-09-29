@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>UI Site — voice dashboard</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<header class="indicator">
+  <div class="indicator-orb">
+    <svg class="sweep" id="sweep" viewBox="0 0 100 60" aria-hidden="true">
+      <path d="M 10 55 A 40 40 0 0 1 90 55" fill="none" stroke-width="8" stroke-linecap="round"></path>
+    </svg>
+    <span class="listening-dot" id="listening-dot"></span>
+  </div>
+  <div class="indicator-text">
+    <div class="listening-label" id="listening-label">passive</div>
+    <div class="detected" id="detected"></div>
+    <div class="status-line hidden" id="status-line"></div>
+  </div>
+</header>
+
+<main class="grid">
+
+  <section class="panel">
+    <h2>Reminders</h2>
+    <div class="readout" id="reminder-latest">No reminders yet.</div>
+    <ul class="msglog hidden" id="reminder-list"></ul>
+    <div class="controls">
+      <select id="reminder-task"></select>
+      <button data-act="reminder-add">Log</button>
+      <button data-act="reminders-expand" id="btn-reminders-expand">List</button>
+      <button data-act="reminders-collapse" id="btn-reminders-collapse" class="hidden">Collapse</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Thermostat</h2>
+    <div class="readout big" id="thermo-value">22°</div>
+    <div class="controls">
+      <button data-act="thermo-set" data-degrees="18">18°</button>
+      <button data-act="thermo-set" data-degrees="22">22°</button>
+      <button data-act="thermo-set" data-degrees="26">26°</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Alarm</h2>
+    <div class="readout" id="alarm-readout">No alarm set</div>
+    <div class="controls">
+      <select id="alarm-time"></select>
+      <button data-act="alarm-set">Set</button>
+      <button data-act="alarm-reset" id="btn-alarm-reset" disabled>Reset</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Lights</h2>
+    <div class="lights-row">
+      <span class="lights-dot" id="lights-dot"></span>
+      <span class="readout" id="lights-status">Off</span>
+    </div>
+    <div class="level-bar" id="light-levels">
+      <span class="level-seg" data-level="20"></span>
+      <span class="level-seg" data-level="60"></span>
+      <span class="level-seg" data-level="100"></span>
+    </div>
+    <div class="controls">
+      <button data-act="light-power-on">On</button>
+      <button data-act="light-power-off">Off</button>
+      <button data-act="light-increase">+</button>
+      <button data-act="light-decrease">−</button>
+      <button data-act="light-level" data-level="20">20%</button>
+      <button data-act="light-level" data-level="60">60%</button>
+      <button data-act="light-level" data-level="100">100%</button>
+    </div>
+    <div class="controls">
+      <button class="swatch" data-act="light-color" data-color="white" style="background:#f2f2f2" title="white" aria-label="white"></button>
+      <button class="swatch" data-act="light-color" data-color="red" style="background:#e5484d" title="red" aria-label="red"></button>
+      <button class="swatch" data-act="light-color" data-color="green" style="background:#46a758" title="green" aria-label="green"></button>
+      <button class="swatch" data-act="light-color" data-color="blue" style="background:#3e8bfd" title="blue" aria-label="blue"></button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Timer</h2>
+    <div class="readout big" id="timer-value">00:00</div>
+    <div class="readout muted" id="timer-state">Timer idle</div>
+    <div class="controls">
+      <button data-act="timer-start" data-duration="10">10 s</button>
+      <button data-act="timer-start" data-duration="30">30 s</button>
+      <button data-act="timer-start" data-duration="60">1 min</button>
+      <button data-act="timer-reset" id="btn-timer-reset" disabled>Reset</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Music</h2>
+    <div class="readout" id="music-track">Stopped</div>
+    <div class="volbar"><div id="music-volume-bar"></div></div>
+    <div class="readout muted" id="music-volume">50%</div>
+    <div class="controls">
+      <button data-act="music-play">Play</button>
+      <button data-act="music-pause">Pause</button>
+      <button data-act="music-next">Next</button>
+      <button data-act="music-stop">Stop</button>
+      <button data-act="music-vol-up">Vol +</button>
+      <button data-act="music-vol-down">Vol −</button>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Phone</h2>
+    <div class="readout" id="phone-status">Not on a call</div>
+    <div class="controls">
+      <button data-act="phone-call">Call</button>
+      <button data-act="phone-message">Message</button>
+      <button data-act="phone-hang-up" id="btn-phone-hang-up" class="hidden">Hang up</button>
+    </div>
+    <ul class="msglog" id="phone-messages"></ul>
+  </section>
+
+</main>
+
+<script src="/static/app.js"></script>
+</body>
+</html>

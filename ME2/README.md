@@ -383,7 +383,7 @@ TensorRT/DeepSpeed acceleration, and no web UI:
 | `deepspeed==0.15.1` | training-only (`bin/train.py`, `utils/train_utils.py`) |
 | `tensorrt-cu12`, `tensorrt-cu12-bindings`, `tensorrt-cu12-libs` | needs `load_trt=True`, which defaults to `False` and is never set here |
 | `onnxruntime-gpu==1.18.0` | replaced with CPU `onnxruntime==1.18.0` — CosyVoice's ONNX components (speech tokenizer, campplus) fall back to CPU with a warning, not a failure, when handed `CUDAExecutionProvider` and it isn't available |
-| `gradio`, `fastapi`, `fastapi-cli`, `uvicorn`, `grpcio`, `grpcio-tools` | webui/runtime-server only, unused by direct `AutoModel` inference |
+| `gradio`, ~~`fastapi`~~, `fastapi-cli`, ~~`uvicorn`~~, `grpcio`, `grpcio-tools` | webui/runtime-server only, unused by direct `AutoModel` inference — **`fastapi`/`uvicorn` re-added** for the unrelated `ui-site` feature (the FastAPI dashboard service), pinned `fastapi==0.115.6`/`uvicorn==0.30.6`/`websockets==12.0` (plain uvicorn ships no WebSocket transport), with `httpx==0.27.2` added dev-only for its `TestClient` tests. Documented reversal of this exclusion, not an oversight — see the "UI site" section below. `gradio`/`fastapi-cli`/`grpcio*` remain excluded. |
 | `tensorboard` | training helper |
 | ~~`onnx`~~ | ~~training helper~~ — **re-added** for the unrelated `vcm-toy` feature's Task 06 (ONNX export/quantization/benchmark of the toy VCM CTC model), pinned `onnx==1.16.1`. This is a deliberate, documented reversal of the original CosyVoice-spike exclusion, not an oversight: `onnx` (the export/graph package) was never needed for CosyVoice's own `AutoModel`/`inference_zero_shot` inference path, but `vcm.export_onnx` (task 06) needs it to build/quantize an ONNX graph from the trained `vcm.model` checkpoint. See `docs/raw_requirements/` and `.scratch/vcm-toy/tickets/06-onnx-export-benchmark.md`. |
 | `gdown`, `wget` | **re-added** during this spike — see below |
@@ -893,3 +893,73 @@ just accepted triggers) as a JSONL `"window"` record, so an operator can empiric
 Same as the VCM-toy checkpoint above: any checkpoint used here inherits **CC-BY-NC-SA-4.0**
 (NonCommercial + ShareAlike) via `background_noise/`'s ESC-50 license. The streaming CLI's
 startup banner echoes this license string on every run.
+
+## UI site
+
+A FastAPI smart-home dashboard that displays the voice pipeline's output as seven device
+panels (reminders, thermostat, lights, timer, alarm, music, phone) plus a listening
+indicator. It is a **separate service** from the voice pipeline (feature `ui-site`,
+design record at `feature-engineering/ui-site/SPEC.md`): it runs in its own terminal
+window, holds a single in-memory state (no persistence, no auth, zero-cloud — it makes no
+network calls), and is driven **one-way, model → UI**, through its own HTTP API. The UI
+never calls, spawns, or reads the model.
+
+### Running it (two terminal windows)
+
+Terminal 2 — the UI service:
+
+```bash
+make app                                  # http://127.0.0.1:8000
+```
+
+Open http://127.0.0.1:8000 in a browser. Every panel is also clickable locally (REST
+actions); state is pushed over one WebSocket, including a 1-second tick (timer countdown,
+call elapsed, alarm due-check, indicator status expiry).
+
+Terminal 1 — the model side posts to the UI's API through a thin forwarder (stdlib-only,
+no model imports — it is the model side's only touch point with the UI):
+
+```bash
+# Live: the model-serving pipeline (Option D fil50 VCM int8 export, gated by
+# the trained `out/wakeword-sesame` DS-CNN) piped one-way into the forwarder
+make app-pipeline                                  # mic (default)
+make app-pipeline APP_PIPELINE_SOURCE=clip.wav     # same pipeline, file replay
+
+# Replay only (no model): a recorded JSONL, e.g. the phase-1 podcast captures
+uv run python -m app.forward --file phase1_podcast5.jsonl
+uv run python -m app.forward --file phase1_podcast5.jsonl --realtime --synthesize-listening
+```
+
+- `POST /api/command` takes a decoded `{"intent", "slots"}`. The 19-intent Option B
+  vocabulary is imported from `me2_voicegen.vcm.optionb`, so the UI never re-decodes text
+  and cannot drift from the model's grammar (that import is pure Python — no torch).
+- `POST /api/listening` takes `{"state": "passive"|"active"}` and drives the indicator
+  (passive dot vs. active dot + a 3-second semicircle sweep).
+- `--realtime` paces a replay by each record's `t_seconds`; `--synthesize-listening`
+  (file mode) adds the listening events a listening gate would have emitted
+  (`active` at `t − 3 s`, `passive` at `t`) so the indicator demo works before the
+  model-side ticket below lands.
+
+### Model-side follow-up (parked)
+
+For the indicator to be faithful in *live* runs, the streaming runtime needs two things:
+(A) gate re-open control so the 3-second listening window stays bounded (a double-check
+confirmed the current `WakeWordGate` re-opens on every renewed detection while already
+open — the opposite behavior is pinned by a test today), and (B) `listening` events on
+the stdout JSONL. Both are designed and parked at
+`.scratch/ui-site/tickets/01-model-facing-gate-and-listening.md` to be implemented later.
+Until then, live runs simply leave the indicator passive, and replay demos use
+`--synthesize-listening`.
+
+### Notes
+
+- `src/app` is packaged in the wheel (so `uv run` can import it) but is a separate
+  *service* by process; the voice pipeline never imports it.
+- `fastapi==0.115.6`/`uvicorn==0.30.6`/`websockets==12.0` are documented re-additions
+  in the "Trimmed dependencies" table above (plain uvicorn ships no WebSocket
+  transport — `websockets` provides it, pinned to the legacy-API major version
+  uvicorn 0.30.x drives); `httpx==0.27.2` is dev-only (FastAPI's `TestClient`).
+- Every device panel follows the explicit `(state, event) → next` transition-table
+  pattern from `src/app/services/requirements.md` (kept untouched); an unmapped pair is
+  *ignored* — the command was valid, the device just has no transition for that state
+  (REST still answers 200 with the unchanged state).

@@ -96,8 +96,12 @@ STREAM_MODEL ?= optionc
 STREAM_BACKEND ?= onnx
 STREAM_SOURCE ?= mic
 STREAM_ARGS ?=
+# Feature `ui-site`: app-pipeline's audio source (live mic by default;
+# override with a wav path for a deterministic file-replay run).
+APP_VENV_BIN ?= .venv/bin
+APP_PIPELINE_SOURCE ?= mic
 
-.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench
+.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
 
 WAKEWORD_CLONE_DIR ?= $(if $(TMPDIR),$(TMPDIR),/tmp)/me2_wakeword_clone
 WAKEWORD_POSITIVES_OUT_DIR ?= out/conversions/v2/wakeword/positives_real
@@ -240,6 +244,24 @@ stream-single-period:
 stream-wakeword:
 	$(MAKE) stream STREAM_ARGS="--policy single_period --gate wakeword --gate-period 3 --threshold -0.132222 --wakeword-backend onnx --log-periods"
 
+# Feature `ui-site` (feature-engineering/ui-site/SPEC.md): the FastAPI
+# dashboard, a *separate service* from the voice pipeline (its own process
+# / terminal window). The model side reaches it one-way over its HTTP API:
+# terminal 1 runs a streaming recipe piped into `python -m app.forward`,
+# terminal 2 runs this. See the README "UI site" section.
+app:
+	$(APP_VENV_BIN)/uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+# Feature `ui-site`: the live model-serving pipeline that feeds the
+# dashboard (terminal 1 of the two-window setup; terminal 2 runs `make
+# app`). The Option D (fil50) VCM int8 export fronted by the trained
+# `out/wakeword-sesame` DS-CNN (one 3 s listening period per wakeword
+# detection), piped one-way into the forwarder. Period digest/banner go
+# to stderr, so stdout stays clean JSONL for the pipe. Override
+# APP_PIPELINE_SOURCE with a wav path for a file-replay run.
+app-pipeline:
+	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model out/vcm/option-d-fil50-ambient-rir-135m --backend onnx --onnx-variant int8 --grammar optionb --threshold -0.075 --required-command-margin 4.0 --beam-width 50 --gate wakeword --policy single_period --gate-period 3 --wakeword-model out/wakeword-sesame --wakeword-backend onnx --log-periods --source "$(APP_PIPELINE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward
+
 # Wakeword ("computer"-only) dataset-build targets. See
 # docs/WAKEWORD-DATASET-CONTRACT.md for the manifest schema/output layout
 # `fetch_positives.py` (ticket 01) produces; later tickets (02/03/04/05)
@@ -357,6 +379,27 @@ wakeword-export:
 
 wakeword-bench:
 	$(UV) run python -m me2_voicegen.vcm.benchmark --model-family wakeword --checkpoint "$(WAKEWORD_CHECKPOINT)" --out-dir "$(WAKEWORD_TRAIN_OUT_DIR)" --manifest "$(WAKEWORD_TRAIN_MANIFEST)" --calibration-samples $(WAKEWORD_BENCH_CALIBRATION_SAMPLES) --n-iters $(WAKEWORD_BENCH_N_ITERS)
+
+# Soak-test three-way tally (feature-engineering/soak-test-tally/SPEC.md):
+# scores one podcast's Phase 1 soak-test JSONL (phase1_podcastN.jsonl,
+# repo root -- produced by a live `vcm.streaming --log-decode-diagnostics`
+# run, not by this Makefile) against that podcast's own transcript
+# (soak-test/podcast_N/podcast_N.md), bucketing every trigger as
+# ACOUSTIC_GHOST / MEDIA_TRUE_POSITIVE / PHONETIC_NEAR_MISS. Report is
+# written inside the podcast's own directory, alongside its audio/
+# transcript, rather than under .scratch/ -- SOAK_TALLY_PODCAST selects
+# which one (default 1); override per-podcast, e.g.
+# `make soak-tally SOAK_TALLY_PODCAST=2`. `.scratch/soak-test-tally/
+# three_way_scorer.py` is a spike script (SPEC.md's own Non-goals), not a
+# `me2_voicegen` module -- invoked directly, not via `-m`.
+SOAK_TALLY_PODCAST ?= 1
+SOAK_TALLY_JSONL ?= phase1_podcast$(SOAK_TALLY_PODCAST).jsonl
+SOAK_TALLY_TRANSCRIPT ?= soak-test/podcast_$(SOAK_TALLY_PODCAST)/podcast_$(SOAK_TALLY_PODCAST).md
+SOAK_TALLY_TOLERANCE_S ?= 2.0
+SOAK_TALLY_OUT ?= soak-test/podcast_$(SOAK_TALLY_PODCAST)/phase1_three_way_report.csv
+
+soak-tally:
+	$(UV) run python .scratch/soak-test-tally/three_way_scorer.py "$(SOAK_TALLY_JSONL)" "$(SOAK_TALLY_TRANSCRIPT)" --tolerance-s $(SOAK_TALLY_TOLERANCE_S) --out "$(SOAK_TALLY_OUT)"
 
 test:
 	$(UV) run pytest
