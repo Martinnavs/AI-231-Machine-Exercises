@@ -96,8 +96,12 @@ STREAM_MODEL ?= optionc
 STREAM_BACKEND ?= onnx
 STREAM_SOURCE ?= mic
 STREAM_ARGS ?=
+# Feature `ui-site`: app-pipeline's audio source (live mic by default;
+# override with a wav path for a deterministic file-replay run).
+APP_VENV_BIN ?= .venv/bin
+APP_PIPELINE_SOURCE ?= mic
 
-.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally
+.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
 
 WAKEWORD_CLONE_DIR ?= $(if $(TMPDIR),$(TMPDIR),/tmp)/me2_wakeword_clone
 WAKEWORD_POSITIVES_OUT_DIR ?= out/conversions/v2/wakeword/positives_real
@@ -239,6 +243,24 @@ stream-single-period:
 # the checkpoint directly instead.
 stream-wakeword:
 	$(MAKE) stream STREAM_ARGS="--policy single_period --gate wakeword --gate-period 3 --threshold -0.132222 --wakeword-backend onnx --log-periods"
+
+# Feature `ui-site` (feature-engineering/ui-site/SPEC.md): the FastAPI
+# dashboard, a *separate service* from the voice pipeline (its own process
+# / terminal window). The model side reaches it one-way over its HTTP API:
+# terminal 1 runs a streaming recipe piped into `python -m app.forward`,
+# terminal 2 runs this. See the README "UI site" section.
+app:
+	$(APP_VENV_BIN)/uvicorn app.main:app --host 127.0.0.1 --port 8000
+
+# Feature `ui-site`: the live model-serving pipeline that feeds the
+# dashboard (terminal 1 of the two-window setup; terminal 2 runs `make
+# app`). The Option D (fil50) VCM int8 export fronted by the trained
+# `out/wakeword-sesame` DS-CNN (one 3 s listening period per wakeword
+# detection), piped one-way into the forwarder. Period digest/banner go
+# to stderr, so stdout stays clean JSONL for the pipe. Override
+# APP_PIPELINE_SOURCE with a wav path for a file-replay run.
+app-pipeline:
+	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model out/vcm/option-d-fil50-ambient-rir-135m --backend onnx --onnx-variant int8 --grammar optionb --threshold -0.075 --required-command-margin 4.0 --beam-width 50 --gate wakeword --policy single_period --gate-period 3 --wakeword-model out/wakeword-sesame --wakeword-backend onnx --log-periods --source "$(APP_PIPELINE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward
 
 # Wakeword ("computer"-only) dataset-build targets. See
 # docs/WAKEWORD-DATASET-CONTRACT.md for the manifest schema/output layout
