@@ -1,0 +1,105 @@
+{
+  "verdict": "NO-GO",
+  "val_oof": {
+    "G1": true,
+    "G2": false,
+    "G3": true,
+    "G4": true,
+    "G4_failing": [],
+    "G5": false,
+    "B": {
+      "clean": [
+        3242,
+        3
+      ],
+      "noisy_s0": [
+        2985,
+        8
+      ]
+    },
+    "H": {
+      "clean": [
+        3279,
+        5
+      ],
+      "noisy_s0": [
+        3103,
+        4
+      ]
+    },
+    "control_d2_global": {
+      "clean": [
+        3274,
+        3
+      ],
+      "noisy_s0": [
+        3080,
+        3
+      ]
+    }
+  },
+  "test_non_independent": {
+    "G1": true,
+    "G2": true,
+    "G3": true,
+    "G4": true,
+    "G4_failing": [],
+    "G5": false,
+    "B": {
+      "clean": [
+        3434,
+        2
+      ],
+      "noisy_s0": [
+        3282,
+        4
+      ]
+    },
+    "H": {
+      "clean": [
+        3449,
+        2
+      ],
+      "noisy_s0": [
+        3337,
+        2
+      ]
+    },
+    "control_d2_global": {
+      "clean": [
+        3437,
+        0
+      ],
+      "noisy_s0": [
+        3297,
+        0
+      ]
+    }
+  },
+  "hybrid_thresholds_full_val": {
+    "default": -0.9073745521852197,
+    "ALARM": -0.9073745521852197,
+    "BRIGHTNESS": -0.9073745521852197,
+    "PAUSE": -3.098514816891105,
+    "CALL": -0.9073745521852197,
+    "TIME": -1.5230292648572772,
+    "COLOR": -0.9073745521852197,
+    "CREATE_REMINDER": -0.9073745521852197,
+    "LIGHT_OFF": -0.9073745521852197,
+    "LIGHT_ON": -0.9073745521852197,
+    "LIST_REMINDERS": -1.0981285660040054,
+    "MESSAGE": -2.297803671821454,
+    "NEXT": -1.6028456358372336,
+    "PLAY_MUSIC": -0.9073745521852197,
+    "STOP": -1.9268791204902322,
+    "TEMPERATURE": -0.9073745521852197,
+    "TIMER": -0.9073745521852197,
+    "VOLUME_DOWN": -0.9073745521852197,
+    "VOLUME_UP": -0.9073745521852197,
+    "WEATHER": -0.9073745521852197
+  },
+  "val_half_sizes": [
+    1941,
+    2127
+  ]
+}

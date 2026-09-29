@@ -362,7 +362,119 @@ Fast suite: 5,637 tests green (2026-09-26).
 - INT8 re-export; correct stale size figures (VCM INT8 is ~1.0 MB, not 0.26 MB).
 
 ### Results
-(pending)
+
+**Dense phonetic scoring offline pilot (2026-09-30) — NO-GO as pre-committed.** Feature
+`dense-phonetic-scoring-pilot` (plan/design: `.scratch/dense-phonetic-scoring-pilot/`). Rescored the
+production checkpoint `out/vcm/option-d-fil50-ambient-rir-135m` from CPU logits (no retraining, no GPU,
+production decoder untouched; code: `scripts/dense_pilot_dump.py`, `src/me2_voicegen/vcm/dense_pilot.py`).
+Noisy = fixed-seed-0 `noisy_eval` (dumped cross-tree from `me2-iteration3`). Full report:
+`out/vcm/option-d-fil50-ambient-rir-135m/dense_pilot/metadata/dense_pilot_report.{json,md}`.
+
+- **Parity:** baseline recomputed from the CPU logits reproduced every documented integer count exactly
+  (0 rows tolerated as numerics), so the verdict is valid. Baseline for this checkpoint is clean babble
+  FAR 3/255, silence 1/324 (not the older checkpoint's ~0.008/0.000).
+- **Variants:** D1 = mean log-prob over non-blank frames of the Viterbi alignment of the winner; D2 = raw beam
+  mass / len(winner text). Thresholds calibrated on clean val only (iso-accept vs. baseline −0.1).
+  Val-selected variant: **`d2-global`** (val reject-probe FAs, clean+noisy at margin 4.0: d2-global 2,
+  d2-per_intent 4, baseline-per_intent 7, d1-global 9, d1-per_intent 36).
+- **Verdict at margin 4.0 (test, selected vs. baseline): NO-GO — R3, R5, R6 failed.**
+
+  | | baseline (−0.1) | d2-global |
+  |---|---|---|
+  | clean exact | 3434/3494 | 3425/3494 |
+  | noisy exact | 3282/3494 | 3251/3494 (−0.89pp, R5 budget 0.5pp) |
+  | clean reject FA | 2 | 0 |
+  | noisy reject FA (babble+silence) | 4 (2+2) | 0 |
+  | noisy TIME+STOP FA | 1 | 0 |
+
+  R1, R2, R4, R7 pass. **R6 fails on exactly the short intents dense scoring targets:** noisy exact
+  PAUSE 89→84/100, STOP 133→126/134, TIME 95→91/107 (clean PAUSE 99→94/100).
+- **R3 caveat (a flaw in the pre-committed rule, not changed after the fact):** at margin 4.0 the baseline has
+  only 4 noisy-test reject FAs (the production margin gate already removes 12 of the 16 seen at margin
+  None). The minimum achievable sign-test p with 4 removals and 0 additions is 1/16 = 0.0625 > 0.05, so R3
+  was unpassable at that baseline count; the `MIN_BASELINE_NOISY_FA = 4` floor should have been 5.
+  The verdict stands regardless (R5 and R6 fail independently).
+- **Exploratory, post-hoc, not a criterion (test looked at once, n tiny):** `d2-global` with the margin gate
+  OFF has 0 reject FAs clean and noisy, at exact 3437 clean / 3297 noisy — better than the production
+  baseline + margin 4.0 on both accuracy (3434 / 3282) and FAs (2 / 4). That hints dense scoring might
+  substitute for the margin gate rather than stack on it, but the margin-none configuration was not the
+  pre-registered decision setting; treat as a hypothesis for a follow-up, not a result.
+- **Follow-up, margin-gate replacement (pre-registered rule in `dense_pilot.followup_report`, hash in
+  `metadata/frozen_before_followup.txt`; result `metadata/dense_followup_margin_off.json`) — FOLLOWUP-NO-GO,
+  narrowly.** `d2-global`, margin OFF, vs. production baseline + margin 4.0. Passes on val AND test: noisy
+  FA (val 1 vs 8, test 0 vs 4), clean FA (val 1 vs 3, test 0 vs 2), overall exact accuracy (val clean
+  3264 vs 3242 / noisy 3021 vs 2985; test clean 3437 vs 3434 / noisy 3297 vs 3282). Fails only the
+  per-intent budget: val CALL, MESSAGE, PAUSE, PLAY_MUSIC; test PAUSE, STOP (>3pp drop in clean or noisy
+  exact). Test was already seen once for this config, so it is a non-independent confirmation; val is the
+  independent evidence. Not implemented in the decoder; per-intent variants were worse on val FAs
+  (d2-per_intent 10, d1-per_intent 243, vs. d2-global 2).
+- **Hybrid pilot (D2, margin OFF, relax-only per-intent thresholds tau_i = min(tau_g, tau_i_iso); single
+  pre-committed candidate; val evaluated out-of-fold over two speaker-disjoint halves; rule + hash in
+  `metadata/frozen_before_hybrid.txt`, result `metadata/dense_hybrid_report.json`) — NO-GO.** G4 (per-intent
+  budget) now passes on both OOF val and test, and accuracy rises (test exact clean 3449 / noisy 3337 vs.
+  production 3434 / 3282; OOF val 3279 / 3103 vs. 3242 / 2985). But it gives the FA win back: OOF val clean
+  reject FA 5 vs. B 3 (**G2 fails**), and total reject FA exceeds the `d2-global` control + 2 slack on both
+  splits (**G5 fails**: OOF val 9 vs. 6, test 4 vs. 0). Test H vs. B: clean FA 2 vs. 2, noisy FA 2 vs. 4
+  (non-independent). The relaxed thresholds (PAUSE −3.10, MESSAGE −2.30, STOP −1.93, NEXT −1.60,
+  TIME −1.52 vs. global −0.91) are what let FAs back in. Caveats: FA counts are tiny (B: 3/8 val, 2/4 test),
+  test was already seen for `d2-global`, and the `hybrid` CLI stage has unit tests but no end-to-end test.
+- **Ghost-clip probe (2026-09-30; independent data: 141 `acoustic_ghost` clips, never in this checkpoint's
+  training manifest nor used for any threshold; script `scripts/dense_pilot_ghosts.py`, rule frozen in
+  `metadata/frozen_before_ghost_probe.txt`, result `metadata/dense_ghost_probe.json`).** Every ghost must be
+  rejected, so any accept is a false accept. Rule: candidate PASSES iff ghost FA <= production's. Results
+  (FA of 141): **production (−0.1 + margin 4.0) 27 (19.1%, Wilson upper 26.4%)**; baseline margin off 57;
+  **`d2-global` margin off 3 (2.1%, upper 6.1%) — PASS**; **hybrid (relax-only per-intent) 11 (7.8%) — PASS**.
+  Hybrid's FAs cluster on exactly the relaxed intents (STOP 5, PAUSE 4); `d2-global`'s 3 are TIME/STOP/NEXT.
+  Caveat: ghost ground truth is "not a command" by construction (harvested where a detector fired), and
+  the podcast audio is out-of-distribution for babble/silence-based calibration. **Unexplained discrepancy:**
+  this section's earlier note reports 0/58 test-split ghost FAs for the older `option-d-dataset-v2`
+  checkpoint, but the current production checkpoint accepts 13/58 on the same podcast (podcast_3) at margin 4.0;
+  not investigated (different checkpoint/threshold, old figure not re-run).
+- **Margin gate vs. D2, head to head (2026-09-30; `metadata/dense_margin_vs_d2.json`).** Exact-correct targets /
+  reject-probe FAs (babble+silence); val = 3330 targets, test = 3494; ghost FA of 141:
+
+  | config | tau | val clean | val noisy | test clean | test noisy | ghost FA |
+  |---|---|---|---|---|---|---|
+  | baseline, margin off | −0.100 | 3263/13 | 3062/34 | 3448/4 | 3345/16 | 57 |
+  | baseline, margin 2 | −0.100 | 3251/5 | 3002/8 | 3436/2 | 3298/4 | 36 |
+  | **baseline, margin 4 (production)** | −0.100 | 3242/3 | 2985/8 | 3434/2 | 3282/4 | 27 |
+  | baseline, margin 6 | −0.100 | 3230/3 | 2962/8 | 3425/2 | 3265/3 | 23 |
+  | **d2-global, margin off** | −0.907 | 3264/1 | 3021/1 | 3437/0 | 3297/0 | 3 |
+  | d2-global + margin 4 | −0.880 | 3243/1 | 2971/1 | 3425/0 | 3251/0 | 3 |
+
+  The margin gate buys FA reduction at a steep accuracy price (margin 4 vs. off: −77 noisy val, −63 noisy test
+  exact) and saturates on babble/silence beyond 4. D2 without the gate has fewer FAs AND more exact-correct
+  than production on every split. **Adding the margin gate on top of D2 removes no further FAs (val/test/ghost
+  unchanged) and only costs accuracy — the gate is redundant under D2, so the ghost win is not an artifact of
+  dropping the gate.** Cost of D2 vs. production persists per intent (test noisy PAUSE 89→86, STOP 133→126;
+  clean PAUSE 99→94). D2's iso-accept tau was set to the margin-off baseline's accept count; its FA headroom
+  (test 0 vs. 4, ghost 3 vs. 27) suggests a looser tau could recover PAUSE/STOP accepts — untested hypothesis.
+- **Looser D2 threshold (2026-09-30; `scripts/dense_pilot_loosen.py`, rule frozen in
+  `metadata/frozen_before_loosen.txt`, result `metadata/dense_loosen_probe.json`) — FAIL by the pre-registered
+  rule, by one intent-cell.** Margin OFF; global tau chosen on VAL ONLY as the loosest tau keeping val reject FAs
+  within production's val counts (clean 3, noisy 8): **tau* = −1.204** (iso-accept was −0.907). Rule: L1 test FA
+  <= B, L2 ghost FA <= B, L3 exact >= B (val+test, clean+noisy), L4 per-intent (>=50) <= 3pp drop.
+
+  | | production (m=4) | D2 iso (−0.907) | D2 loose (−1.204) |
+  |---|---|---|---|
+  | val exact/FA clean | 3242/3 | 3264/1 | 3277/2 |
+  | val exact/FA noisy | 2985/8 | 3021/1 | 3094/4 |
+  | test exact/FA clean | 3434/2 | 3437/0 | 3446/0 |
+  | test exact/FA noisy | 3282/4 | 3297/0 | 3344/0 |
+  | ghost FA of 141 | 27 | 3 | 5 |
+  | test PAUSE / STOP exact, clean | 99 / 132 | 94 / 132 | 97 / 133 |
+  | test PAUSE / STOP exact, noisy | 89 / 133 | 86 / 126 | 87 / 129 |
+
+  L1, L2, L3 pass; **L4 fails on one cell: MESSAGE val/clean 95→92 of 97 (−3.09pp vs. the 3.00pp budget)** — i.e.
+  one more correct row would have passed. PAUSE/STOP are recovered to within budget on val and test. The loosening
+  curve (`curve` in the JSON) shows where it breaks: ghost FA rises steadily as tau loosens (3 at −0.907 → 9 at
+  −1.504), and test noisy FA first appears at ~−1.42; tau* sits at a val FA cliff edge (−1.248 already has val
+  clean FA 4 > 3), so the val selection may be optimistic. Test was already seen for D2; ghosts and the val-only
+  selection are the independent parts.
+- MV2: 0 alignment failures on all 4 dumps. MV4: beam mass exceeds the Viterbi score by median 3.9 nats
+  (p95 9.6, max 21.1) on clean val targets, so D1 is a loose proxy for beam belief.
+- Decision constants were frozen before test scoring (`metadata/frozen_before_test_scoring.txt`, sha256 of
+  `dense_pilot.py`); the test split was scored and reported in a single run. Nothing was committed to git.
 
 ## wakeword-sesame — parallel "sesame" wakeword phrase-instance (COMPLETE, comparison-only)
 

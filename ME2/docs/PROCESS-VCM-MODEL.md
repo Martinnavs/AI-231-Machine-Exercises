@@ -70,7 +70,7 @@ recipe, not a future change.
 |---|---|
 | Incomplete-prefix margin gate | **Implemented and shipped** — see below |
 | Unconstrained greedy gating (Δ lexical-intrusion defense) | **Not implemented** — diagnostic only |
-| Dense phonetic scoring (score over non-blank frames only) | **Not implemented** |
+| Dense phonetic scoring (score over non-blank frames only) | **Piloted offline 2026-09-30 — NO-GO** at margin 4.0 (fails accuracy budgets on PAUSE/STOP/TIME; see `MLOPS-PROJECTS.md` Iteration 4 Results). Not implemented in the decoder. |
 | Intent-length-dependent thresholding (per-intent thresholds) | **Not implemented** — single global threshold still in use |
 
 Confirmed by grep: `grep -rln "dense_phonetic\|unconstrained_greedy_gate\|intent.length.dependent\|per_intent_threshold" src/` → zero hits.
