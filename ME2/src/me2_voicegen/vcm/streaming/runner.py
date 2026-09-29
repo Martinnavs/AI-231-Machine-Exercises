@@ -274,7 +274,10 @@ class StreamingRunner:
             "confidence": confidence,
             "policy_reason": decision.reason,
         }
-        print(json.dumps(payload), file=self._out)
+        # stdout is a pipe in the live app-pipeline. Without an explicit
+        # flush, its block buffer can hold accepted commands until the
+        # streaming process exits, so app.forward never sees them promptly.
+        print(json.dumps(payload), file=self._out, flush=True)
 
         if emitted:
             self._events += 1

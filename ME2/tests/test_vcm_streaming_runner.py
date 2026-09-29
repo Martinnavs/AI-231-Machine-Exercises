@@ -109,6 +109,18 @@ class _RaisingAudioSource:
         self.close()
 
 
+class _FlushTrackingStringIO(io.StringIO):
+    """Records explicit flushes from the JSONL writer."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.flush_count = 0
+
+    def flush(self) -> None:
+        self.flush_count += 1
+        super().flush()
+
+
 class _InfiniteAudioSource:
     """Never ends on its own -- like a real microphone. Used for
     `--listen-for` expiry tests."""
@@ -835,7 +847,7 @@ def test_jsonl_payload_key_set_unchanged():
     # No new JSONL fields (SPEC contract section 5): every record's key set
     # is exactly the pre-feature schema, 'window' and 'trigger' alike.
     source = _ArrayAudioSource(np.zeros(24000, dtype=np.float32), block_samples=4000)
-    out = io.StringIO()
+    out = _FlushTrackingStringIO()
     StreamingRunner(
         source=source,
         backend=_fixed_target_phrase_backend(),
@@ -875,6 +887,7 @@ def test_jsonl_payload_key_set_unchanged():
     ]
     for line in lines:
         assert set(json.loads(line)) == expected_keys
+    assert out.flush_count == len(lines)
 
 
 def _broken_play_logp(total_frames: int = 200) -> np.ndarray:
