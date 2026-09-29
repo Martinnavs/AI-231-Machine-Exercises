@@ -71,7 +71,9 @@ def _write_synthetic_torch_checkpoint(tmp_path: Path, seed: int = 0) -> Path:
     return path
 
 
-def _run_cli(checkpoint_path: Path, wav_path: Path) -> subprocess.CompletedProcess:
+def _run_cli(
+    checkpoint_path: Path, wav_path: Path, extra_args: tuple[str, ...] = ()
+) -> subprocess.CompletedProcess:
     return subprocess.run(
         [
             sys.executable,
@@ -102,6 +104,7 @@ def _run_cli(checkpoint_path: Path, wav_path: Path) -> subprocess.CompletedProce
             "--beam-width",
             "5",
             "--log-all-windows",
+            *extra_args,
         ],
         cwd=str(PROJECT_ROOT),
         capture_output=True,
@@ -352,3 +355,32 @@ sys.exit(pytest.main(["-q", "-m", "not slow", *{streaming_test_files!r}]))
         f"outside a monkeypatched fake.\nstdout={result.stdout}\nstderr={result.stderr}"
     )
     assert "AssertionError" not in result.stdout
+
+
+# ---------------------------------------------------------------------------
+# --score-mode through the real CLI (dense-d2-loose-impl task 2).
+# ---------------------------------------------------------------------------
+
+
+def test_cli_score_mode_flag_reaches_runner_and_banner(tmp_path, vcm_wav_factory):
+    checkpoint_path = _write_synthetic_torch_checkpoint(tmp_path)
+    wav_path = vcm_wav_factory("score_mode.wav", duration_s=1.0)
+
+    default = _run_cli(checkpoint_path, wav_path)
+    per_char = _run_cli(checkpoint_path, wav_path, ("--score-mode", "per_char"))
+
+    assert default.returncode == 0 and per_char.returncode == 0, per_char.stderr
+    assert "score_mode: mean_frame" in default.stderr
+    assert "score_mode: per_char" in per_char.stderr
+    # Default stdout is unchanged by the new flag existing; per_char runs end to end.
+    for line in per_char.stdout.splitlines():
+        if line.strip():
+            json.loads(line)
+
+
+def test_cli_rejects_unknown_score_mode(tmp_path, vcm_wav_factory):
+    checkpoint_path = _write_synthetic_torch_checkpoint(tmp_path)
+    wav_path = vcm_wav_factory("bad_mode.wav", duration_s=1.0)
+    result = _run_cli(checkpoint_path, wav_path, ("--score-mode", "dense"))
+    assert result.returncode != 0
+    assert "score-mode" in result.stderr or "score_mode" in result.stderr

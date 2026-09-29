@@ -721,6 +721,7 @@ def test_streaming_runner_init_signature_unchanged_by_mode_period_wiring():
         "listen_for_s",
         "log_all_windows",
         "required_command_margin",
+        "score_mode",
         "out",
         "summary_out",
         "poll_interval_s",
@@ -1583,7 +1584,8 @@ def test_runner_passes_required_command_margin_to_decode(monkeypatch):
     calls: list = []
 
     def _recording_decode(
-        logp, grammar, threshold, beam_width, required_command_margin=None
+        logp, grammar, threshold, beam_width, required_command_margin=None,
+        score_mode="mean_frame",
     ):
         calls.append(required_command_margin)
         return DecodeResult(
@@ -1616,3 +1618,37 @@ def test_runner_passes_required_command_margin_to_decode(monkeypatch):
         runner.run()
         assert len(calls) > 0
         assert all(m == margin for m in calls)
+
+
+def test_runner_passes_score_mode_to_decode(monkeypatch):
+    """The runner hands its `score_mode` (default "mean_frame") to `decode`
+    on every window evaluation (dense-d2-loose-impl task 2)."""
+    import me2_voicegen.vcm.streaming.runner as runner_mod
+
+    from me2_voicegen.vcm.decoder import DecodeResult
+
+    calls: list = []
+
+    def _recording_decode(
+        logp, grammar, threshold, beam_width, required_command_margin=None,
+        score_mode="mean_frame",
+    ):
+        calls.append(score_mode)
+        return DecodeResult(
+            intent=None, slots={}, text="", confidence=float("-inf"),
+            no_match=True, out_of_grammar_gap=float("inf"),
+        )
+
+    monkeypatch.setattr(runner_mod, "decode", _recording_decode)
+
+    for kwargs, expected in (({}, "mean_frame"), ({"score_mode": "per_char"}, "per_char")):
+        calls.clear()
+        source = _ArrayAudioSource(np.zeros(24000, dtype=np.float32), block_samples=4000)
+        backend = _FixedLogpBackend(_one_hot_logp([alphabet.BLANK_ID] * 5))
+        runner = StreamingRunner(
+            source=source, backend=backend, grammar=OPTIONB_GRAMMAR,
+            policy=ThresholdPolicy(threshold=-1e6), window_s=1.0, stride_s=0.25,
+            refractory_s=1.5, beam_width=25, out=io.StringIO(), **kwargs,
+        )
+        runner.run()
+        assert len(calls) > 0 and all(m == expected for m in calls)

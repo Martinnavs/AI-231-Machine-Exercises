@@ -114,6 +114,7 @@ _FIELD_TYPES: dict[str, type] = {
     "gate_period_s": float,
     "log_periods": bool,
     "required_command_margin": float,
+    "score_mode": str,
     "wakeword_model": str,
     "wakeword_backend": str,
     "wakeword_onnx_variant": str,
@@ -126,6 +127,7 @@ _FIELD_CHOICES: dict[str, tuple[str, ...]] = {
     "gate": ("none", "spacebar", "wakeword"),
     "wakeword_backend": ("onnx", "torch"),
     "wakeword_onnx_variant": ("fp32", "int8"),
+    "score_mode": ("mean_frame", "per_char"),
 }
 
 _NULLABLE_FIELDS = frozenset(
@@ -204,6 +206,7 @@ class StreamingConfig:
     gate_period_s: float = 5.0
     log_periods: bool = False
     required_command_margin: Optional[float] = None
+    score_mode: str = "mean_frame"
     wakeword_model: str = "default"
     wakeword_backend: str = "torch"
     wakeword_onnx_variant: str = "fp32"

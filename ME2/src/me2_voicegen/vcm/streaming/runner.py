@@ -87,6 +87,7 @@ class StreamingRunner:
         listen_for_s: Optional[float] = None,
         log_all_windows: bool = False,
         required_command_margin: Optional[float] = None,
+        score_mode: str = "mean_frame",
         out: TextIO = sys.stdout,
         summary_out: TextIO = sys.stderr,
         poll_interval_s: float = 0.005,
@@ -109,6 +110,10 @@ class StreamingRunner:
         # Incomplete-prefix rejection gate margin (docs/
         # INCOMPLETE-GRAMMAR-REJECTION.md, Step 3); None = gate disabled.
         self.required_command_margin = required_command_margin
+        # What `DecodeResult.confidence` measures ("mean_frame" | "per_char",
+        # see vcm.decoder.decode_utterance); the policy threshold must be on
+        # the matching scale.
+        self.score_mode = score_mode
         self.poll_interval_s = poll_interval_s
 
         self._out = out
@@ -247,6 +252,7 @@ class StreamingRunner:
             threshold=NEG_INF,
             beam_width=self.beam_width,
             required_command_margin=self.required_command_margin,
+            score_mode=self.score_mode,
         )
 
         obs = WindowObservation(

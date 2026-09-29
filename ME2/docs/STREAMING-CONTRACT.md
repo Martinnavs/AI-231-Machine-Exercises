@@ -123,6 +123,17 @@ flags (StreamingConfig.merge)`:
   banner reports the resolved value; the JSONL schema (section 5) is
   unchanged -- a gate rejection surfaces only as `intent: null` /
   `confidence: null`.
+- `score_mode: str = "mean_frame"` -- what `confidence` (and so the policy
+  threshold) measures; one of `"mean_frame"` (beam log mass / window frames,
+  the historical behavior) or `"per_char"` (the same raw mass / length of the
+  winning phrase: duration-invariant, on a different scale -- thresholds are
+  around -1, not -0.1, and are NOT interchangeable between modes). Forwarded
+  verbatim to every window's `decode()`; winner selection and
+  `out_of_grammar_gap` are identical in both modes. CLI: `--score-mode`;
+  `make vcmx-serve` var `VCMX_SERVE_SCORE_MODE`. Opt-in and NOT the production
+  setting: `per_char` needs its own calibrated threshold and is gated on the
+  validation plan in `.scratch/dense-d2-loose-impl/PLAN.md`. The banner
+  reports the resolved value; the JSONL schema (section 5) is unchanged.
 
 `MODEL_REGISTRY = {"optionc": out/vcm/optionb-optionc, "default":
 out/vcm/optionb}` (`optionc` is the config default -- it beats `default` on

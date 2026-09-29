@@ -577,3 +577,23 @@ def test_from_json_rejects_bad_required_command_margin(tmp_path, json_value):
     with pytest.raises(SystemExit) as excinfo:
         StreamingConfig.from_json(config_path)
     assert "required_command_margin" in str(excinfo.value)
+
+
+def test_streaming_config_score_mode_defaults_mean_frame():
+    assert StreamingConfig().score_mode == "mean_frame"
+
+
+@pytest.mark.parametrize("value", ["mean_frame", "per_char"])
+def test_from_json_accepts_score_mode(tmp_path, value):
+    config_path = tmp_path / "config.json"
+    config_path.write_text(json.dumps({"score_mode": value}))
+    assert StreamingConfig.from_json(config_path).score_mode == value
+
+
+@pytest.mark.parametrize("value", ["dense", 1, None, True])
+def test_from_json_rejects_bad_score_mode(tmp_path, value):
+    config_path = tmp_path / "config.json"
+    config_path.write_text(json.dumps({"score_mode": value}))
+    with pytest.raises(SystemExit) as excinfo:
+        StreamingConfig.from_json(config_path)
+    assert "score_mode" in str(excinfo.value)

@@ -84,6 +84,19 @@ def build_arg_parser() -> argparse.ArgumentParser:
             "gate"
         ),
     )
+    parser.add_argument(
+        "--score-mode",
+        dest="score_mode",
+        choices=("mean_frame", "per_char"),
+        default=None,
+        help=(
+            "what the confidence threshold measures: 'mean_frame' (default; "
+            "beam log mass / window frames) or 'per_char' (beam log mass / "
+            "phrase length, duration-invariant). The two are on different "
+            "scales: pick --threshold for the mode you choose (per_char "
+            "thresholds are around -1, not -0.1)"
+        ),
+    )
     parser.add_argument("--window-s", dest="window_s", type=float, default=None)
     parser.add_argument("--stride-s", dest="stride_s", type=float, default=None)
     parser.add_argument("--refractory-s", dest="refractory_s", type=float, default=None)
@@ -250,6 +263,7 @@ def _print_banner(
         f"refractory_s={cfg.refractory_s} beam_width={cfg.beam_width}",
         f"  resolved threshold: {threshold}",
         f"  required_command_margin: {cfg.required_command_margin}",
+        f"  score_mode: {cfg.score_mode}",
         f"  license: {license_note}",
         f"  {gate_line}",
     ]
@@ -357,6 +371,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         listen_for_s=cfg.listen_for,
         log_all_windows=cfg.log_all_windows,
         required_command_margin=cfg.required_command_margin,
+        score_mode=cfg.score_mode,
     )
     try:
         runner.run()

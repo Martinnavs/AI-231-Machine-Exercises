@@ -699,3 +699,88 @@ def test_sweep_margins_formula_matches_live_gated_decode(total_frames, margin_na
     else:
         assert live.rejection_reason == "incomplete_prefix"
         assert live.intent is None
+
+
+# ---------------------------------------------------------------------------
+# score_mode="per_char" (dense-d2-loose-impl task 1): confidence = winning
+# terminal's raw beam log mass / len(phrase), duration-invariant; default
+# "mean_frame" must stay bit-identical to the historical behavior.
+# ---------------------------------------------------------------------------
+
+
+@pytest.mark.parametrize("total_frames", [44, 70, 151, 251])
+def test_per_char_confidence_is_duration_invariant_and_equals_raw_over_len(total_frames):
+    logp = make_play_broken_posterior(total_frames)
+    res = dec.decode_utterance(logp, OPTIONB_GRAMMAR, threshold=NEGINF, score_mode="per_char")
+    assert res.intent == "TIME"
+    assert res.grammar_text == "time"
+    assert res.confidence == pytest.approx(res.command_raw_score / len("time"))
+    # Same value at every T (unique optimal alignment => raw mass is T-invariant).
+    assert res.confidence == pytest.approx(TIME_RAW_EXPECTED / 4.0, abs=1e-6)
+
+
+@pytest.mark.parametrize("total_frames", [44, 70, 151, 251])
+def test_mean_frame_confidence_still_dilutes_with_trailing_blanks(total_frames):
+    res = dec.decode_utterance(make_play_broken_posterior(total_frames), OPTIONB_GRAMMAR,
+                               threshold=NEGINF, score_mode="mean_frame")
+    assert res.confidence == pytest.approx(res.command_raw_score / total_frames)
+
+
+def test_per_char_threshold_decision_does_not_flip_with_window_length():
+    # The documented /T failure: rejected at T=44, accepted from T=70 at -0.1.
+    # Under per_char the decision at a fixed threshold cannot depend on T.
+    decisions = {
+        T: dec.decode_utterance(make_play_broken_posterior(T), OPTIONB_GRAMMAR, threshold=-1.2,
+                                score_mode="per_char").no_match
+        for T in (44, 70, 151, 251)
+    }
+    assert len(set(decisions.values())) == 1
+    assert all(decisions.values())  # -1.745 per char < -1.2: rejected everywhere
+
+
+def test_default_score_mode_equals_explicit_mean_frame_on_all_phrases():
+    assert len(_DECODABLE) > 50  # alphabet-decodable phrases (digit forms excluded)
+    for text, _intent, _slots in _DECODABLE:
+        logp = make_posterior(text)
+        a = dec.decode_utterance(logp, OPTIONB_GRAMMAR, threshold=LOW_THRESHOLD)
+        b = dec.decode_utterance(logp, OPTIONB_GRAMMAR, threshold=LOW_THRESHOLD,
+                                 score_mode="mean_frame")
+        assert a == b, text
+
+
+def test_per_char_never_changes_winner_slots_or_gap():
+    for T in (44, 151):
+        logp = make_play_broken_posterior(T)
+        a = dec.decode_utterance(logp, OPTIONB_GRAMMAR, threshold=NEGINF)
+        b = dec.decode_utterance(logp, OPTIONB_GRAMMAR, threshold=NEGINF, score_mode="per_char")
+        assert (a.intent, a.slots, a.grammar_text, a.text) == (b.intent, b.slots, b.grammar_text, b.text)
+        assert a.out_of_grammar_gap == b.out_of_grammar_gap  # keeps mean-frame meaning
+        assert a.command_raw_score == b.command_raw_score
+
+
+def test_per_char_no_terminal_is_no_match_with_neg_inf_confidence():
+    res = dec.decode_utterance(make_play_no_completion_posterior(30), OPTIONB_GRAMMAR,
+                               threshold=-1.2, score_mode="per_char")
+    assert res.no_match and res.intent is None and res.confidence == NEGINF
+
+
+def test_per_char_empty_input_has_no_division_by_zero():
+    res = dec.decode_utterance(np.zeros((0, vcm_alphabet.ALPHABET_SIZE)), OPTIONB_GRAMMAR,
+                               threshold=-1.2, score_mode="per_char")
+    assert res.no_match
+
+
+def test_invalid_score_mode_raises():
+    with pytest.raises(ValueError, match="score_mode"):
+        dec.decode_utterance(make_posterior("stop"), OPTIONB_GRAMMAR, threshold=-1.0,
+                             score_mode="nope")
+
+
+def test_per_char_composes_with_margin_gate_and_batch():
+    T = 70
+    batch = np.stack([make_play_broken_posterior(T), make_play_broken_posterior(T)])
+    out = dec.decode(batch, OPTIONB_GRAMMAR, threshold=-5.0, required_command_margin=0.0,
+                     score_mode="per_char")
+    assert [r.rejection_reason for r in out] == ["incomplete_prefix"] * 2
+    out2 = dec.decode(batch, OPTIONB_GRAMMAR, threshold=-5.0, score_mode="per_char")
+    assert [r.intent for r in out2] == ["TIME", "TIME"]  # -1.745 >= -5.0

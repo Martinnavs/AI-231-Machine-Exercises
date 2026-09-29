@@ -87,6 +87,11 @@ VCMX_SERVE_MANIFEST ?= $(VCMX_TREATMENT)/manifest.csv
 VCMX_SERVE_VARIANT ?= int8
 VCMX_SERVE_THRESHOLD ?= -0.1
 VCMX_SERVE_MARGIN ?= 4.0
+# "mean_frame" (default) or "per_char" (dense-d2-loose-impl; needs its own
+# VCMX_SERVE_THRESHOLD ~ -1.2 and VCMX_SERVE_MARGIN= (empty) -- not the
+# production setting until its validation gates pass, see
+# .scratch/dense-d2-loose-impl/PLAN.md).
+VCMX_SERVE_SCORE_MODE ?= mean_frame
 VCMX_SERVE_BEAM_WIDTH ?= 50
 VCMX_SERVE_GATE ?= none
 VCMX_SERVE_SOURCE ?= mic
@@ -210,7 +215,7 @@ vcmx-export:
 # mic is always listening, no wakeword/spacebar in front of it). See
 # vcmx-serve-wakeword below for the gated counterpart.
 vcmx-serve:
-	$(UV) run python -m me2_voicegen.vcm.streaming --model "$(VCMX_TRAINED_OUT_DIR)" --backend onnx --onnx-variant $(VCMX_SERVE_VARIANT) --grammar optionb --threshold $(VCMX_SERVE_THRESHOLD) --required-command-margin $(VCMX_SERVE_MARGIN) --beam-width $(VCMX_SERVE_BEAM_WIDTH) --gate $(VCMX_SERVE_GATE) --source "$(VCMX_SERVE_SOURCE)" $(VCMX_SERVE_ARGS)
+	$(UV) run python -m me2_voicegen.vcm.streaming --model "$(VCMX_TRAINED_OUT_DIR)" --backend onnx --onnx-variant $(VCMX_SERVE_VARIANT) --grammar optionb --threshold $(VCMX_SERVE_THRESHOLD) $(if $(VCMX_SERVE_MARGIN),--required-command-margin $(VCMX_SERVE_MARGIN),) --score-mode $(VCMX_SERVE_SCORE_MODE) --beam-width $(VCMX_SERVE_BEAM_WIDTH) --gate $(VCMX_SERVE_GATE) --source "$(VCMX_SERVE_SOURCE)" $(VCMX_SERVE_ARGS)
 
 # Same VCM model/margin/threshold as vcmx-serve, but fronted by the trained
 # wakeword DS-CNN (out/wakeword, feature wakeword-gate) in place of an

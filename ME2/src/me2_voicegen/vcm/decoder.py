@@ -29,6 +29,8 @@ from . import alphabet as vcm_alphabet
 
 NEG_INF = float("-inf")
 
+SCORE_MODES = ("mean_frame", "per_char")
+
 
 def _logsumexp(a: float, b: float) -> float:
     if a == NEG_INF:
@@ -149,6 +151,7 @@ def decode_utterance(
     threshold: float,
     beam_width: int = 50,
     required_command_margin: float | None = None,
+    score_mode: str = "mean_frame",
 ) -> DecodeResult:
     """logp: (T, 29) log-probabilities/log-posteriors over the 29-token
     alphabet (docs/VCM-CONTRACT.md section 7). `threshold` is a mean
@@ -166,7 +169,20 @@ def decode_utterance(
     "incomplete_prefix"`. The existing confidence threshold stays an
     independent second gate. Decision order: (1) no completed terminal ->
     `no_match`, incomplete-prefix reason when applicable; (2) margin gate;
-    (3) confidence threshold; (4) accept."""
+    (3) confidence threshold; (4) accept.
+
+    `score_mode` picks what `confidence` (and therefore the threshold gate)
+    measures. `"mean_frame"` (default, the historical behavior) is the winning
+    terminal's beam log mass / T. `"per_char"` is that same raw mass divided
+    by the length of the winning phrase's text: duration-invariant (trailing
+    blank frames cannot dilute it) and on a different scale (roughly -1 for
+    a weak accept), so thresholds are NOT interchangeable between modes.
+    Winner selection is identical in both modes (T is constant within an
+    utterance, so argmax raw mass == argmax mass/T), and `out_of_grammar_gap`
+    keeps its mean-frame meaning in both. See
+    `.scratch/dense-d2-loose-impl/PLAN.md`."""
+    if score_mode not in SCORE_MODES:
+        raise ValueError(f"score_mode must be one of {SCORE_MODES}, got {score_mode!r}")
     T = logp.shape[0]
     greedy_text, greedy_score = _greedy_unconstrained(logp)
 
@@ -185,6 +201,15 @@ def decode_utterance(
             intent, slots_ = entry.node.terminal[0]
             best_intent, best_slots, best_score = intent, slots_, score
             best_command_prefix, best_command_raw = prefix, entry.total()
+
+    # `best_score` is the mean-frame score above; `gap` below always uses it
+    # (greedy_score is mean-frame too). `accept_score` is what the threshold
+    # gate and the reported `confidence` use, per `score_mode`.
+    frame_score = best_score
+    if score_mode == "per_char" and best_intent is not None and best_command_prefix:
+        accept_score = best_command_raw / len(best_command_prefix)
+    else:
+        accept_score = best_score
 
     # Strongest designated incomplete-prefix competitor in the final beam, on
     # raw (unnormalized, duration-invariant) beam log mass. Grammars that did
@@ -205,7 +230,7 @@ def decode_utterance(
 
     if required_command_margin is None:
         # Baseline: unchanged acceptance rule, no rejection reason.
-        no_match = best_intent is None or best_score < threshold
+        no_match = best_intent is None or accept_score < threshold
         rejection_reason: str | None = None
     elif best_intent is None:
         no_match = True
@@ -216,16 +241,16 @@ def decode_utterance(
         no_match = True
         rejection_reason = "incomplete_prefix"
     else:
-        no_match = best_score < threshold
+        no_match = accept_score < threshold
         rejection_reason = None
 
-    gap = greedy_score - best_score if best_intent is not None else float("inf")
+    gap = greedy_score - frame_score if best_intent is not None else float("inf")
 
     return DecodeResult(
         intent=None if no_match else best_intent,
         slots={} if no_match else best_slots,
         text=greedy_text,
-        confidence=best_score,
+        confidence=accept_score,
         no_match=no_match,
         out_of_grammar_gap=gap,
         grammar_text=best_command_prefix if best_command_prefix is not None else "",
@@ -243,11 +268,12 @@ def decode(
     threshold: float,
     beam_width: int = 50,
     required_command_margin: float | None = None,
+    score_mode: str = "mean_frame",
 ) -> DecodeResult | list[DecodeResult]:
     """Accepts (T, 29) for a single utterance (-> one DecodeResult) or
     (B, T, 29) for a batch (-> list[DecodeResult]), per
     docs/VCM-CONTRACT.md section 7. `required_command_margin` (see
-    `decode_utterance`) applies to every row of a batch."""
+    `decode_utterance`) and `score_mode` apply to every row of a batch."""
     logp = np.asarray(logp)
     if logp.ndim == 2:
         return decode_utterance(
@@ -256,6 +282,7 @@ def decode(
             threshold,
             beam_width=beam_width,
             required_command_margin=required_command_margin,
+            score_mode=score_mode,
         )
     if logp.ndim == 3:
         return [
@@ -265,6 +292,7 @@ def decode(
                 threshold,
                 beam_width=beam_width,
                 required_command_margin=required_command_margin,
+                score_mode=score_mode,
             )
             for b in range(logp.shape[0])
         ]

@@ -141,12 +141,15 @@ def infer_waveform(
     beam_width: int = 50,
     device: str | torch.device = "cpu",
     required_command_margin: float | None = None,
+    score_mode: str = "mean_frame",
 ) -> DecodeResult:
     """Whole-clip mode: one waveform -> one `DecodeResult`. Used by
     `vcm.evaluate` over the manifest's `test`/`val` splits.
     `required_command_margin` (docs/INCOMPLETE-GRAMMAR-REJECTION.md, Step 3)
     is the incomplete-prefix rejection gate margin, forwarded verbatim to
-    `decode`; `None` (default) leaves the gate disabled."""
+    `decode`; `None` (default) leaves the gate disabled. `score_mode`
+    (`"mean_frame"` default | `"per_char"`, see `decoder.decode_utterance`) is
+    likewise forwarded verbatim."""
     logp = logp_for_waveform(model, feature_extractor, waveform, device=device)
     return decode(
         logp,
@@ -154,6 +157,7 @@ def infer_waveform(
         threshold,
         beam_width=beam_width,
         required_command_margin=required_command_margin,
+        score_mode=score_mode,
     )
 
 
@@ -193,6 +197,7 @@ class SlidingWindowPipeline:
         refractory_s: float = DEFAULT_REFRACTORY_S,
         device: str | torch.device = "cpu",
         required_command_margin: float | None = None,
+        score_mode: str = "mean_frame",
     ) -> None:
         self.model = model
         self.feature_extractor = feature_extractor
@@ -204,6 +209,7 @@ class SlidingWindowPipeline:
         self.refractory_samples = int(round(refractory_s * SAMPLE_RATE))
         self.device = device
         self.required_command_margin = required_command_margin
+        self.score_mode = score_mode
 
         self._buffer = torch.zeros(0)
         self._samples_since_last_window = 0
@@ -257,6 +263,7 @@ class SlidingWindowPipeline:
                 beam_width=self.beam_width,
                 device=self.device,
                 required_command_margin=self.required_command_margin,
+                score_mode=self.score_mode,
             )
 
             if self._debouncer.gate(not result.no_match):

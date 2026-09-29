@@ -332,3 +332,28 @@ def test_load_checkpoint_weights_only_failure_falls_back_with_explicit_allow_uns
     captured = capsys.readouterr()
     assert "warning" in captured.err.lower()
     assert "allow_unsafe_load" in captured.err
+
+
+def test_infer_waveform_threads_score_mode(vcm_stub_model_factory):
+    """per_char confidence == command_raw_score / len(phrase); the default
+    (mean_frame) is unchanged and differs from it (dense-d2-loose-impl)."""
+    model = vcm_stub_model_factory(forced_ids=CALL_IDS)
+    fe = LogMelFeatureExtractor()
+    waveform = _tone(0.1)
+    default = infer_waveform(model, fe, waveform, TOY_GRAMMAR, threshold=-50.0)
+    per_char = infer_waveform(model, fe, waveform, TOY_GRAMMAR, threshold=-50.0,
+                              score_mode="per_char")
+    assert per_char.intent == default.intent == "CALL"
+    assert per_char.confidence == pytest.approx(per_char.command_raw_score / len(per_char.grammar_text))
+    assert default.confidence != per_char.confidence
+    assert default == infer_waveform(model, fe, waveform, TOY_GRAMMAR, threshold=-50.0,
+                                     score_mode="mean_frame")
+
+
+def test_sliding_window_pipeline_threads_score_mode(vcm_stub_model_factory):
+    model = vcm_stub_model_factory(forced_ids=CALL_IDS)
+    pipe = SlidingWindowPipeline(model, LogMelFeatureExtractor(), TOY_GRAMMAR, threshold=-50.0,
+                                 score_mode="per_char")
+    assert pipe.score_mode == "per_char"
+    assert SlidingWindowPipeline(model, LogMelFeatureExtractor(), TOY_GRAMMAR,
+                                 threshold=-50.0).score_mode == "mean_frame"
