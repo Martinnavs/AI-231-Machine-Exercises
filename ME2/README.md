@@ -1,11 +1,13 @@
 # ME2 — Spoken-command voice assistant (grammar-constrained VCM + wakeword DS-CNN)
 
 A Raspberry-Pi-targeted, zero-cloud spoken-command system: a DS-CNN wake-word detector
-("computer" — the production phrase instance; a parallel, comparison-only "sesame" instance
-also exists, see the "Wakeword DS-CNN" section) gates a ~1M-parameter grammar-constrained CTC
-acoustic model (the "VCM") that decodes speech into one of a fixed set of intents/slots. The
-training data for both models is synthetic-plus-real audio produced by a CosyVoice2 zero-shot TTS
-/ voice-conversion pipeline that this repo also owns end to end.
+("sesame" — the production phrase instance as of 2026-09-28/29, `wakeword-sesame-ambient-rir-45m`;
+superseded "computer" after the `ambient-reverb-cooccurrence` experiment, see the "Wakeword
+DS-CNN" section) gates a ~1M-parameter grammar-constrained CTC acoustic model (the "VCM",
+production checkpoint `option-d-fil50-ambient-rir-135m`) that decodes speech into one of a
+fixed set of intents/slots. The training data for both models is synthetic-plus-real audio
+produced by a CosyVoice2 zero-shot TTS / voice-conversion pipeline that this repo also owns
+end to end.
 
 This repo started (see "Setup: the four `make` steps, in order" below) as a Phase-1 spike proving
 CosyVoice2 zero-shot voice-cloning synthesis runs end-to-end on this HPC node (3x idle
@@ -74,10 +76,12 @@ happens today — nothing below replaces it, later work only builds on top of it
   dataset is CC-BY-NC-SA-4.0-encumbered (non-commercial, share-alike) once its noise-augmented
   rows are included — see the contract doc's licensing section before using or redistributing it.
   A DS-CNN has since been trained on this dataset and wired into the live streaming runtime as a
-  `ListeningGate` — see "Wakeword DS-CNN" below, this is no longer a follow-up. A parallel,
-  comparison-only "sesame" phrase instance of the same pipeline (all-TTS positives, its own
-  dataset + checkpoint, not a production cutover) is documented in
-  `docs/PROCESS-WAKEWORD.md`'s "Parallel 'sesame' phrase instance" section.
+  `ListeningGate` — see "Wakeword DS-CNN" below, this is no longer a follow-up. A parallel
+  "sesame" phrase instance of the same pipeline (all-TTS positives, its own dataset +
+  checkpoint) was originally built comparison-only, then promoted to production on
+  2026-09-28/29 after the `ambient-reverb-cooccurrence` experiment
+  (`wakeword-sesame-ambient-rir-45m`) — see `docs/PROCESS-WAKEWORD.md`'s "Parallel 'sesame'
+  phrase instance" and "Confound resolution, promotion, and cascade soak test" sections.
 - **A real DS-CNN wake-word model** (`src/me2_voicegen/wakeword/model.py`), trained, benchmarked,
   and wired into the streaming runtime's `ListeningGate` seam — see "Wakeword DS-CNN" below.
 - **Option B**: a second, real-dataset spoken-command grammar (19 intents) with its own trained
@@ -649,12 +653,14 @@ checkpoint above.
 
 The trained checkpoint is wired into the streaming runtime as a `WakeWordGate`, satisfying the
 same `ListeningGate` protocol the manual `SpacebarGate` does — see "Streaming inference" below.
-A parallel, comparison-only **"sesame" phrase instance** of this pipeline (different target word,
-all-TTS positives, its own `out/conversions/v2/wakeword-sesame/` dataset + `out/wakeword-sesame/`
-checkpoint, real eval numbers included) is documented in the "Parallel 'sesame' phrase instance"
-section of [`docs/PROCESS-WAKEWORD.md`](docs/PROCESS-WAKEWORD.md) — it is not wired into serving;
-promotion would be a separate decision. Full dataset-build stage-by-stage detail, architecture,
-and benchmark numbers for both instances are in
+A parallel **"sesame" phrase instance** of this pipeline (different target word, all-TTS
+positives, its own `out/conversions/v2/wakeword-sesame/` dataset + `out/wakeword-sesame/`
+checkpoint, real eval numbers included) was originally comparison-only, not wired into serving.
+It was **promoted to production on 2026-09-28/29** (`out/wakeword-sesame-ambient-rir-45m`, after
+the `ambient-reverb-cooccurrence` joint RIR+babble training experiment and a real-hardware
+cascade soak test) and now supersedes "computer" as the shipped wakeword checkpoint. Full
+dataset-build stage-by-stage detail, architecture, and benchmark numbers for both instances, plus
+the promotion and soak-test results, are in
 [`docs/PROCESS-WAKEWORD.md`](docs/PROCESS-WAKEWORD.md).
 
 ## VCMX — combined VCM + wakeword export & serving

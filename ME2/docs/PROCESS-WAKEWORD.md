@@ -45,7 +45,7 @@ intelligibility; most flags are the QA tool's own ratio-scoring quirk, not real 
 precomputation is applied only to the `_wakeword_` chain + `common_voice_negative_sample`, while
 `adversaries`/`adversaries_noisy` stay on a live-VAD-with-fallback path.
 
-## Parallel "sesame" phrase instance (comparison-only)
+## Parallel "sesame" phrase instance (comparison-only when built; PROMOTED TO PRODUCTION 2026-09-28/29 — see "Confound resolution, promotion, and cascade soak test" below)
 
 Built 2026-09-27 (ticket: `ME2/.scratch/wakeword-sesame/tickets/00-RECAP.md`
 in the main tree). Motivation: "computer" has too much pronunciation variance
@@ -55,10 +55,15 @@ as a wakeword. It is a **parallel, comparison-only** dataset
 (`generate_adversaries.py` gained a `--phrase-set` switch in T1,
 `build_unknown_external.py` a `--scrub-word` switch in T2 — both
 backward-compatible, default behavior byte-identical). **Not a production
-cutover**: the shipped "computer" checkpoints (`out/wakeword/`,
+cutover at build time**: the "computer" checkpoints (`out/wakeword/`,
 `out/wakeword-fil50/`) and the original `out/conversions/v2/wakeword/`
-dataset are untouched; promotion of "sesame" is a separate later human
-decision (mirrors the fil50-promotion precedent).
+dataset were left untouched, and promotion of "sesame" was deferred as a
+separate later human decision (mirrors the fil50-promotion precedent).
+**That promotion has since happened** — see "Confound resolution,
+promotion, and cascade soak test" below: `wakeword-sesame-ambient-rir-45m`
+(a descendant of this dataset, with the ambient-reverb-cooccurrence
+ticket's later changes layered on) is now the production wakeword
+checkpoint, superseding "computer".
 
 **Why the positive class had to be built differently (the part that isn't
 just re-running stages):** `positives_real`/`positives_converted` are
@@ -126,7 +131,7 @@ hardware (`out/wakeword-sesame/metadata/wakeword_benchmark.md`).
 §7); the `*_noisy` rows make the whole sesame dataset
 CC-BY-NC-SA-4.0-encumbered exactly like the computer dataset.
 
-### Ambient babble + reverb co-occurrence experiment (2026-09-28, comparison-only)
+### Ambient babble + reverb co-occurrence experiment (2026-09-28, SUPERSEDED — see "Confound resolution, promotion, and cascade soak test" below)
 
 Layered on the `ambient-noise-overlay` feature (its SPEC +
 `out/conversions/v2/wakeword-sesame/summary.md` are the canonical
@@ -181,6 +186,63 @@ never actually fired; wakeword noise exposure came only from the offline
 `*_noisy` subset rows. Baseline and -rir runs are equally affected, so
 the comparison above is valid within that frame; fixing the root (or the
 glob) is a separate decision with its own retraining cost.
+
+### Confound resolution, promotion, and cascade soak test (2026-09-28/29 — PROMOTED TO PRODUCTION)
+
+The "elevating RIR did not improve" verdict above turned out to be an artifact of two
+confounds, not a real finding: the `-rir` runs were undertrained relative to their
+baselines (43/29 epochs vs 56/42 in the same wall-clock budget), and the noise-root glob
+bug (above) meant wakeword's online noise pool was silently empty in every run compared.
+Both were controlled for:
+
+1. **The noise-root glob was fixed** (`WakewordDataset._noise_pool()` now `rglob`s;
+   `out/conversions/v2/background_noise` resolves to 2,153 wavs, not 0).
+2. **Training time was extended 1.5×** (30min → 45min) with the fixed pool, `p_rir 0.3`:
+   `out/wakeword-sesame-ambient-rir-45m` (26 epochs, best val loss 0.0244).
+
+`_wakeword_` recall under the same fixed noisy/reverb gate (seed 0), full comparison:
+
+| checkpoint | val recall | test recall | test F1 | test `_silence_` recall |
+|---|---|---|---|---|
+| `wakeword-sesame` (base manifest, no ambient) | 0.961 | 0.897 | 0.939 | 0.929 |
+| `wakeword-sesame-ambient` (broken pool, p_rir 0) | 0.931 | 0.899 | 0.944 | 0.821 |
+| `wakeword-sesame-ambient-rir` (broken pool, p_rir 0.3) | 0.936 | 0.856 | 0.913 | 0.679 |
+| **`wakeword-sesame-ambient-rir-45m`** (fixed pool, p_rir 0.3, 1.5× time) | **0.975** | **0.952** | **0.964** | **1.000** |
+
+The silence-recall collapse across the broken-pool runs (0.929 → 0.821 → 0.679) fully
+reverses once real online noise diversity is restored — best target-word recall and
+perfect silence recall of any sesame checkpoint tested. This is "working noise pool +
+adequate training time", not "RIR probability" in isolation — the three changes moved
+together, so this does not re-litigate the RIR-specific null result above, it supersedes
+the broken baseline it was measured against.
+
+**Promotion (2026-09-28/29, user decision):** `wakeword-sesame-ambient-rir-45m` checked
+in as the production wakeword checkpoint (commit `d5cd0e8` on `optionb-grammar-v2`),
+superseding both the "computer" wakeword and the plain (non-ambient) `wakeword-sesame`
+checkpoint. Clean val `_wakeword_` recall 0.9926 — on par with `wakeword-sesame-ambient`
+(0.9951), no regression. Accent recall gap 0.5pt (filipino 0.990/202, non-filipino
+0.995/206). Export/benchmark: fp32 124.5 KB / INT8 49.6 KB, p50 0.31/0.14 ms — well
+inside the ≤20 ms/100 ms-frame budget.
+
+**Cascade soak test (2026-09-29, real hardware, ~8 cumulative hours):**
+`docs/CASCADE-SOAK-TEST.md` runs the actual `me2_voicegen.vcm.streaming` cascade
+(`ListeningGate`/`wakeword_gate.py` → VCM, the two newly-promoted checkpoints) against
+real podcast/ambience recordings (`raw_datasets/ambient-noise/`) containing zero genuine
+"sesame" utterances — this measures the real end-to-end false-action rate, not the two
+stages' isolated FARs multiplied together (an independence assumption that was never
+verified). Result: **10 wakeword-gate false triggers, 0 resulted in a VCM accept** (all
+10 correctly REJECTed) — every trigger was loud/emphasized, close-mic natural speech
+(e.g. "necesseties", "tapos tapos", "kisser he kisses"), an acoustic register outside the
+training distribution and a failure mode the synthetic noisy_eval gate doesn't cover.
+Caveat: n=10 is a small sample (95% CI upper bound on the true compound-accept rate is
+~25-30%, not near-zero) — "no compound false actions observed under real, hard
+conditions," not a confident near-zero claim. Secondary, non-blocking finding: 1.25
+false wakeword triggers/hour on this content is a real standby-cost concern independent
+of the (so-far zero) compound-accept risk; adding this speech register to wakeword's
+`_unknown_` training data is a candidate future fix, not done here.
+
+Full task-by-task history, the confound-control numbers, and the soak test's caveats in
+full: `.scratch/ambient-reverb-cooccurrence/tickets/00-RECAP.md`'s Execution Log.
 
 ## Model architecture
 

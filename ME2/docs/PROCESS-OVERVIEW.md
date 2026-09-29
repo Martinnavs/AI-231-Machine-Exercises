@@ -75,7 +75,8 @@ and it's already how `vcmx-serve-wakeword` is wired — see `PROCESS-STREAMING-S
 | Streaming runtime | shipped | fp32 ONNX is the serving default (INT8 needs its own threshold re-tuning pass) |
 | VCMX (combined export/serve) | shipped, reviewed, approved | treatment 25,231 rows / control 21,055 rows, speaker-disjoint |
 | `accent-balance-fil50` (50/50 Filipino rebalance) | **complete, all criteria met** | wakeword accent recall gap 13.0pts → 0.4pts; see `PROCESS-DATA-GENERATION.md` / `MLOPS-PROJECTS.md` |
-| `wakeword-sesame` (parallel "sesame" wakeword phrase-instance) | **complete, comparison-only, not production** | `_wakeword_` F1 0.989, accent gap 0.1pt; see `PROCESS-WAKEWORD.md` / `MLOPS-PROJECTS.md` |
+| `wakeword-sesame` (parallel "sesame" wakeword phrase-instance) | complete at build time, comparison-only — **superseded by `ambient-reverb-cooccurrence` below** | `_wakeword_` F1 0.989, accent gap 0.1pt; see `PROCESS-WAKEWORD.md` / `MLOPS-PROJECTS.md` |
+| `ambient-reverb-cooccurrence` (RIR+babble joint training) | **PROMOTED TO PRODUCTION 2026-09-28/29** — `option-d-fil50-ambient-rir-135m` (VCM), `wakeword-sesame-ambient-rir-45m` (wakeword) | cascade soak test (8hrs real audio): 10 wakeword false triggers, 0 compound accepts; see `PROCESS-WAKEWORD.md` / `MLOPS-PROJECTS.md` / `CASCADE-SOAK-TEST.md` |
 
 Everything described in this doc set is landed, working, and has no open blocking decisions — see
 `PROCESS-DATA-GENERATION.md`'s "Current status" section for `accent-balance-fil50`'s decisions and

@@ -419,3 +419,95 @@ estimate, not real RPi hardware).
 production; recalibrating the streaming gate's wakeword threshold for sesame (still the
 unchanged 0.9 "computer" default). Full numbers, per-voice QA tables, and the complete
 task-by-task history: the ticket's Execution Log.
+
+## ambient-reverb-cooccurrence — RIR+babble joint training experiment (COMPLETE, PROMOTED TO PRODUCTION)
+
+Follow-up to the `ambient-noise-overlay` feature (which materialized offline babble noise
+into the VCM fil50 and sesame wakeword manifests). Ticket:
+`.scratch/ambient-reverb-cooccurrence/tickets/00-RECAP.md`. Original question: is the
+current babble-only training regime enough for production, or does reverb need to be
+layered on top, and is doing so even acoustically realistic given babble is already
+additively mixed into the audio (verdict: yes, realistic — convolution is linear, so
+convolving the already-mixed signal with one shared RIR is equivalent to reverberating
+both sources separately in the same room).
+
+**Verified asymmetry that motivated the work:** VCM's `--p-rir` already defaulted to 0.3
+(so `option-d-fil50-ambient` already had joint RIR+babble exposure); wakeword's
+`train.py` had no `--p-rir` flag at all and silently ran at 0.0 — zero reverb exposure
+despite having babble.
+
+**First pass (90/30-min budgets) — a null-to-negative result that turned out to be
+confounded, not real:** raising VCM's `p_rir` 0.3→0.7 and adding `p_rir 0.3` to wakeword
+produced flat-to-worse results (VCM noisy exact accuracy unchanged to 3 decimals with a
+10× noisy-babble-FAR increase; wakeword test recall fell 0.899→0.856). Root causes,
+found by a deliberate follow-up rather than accepted at face value: (a) the `-rir` runs
+were undertrained relative to their baselines under the same wall-clock budget (RIR
+convolution is expensive per batch); (b) `WakewordDataset._noise_pool()`'s
+`noise_root.glob("*.wav")` was non-recursive while the actual noise corpus's wavs live
+under `.../background_noise/audio/` — the online ESC-50 noise pool had been **silently
+empty for every wakeword training run to date** (production `wakeword`, `wakeword-fil50`,
+and every sesame variant). Fixed (`.rglob`), with a regression test proving the real bug
+shape (`tests/test_wakeword_dataset.py::test_noise_pool_finds_wavs_nested_under_an_audio_subdirectory`).
+
+**Second pass (1.5× time, fixed noise pool) — confound resolved, real gains on both
+models:**
+
+| VCM (test split, cross-tree noisy_eval, seed 0) | clean exact | noisy exact | noisy-clean gap | noisy babble FAR |
+|---|---|---|---|---|
+| `option-d-fil50-ambient` (p_rir 0.3, 56ep, 90min) | 0.9797 | 0.9256 | −5.4pt | 0.004 |
+| control: same config, 135min (p_rir 0.3, 78ep) | 0.9834 | 0.9359 | −4.6pt | 0.012 |
+| **`option-d-fil50-ambient-rir-135m`** (p_rir 0.7, 67ep, 135min) | **0.9868** | **0.9574** | **−2.9pt** | **0.039** |
+
+The p_rir-0.3-at-135min control isolates the two effects: more training time alone
+recovers ~28% of the gain at ~1/3 the FAR cost; the added reverb exposure (0.3→0.7 at
+equal time) buys the rest at proportionally more FAR cost. Both effects are real, not one
+masking the other — this was a deliberate confound-settling experiment, not an assumption.
+
+| Wakeword (test split, wakeword noisy_eval gate, seed 0) | test recall | test F1 | test silence recall |
+|---|---|---|---|
+| `wakeword-sesame-ambient` (broken pool, p_rir 0, 30min) | 0.899 | 0.944 | 0.821 |
+| `wakeword-sesame-ambient-rir` (broken pool, p_rir 0.3, 30min) | 0.856 | 0.913 | 0.679 |
+| **`wakeword-sesame-ambient-rir-45m`** (fixed pool, p_rir 0.3, 45min) | **0.952** | **0.964** | **1.000** |
+
+Fixing the noise-pool bug and extending training time together reverse the silence-recall
+collapse entirely and produce the best-performing sesame checkpoint measured to date.
+
+**Promotion (2026-09-28/29, user decision) — production checkpoints as of this entry:**
+- VCM: **`out/vcm/option-d-fil50-ambient-rir-135m`** (commit `7c94abb`), superseding
+  `option-d-fil50-ambient` / `option-d-fil50`. Accent gap 0.0074 vs. 0.0153 (roughly
+  halved); 18/19 intents improved. Traded cost, quantified not hidden: noisy babble FAR
+  0.039 vs. 0.004 (the checkpoint's own clean-val-chosen threshold moved looser,
+  −0.075→−0.1).
+- Wakeword: **`out/wakeword-sesame-ambient-rir-45m`** (commit `d5cd0e8`), superseding the
+  "computer" wakeword and plain `wakeword-sesame`. No regression found anywhere; accent
+  gap 0.5pt (filipino 0.990/202, non-filipino 0.995/206).
+- Both exports/benchmarks pass their latency budgets with large margin (VCM p50
+  3.7-3.8ms vs. no stated ceiling beyond the RPi-indicative 20ms/100ms-frame figure;
+  wakeword p50 0.14-0.31ms).
+
+**Cascade soak test (2026-09-29, real hardware, ~8 cumulative hours,
+`docs/CASCADE-SOAK-TEST.md`):** the promotion above rested on each checkpoint's own
+*isolated* noisy-gate FAR; multiplying VCM's 0.039 by wakeword's 0.040 (`_unknown_` miss
+rate under noise) gives an estimated ~0.16% compound false-action rate assuming
+independence — never actually measured end to end. This test runs the real
+`me2_voicegen.vcm.streaming` cascade (`ListeningGate`/`wakeword_gate.py` → VCM, not a
+hand-reconstructed call graph) against real podcast/ambience recordings
+(`raw_datasets/ambient-noise/`) containing zero genuine "sesame" utterances. Result: **10
+wakeword false triggers, 0 resulted in a VCM accept** — all 10 on loud/emphasized,
+close-mic natural speech outside the training distribution, a failure mode the synthetic
+noisy_eval gate never exercises. Caveat stated plainly: n=10 is a small sample (95% CI
+upper bound on the true compound rate is ~25-30%, not near-zero) — this is "no compound
+false actions observed under real, hard conditions," not a confidently near-zero claim.
+Secondary, non-blocking finding: 1.25 wakeword false-triggers/hour on this content is a
+real standby-cost concern independent of the (so-far zero) compound-accept risk.
+
+**Code changes** (all backward-compatible): `wakeword/train.py` gains `--p-rir` (default
+`0.0`); `wakeword/dataset.py`'s `_noise_pool()` now `rglob`s instead of `glob`;
+`wakeword/noisy_eval.py` is new (a wakeword port of `vcm/noisy_eval.py`'s fixed-seed
+determinism contract).
+
+**Open items, not addressed here:** the standby-cost false-trigger rate (1.25/hr on
+emphatic close-mic speech) is not fixed, only measured and flagged; a p_rir=0.3-at-135min
+wakeword control (mirroring the VCM confound-settling control) was not run, since the
+wakeword result already combined the pool fix with the time extension by design. Full
+task-by-task history: the ticket's Execution Log.
