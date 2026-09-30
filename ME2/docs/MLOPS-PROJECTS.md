@@ -524,6 +524,29 @@ Noisy = fixed-seed-0 `noisy_eval` (dumped cross-tree from `me2-iteration3`). Ful
   candidates for follow-up are MESSAGE-specific (long/low-per-char phrasing) analysis or a per-intent floor
   registered before looking at fresh data. All of val/test have now been seen many times; only ghosts, the
   streaming clips and the ambient soak are independent of threshold selection.
+- **Why MESSAGE scores low under D2 (`scripts/dense_pilot_message_analysis.py`, diagnostic only, no gate).**
+  MESSAGE is not a low-scoring intent overall (median d2 ≈ 0; 4.2% of its correct val/clean rows fall below
+  −1.204 vs. ≤ 2.3% for every other intent). The whole strict-per-cell miss (val/clean 95→92 of 97) is **3 clips
+  from 3 voices/groups, two of them from one speaker**: idx 3907 and 3908 (`ref_tagalog8`) and idx 965 (`s85`);
+  test loses 1 MESSAGE row net and val/noisy loses the same `ref_tagalog8` pair. Three findings:
+  1. **The lost clips contain extra speech around the phrase.** Unconstrained greedy reads `'message plos t'`
+     and `'message pos '` (trailing speech), `'siemessage'` (leading speech); their raw beam mass is −12 to
+     −16 nats. The grammar beam has to explain those off-phrase emissions, which is what D2 penalizes.
+  2. **Production B accepted them only through dilution.** Their B confidence is −0.093, −0.100, −0.073 against
+     the −0.1 threshold, from raw mass −12..−16 spread over T = 133..161 frames. These are the "weak evidence
+     hidden by blank frames" rows that dense scoring exists to reject. Whether rejecting "message <extra
+     word>" is right is a product question (a polite trailing word arguably should still act).
+  3. **Per-char normalization has a length bias, and it is the mechanism, not a MESSAGE quirk.** Correct rows
+     rejected at −1.204, val+test clean+noisy pooled: phrase ≤ 6 chars 5.2%, 7-10 chars 3.6%, 11-15 chars 2.2%,
+     16+ chars 0.7%. The same absolute deficit costs more per char on a short phrase; bare "message" (7 chars)
+     lands in the 3.6% band, while "send a message" (14) / "send my message" (15) are barely touched (0 of
+     70 val/clean rows below −1.204). The bias is also what removes false accepts: babble/silence FAs have
+     median winning-phrase length 4 (69% ≤ 6 chars at margin off), and 70% of the FAs C2 removes are ≤ 6 chars.
+     Raw mass alone would flip the bias (raw < −8 in 2.7% of ≤6-char rows vs. 8.4% of 16+ char rows).
+  Also: the MESSAGE miss is statistical-weight-light (3 rows, effectively 2 speakers, budget 3pp = 2.9 rows of
+  97). Not fixed. Candidate follow-ups, each needing its own pre-registered rule and fresh data: a length-aware
+  normalization (e.g. mass / len^α, α between 0 and 1) instead of a per-intent floor, and judging per-intent
+  budgets with speaker-clustered rather than row-level counts.
 - MV2: 0 alignment failures on all 4 dumps. MV4: beam mass exceeds the Viterbi score by median 3.9 nats
   (p95 9.6, max 21.1) on clean val targets, so D1 is a loose proxy for beam belief.
 - Decision constants were frozen before test scoring (`metadata/frozen_before_test_scoring.txt`, sha256 of
