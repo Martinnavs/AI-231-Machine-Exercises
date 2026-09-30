@@ -1085,6 +1085,7 @@ def test_decode_split_threads_required_command_margin(monkeypatch, vcm_fake_mani
         beam_width=50,
         device="cpu",
         required_command_margin=None,
+        score_mode="mean_frame",
     ):
         calls.append(required_command_margin)
         return DecodeResult(
@@ -1134,6 +1135,7 @@ def test_decode_split_threads_incomplete_gate_diagnostic_fields(monkeypatch, vcm
         beam_width=50,
         device="cpu",
         required_command_margin=None,
+        score_mode="mean_frame",
     ):
         return DecodeResult(
             intent="CALL",
@@ -1291,6 +1293,7 @@ def test_same_margin_across_evaluate_cli_streaming_config_and_decode(
         beam_width=50,
         device="cpu",
         required_command_margin=None,
+        score_mode="mean_frame",
     ):
         seen.append(required_command_margin)
         return DecodeResult(
@@ -1308,3 +1311,100 @@ def test_same_margin_across_evaluate_cli_streaming_config_and_decode(
         required_command_margin=args.required_command_margin,
     )
     assert seen and all(m == MARGIN for m in seen)
+
+
+# ---------------------------------------------------------------------------
+# --score-mode (dense-d2-loose-impl task 3)
+# ---------------------------------------------------------------------------
+
+
+def _run_main_capture(tmp_path, manifest_path, extra):
+    out_dir = tmp_path / "eval_out"
+    main(
+        [
+            "--manifest", str(manifest_path),
+            "--checkpoint", "unused.pt",
+            "--out-dir", str(out_dir),
+            "--slot-eval-manifest", str(tmp_path / "no_slot" / "manifest.csv"),
+            *extra,
+        ]
+    )
+    return json.loads((out_dir / "metadata" / "eval_report.json").read_text()), out_dir
+
+
+def test_default_threshold_grid_helper_selects_by_mode():
+    from me2_voicegen.vcm.evaluate import (
+        DEFAULT_THRESHOLD_GRID, PER_CHAR_THRESHOLD_GRID, default_threshold_grid,
+    )
+
+    assert default_threshold_grid("mean_frame") is DEFAULT_THRESHOLD_GRID
+    assert default_threshold_grid("per_char") is PER_CHAR_THRESHOLD_GRID
+    # per_char grid must actually sample the operating region (~ -1.2) finely
+    assert {-1.1, -1.2, -1.3} <= set(PER_CHAR_THRESHOLD_GRID)
+    assert list(PER_CHAR_THRESHOLD_GRID) == sorted(PER_CHAR_THRESHOLD_GRID, reverse=True)
+
+
+def test_main_default_score_mode_is_mean_frame_with_default_grid(
+    tmp_path, monkeypatch, vcm_fake_manifest_factory, vcm_stub_model_factory
+):
+    from me2_voicegen.vcm.evaluate import DEFAULT_THRESHOLD_GRID
+
+    manifest_path = _build_main_manifest(vcm_fake_manifest_factory)
+    _patch_load_checkpoint(monkeypatch, vcm_stub_model_factory)
+    report, out_dir = _run_main_capture(tmp_path, manifest_path, [])
+    section = report["grammar_sections"][0]
+    assert section["score_mode"] == "mean_frame"
+    assert [r["threshold"] for r in section["threshold_sweep_on_val"]] == list(DEFAULT_THRESHOLD_GRID)
+    assert "score mode" not in (out_dir / "metadata" / "eval_report.md").read_text()
+
+
+def test_main_per_char_uses_per_char_grid_and_labels_report(
+    tmp_path, monkeypatch, vcm_fake_manifest_factory, vcm_stub_model_factory
+):
+    from me2_voicegen.vcm.evaluate import PER_CHAR_THRESHOLD_GRID
+
+    manifest_path = _build_main_manifest(vcm_fake_manifest_factory)
+    _patch_load_checkpoint(monkeypatch, vcm_stub_model_factory)
+    report, out_dir = _run_main_capture(tmp_path, manifest_path, ["--score-mode", "per_char"])
+    section = report["grammar_sections"][0]
+    assert section["score_mode"] == "per_char"
+    assert [r["threshold"] for r in section["threshold_sweep_on_val"]] == list(PER_CHAR_THRESHOLD_GRID)
+    assert "score mode: `per_char`" in (out_dir / "metadata" / "eval_report.md").read_text()
+
+
+def test_main_threshold_grid_flag_still_overrides_per_char_grid(
+    tmp_path, monkeypatch, vcm_fake_manifest_factory, vcm_stub_model_factory
+):
+    manifest_path = _build_main_manifest(vcm_fake_manifest_factory)
+    _patch_load_checkpoint(monkeypatch, vcm_stub_model_factory)
+    report, _ = _run_main_capture(
+        tmp_path, manifest_path, ["--score-mode", "per_char", "--threshold-grid=-0.5,-1.5"]
+    )
+    assert [r["threshold"] for r in report["grammar_sections"][0]["threshold_sweep_on_val"]] == [-0.5, -1.5]
+
+
+def test_decode_split_per_char_confidence_is_raw_over_len_and_default_unchanged(
+    vcm_fake_manifest_factory, vcm_stub_model_factory
+):
+    from me2_voicegen.common.features import LogMelFeatureExtractor
+    from me2_voicegen.vcm.dataset import VCMDataset
+    from me2_voicegen.vcm.evaluate import decode_split
+
+    manifest_path = _build_main_manifest(vcm_fake_manifest_factory)
+    model = vcm_stub_model_factory(forced_ids=CALL_IDS)
+    ds = VCMDataset(manifest_path, split="val", augmenter=None)
+    fe = LogMelFeatureExtractor()
+    default = decode_split(model, fe, ds, TOY_GRAMMAR, 25, "cpu")
+    explicit = decode_split(model, fe, ds, TOY_GRAMMAR, 25, "cpu", score_mode="mean_frame")
+    per_char = decode_split(model, fe, ds, TOY_GRAMMAR, 25, "cpu", score_mode="per_char")
+    assert default == explicit
+    checked = 0
+    for d, p in zip(default, per_char):
+        assert (d.intent, d.slots, d.text) == (p.intent, p.slots, p.text)
+        if p.intent is not None:
+            checked += 1
+            # exact raw/len relation is pinned at decoder level; here: same mass, different scale
+            assert d.command_raw_score == p.command_raw_score
+            assert p.confidence != d.confidence
+            assert p.confidence <= 0.0
+    assert checked > 0

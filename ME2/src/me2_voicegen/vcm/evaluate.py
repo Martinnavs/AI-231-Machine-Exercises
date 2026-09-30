@@ -103,6 +103,39 @@ DEFAULT_THRESHOLD_GRID: tuple[float, ...] = (
     -5.0,
 )
 
+# `score_mode="per_char"` confidences (raw beam mass / phrase length; see
+# `vcm.decoder.decode_utterance`) live on a different scale than the default
+# per-frame ones: a weak accept is around -1, not -0.1, and the interesting
+# operating region (about -0.8 .. -1.6) is only sampled at -1.0/-1.5 by
+# DEFAULT_THRESHOLD_GRID. Used automatically for `--score-mode per_char`
+# unless `--threshold-grid` overrides it.
+PER_CHAR_THRESHOLD_GRID: tuple[float, ...] = (
+    0.0,
+    -0.05,
+    -0.1,
+    -0.25,
+    -0.5,
+    -0.75,
+    -0.8,
+    -0.9,
+    -1.0,
+    -1.1,
+    -1.2,
+    -1.3,
+    -1.4,
+    -1.5,
+    -1.6,
+    -1.8,
+    -2.0,
+    -2.5,
+    -3.0,
+    -5.0,
+)
+
+
+def default_threshold_grid(score_mode: str) -> tuple[float, ...]:
+    return PER_CHAR_THRESHOLD_GRID if score_mode == "per_char" else DEFAULT_THRESHOLD_GRID
+
 TARGET_BUCKET = "target_commands"
 REJECT_PROBE_BUCKETS = ("babble", "silence")
 
@@ -195,6 +228,7 @@ def decode_split(
     beam_width: int,
     device: str | torch.device,
     required_command_margin: float | None = None,
+    score_mode: str = "mean_frame",
 ) -> list[RowResult]:
     """Decode every row of `dataset` against `grammar` once, at the most
     permissive possible threshold (`-inf`) -- this captures each row's
@@ -217,6 +251,7 @@ def decode_split(
             beam_width=beam_width,
             device=device,
             required_command_margin=required_command_margin,
+            score_mode=score_mode,
         )
         confidence = None if decoded.intent is None else decoded.confidence
         results.append(
@@ -624,10 +659,11 @@ def evaluate_grammar(
     threshold_grid: tuple[float, ...] = DEFAULT_THRESHOLD_GRID,
     intent_labels: list[str] | None = None,
     required_command_margin: float | None = None,
+    score_mode: str = "mean_frame",
 ) -> dict:
     val_results = decode_split(
         model, feature_extractor, val_dataset, grammar, beam_width, device,
-        required_command_margin=required_command_margin,
+        required_command_margin=required_command_margin, score_mode=score_mode,
     )
     sweep = sweep_thresholds(val_results, threshold_grid)
     chosen = choose_operating_threshold(sweep)
@@ -635,7 +671,7 @@ def evaluate_grammar(
 
     test_results = decode_split(
         model, feature_extractor, test_dataset, grammar, beam_width, device,
-        required_command_margin=required_command_margin,
+        required_command_margin=required_command_margin, score_mode=score_mode,
     )
     confusion = confusion_counts(test_results, threshold)
 
@@ -653,6 +689,7 @@ def evaluate_grammar(
         "chosen_operating_threshold": threshold,
         "chosen_operating_point_val_stats": chosen,
         "required_command_margin": required_command_margin,
+        "score_mode": score_mode,
         "incomplete_prefix_rejections": _incomplete_prefix_rejection_counts(
             val_results, test_results
         ),
@@ -697,6 +734,7 @@ def evaluate_slot_eval_set(
     beam_width: int,
     device: str | torch.device,
     required_command_margin: float | None = None,
+    score_mode: str = "mean_frame",
 ) -> dict:
     """Runs Task 07's slot-eval-set clips (if present) through the same
     pipeline, at the already-chosen (`test`-split-reported) operating
@@ -723,6 +761,7 @@ def evaluate_slot_eval_set(
         decoded = infer_waveform(
             model, feature_extractor, waveform, grammar, threshold=threshold, beam_width=beam_width,
             device=device, required_command_margin=required_command_margin,
+            score_mode=score_mode,
         )
         per_row.append(
             {
@@ -856,6 +895,11 @@ def render_markdown(report: dict) -> str:
         lines.append(f"- `silence` false-accept rate: {fas['false_accepts']}/{fas['n']} {fas_rate_str}")
         # `.get`-based: old reports / partial section dicts without the key
         # render exactly as before (no line).
+        if section.get("score_mode", "mean_frame") != "mean_frame":
+            lines.append(
+                f"- score mode: `{section['score_mode']}` (confidences and thresholds are "
+                "on the per-character scale, not comparable to per-frame reports)"
+            )
         rejections = section.get("incomplete_prefix_rejections")
         if rejections is not None and section.get("required_command_margin") is not None:
             lines.append(
@@ -1051,6 +1095,17 @@ def build_arg_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
+        "--score-mode",
+        choices=("mean_frame", "per_char"),
+        default="mean_frame",
+        help=(
+            "what the confidence threshold measures (vcm.decoder.decode_utterance): "
+            "'mean_frame' (default; beam log mass / T) or 'per_char' (beam log mass / "
+            "phrase length). per_char switches the default val sweep grid to "
+            "PER_CHAR_THRESHOLD_GRID; --threshold-grid still overrides"
+        ),
+    )
+    parser.add_argument(
         "--slot-eval-manifest",
         type=Path,
         default=DEFAULT_SLOT_EVAL_MANIFEST,
@@ -1087,7 +1142,7 @@ def main(argv: list[str] | None = None) -> None:
     metadata_dir = args.out_dir / "metadata"
     metadata_dir.mkdir(parents=True, exist_ok=True)
 
-    threshold_grid = DEFAULT_THRESHOLD_GRID
+    threshold_grid = default_threshold_grid(args.score_mode)
     if args.threshold_grid:
         threshold_grid = tuple(float(x) for x in args.threshold_grid.split(","))
 
@@ -1125,6 +1180,7 @@ def main(argv: list[str] | None = None) -> None:
             threshold_grid,
             intent_labels,
             args.required_command_margin,
+            args.score_mode,
         )
         grammar_sections.append(section)
         ts = section["test_split"]
@@ -1155,6 +1211,7 @@ def main(argv: list[str] | None = None) -> None:
                         args.beam_width,
                         args.device,
                         args.required_command_margin,
+                        args.score_mode,
                     )
                 )
         except Exception as exc:  # noqa: BLE001 - optional section, must not hard-fail
