@@ -1,0 +1,21 @@
+clip_id,text,label,slots,take,path,duration
+uv_call_1,Call,CALL,{},1,out/conversions/v2/user_voice/source/uv_call_1.wav,1.272
+uv_change_color_to_blue_1,Change color to blue,COLOR,"{""COLOR"": ""blue""}",1,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav,2.544
+uv_change_color_to_green_1,Change color to green,COLOR,"{""COLOR"": ""green""}",1,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav,2.592
+uv_change_color_to_green_2,Change color to green,COLOR,"{""COLOR"": ""green""}",2,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav,2.112
+uv_change_color_to_red_1,Change color to red,COLOR,"{""COLOR"": ""red""}",1,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav,2.136
+uv_make_a_phone_call_1,Make a phone call,CALL,{},1,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav,2.208
+uv_place_a_call_1,Place a call,CALL,{},1,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav,1.776
+uv_send_my_message_1,Send my message,MESSAGE,{},1,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav,2.016
+uv_send_my_message_2,Send my message,MESSAGE,{},2,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav,1.656
+uv_send_my_message_3,Send my message,MESSAGE,{},3,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav,1.824
+uv_set_color_to_green_1,Set color to green,COLOR,"{""COLOR"": ""green""}",1,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav,2.304
+uv_set_color_to_red_1,Set color to red,COLOR,"{""COLOR"": ""red""}",1,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav,2.184
+uv_show_my_reminders_1,Show my reminders,LIST_REMINDERS,{},1,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav,2.448
+uv_shut_off_the_lights_1,Shut off the lights,LIGHT_OFF,{},1,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav,1.488
+uv_shut_off_the_lights_2,Shut off the lights,LIGHT_OFF,{},2,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav,2.016
+uv_shut_off_the_lights_3,Shut off the lights,LIGHT_OFF,{},3,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav,1.824
+uv_switch_color_to_green_1,Switch color to green,COLOR,"{""COLOR"": ""green""}",1,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav,2.520
+uv_switch_color_to_red_1,Switch color to red,COLOR,"{""COLOR"": ""red""}",1,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav,2.736
+uv_what_time_is_it_1,What time is it,TIME,{},1,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav,1.800
+uv_what_time_is_it_2,What time is it,TIME,{},2,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav,1.824

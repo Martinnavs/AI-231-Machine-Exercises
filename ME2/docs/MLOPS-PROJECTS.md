@@ -699,3 +699,66 @@ emphatic close-mic speech) is not fixed, only measured and flagged; a p_rir=0.3-
 wakeword control (mirroring the VCM confound-settling control) was not run, since the
 wakeword result already combined the pool fix with the time extension by design. Full
 task-by-task history: the ticket's Execution Log.
+
+## user-voice-weak-phrases — the user's own recordings, voice-converted into personas (COMPLETE, NOT PROMOTED)
+
+Request (2026-09-30): take the 20 recordings in `raw_datasets/added-audio` (the user's voice, file name = spoken
+phrase, covering the six phrases the grammar marks "weak": CALL, COLOR, LIGHT_OFF, LIST_REMINDERS, MESSAGE, TIME),
+map the voice against the fil50 personas, append to the VCM datasets, keep the perturbations identical, and retrain
+with the `option-d-fil50-ambient-rir-135m` methodology. Decisions: ~50 random representative personas, train split
+only, VCM only (wakeword untouched), per-intent cap for class balance. Code: `src/me2_voicegen/user_voice/`
+(prep → plan → convert → QA → collate → ambient mix → assemble), tests `tests/test_user_voice.py`; plan in
+`.scratch/user-voice-weak-phrases/PLAN.md`.
+
+**Data build.** All 20 file names parsed and labeled through `OPTIONB_GRAMMAR` (e.g. "Set color to green" →
+COLOR/green). Personas: seeded random sample of 50 train-split voices, stratified proportionally (42 sapinsapin +
+8 references). 750 jobs, capped at 150 per intent (COLOR has 8 clips and would otherwise have been 400): CALL 150,
+COLOR 150, LIGHT_OFF 150, MESSAGE 150, TIME 100, LIST_REMINDERS 50. CosyVoice2 `convert_voice`, 2 GPUs, 750/750
+converted. QA = the fil50 gate (faster-whisper small, threshold 0.80): **648/750 passed (86.4%)**; per clip the
+pass rate is very uneven (set_color_to_red_1 1/19, shut_off_the_lights_1 19/50, place_a_call_1 27/50), and ASR on the
+20 raw recordings themselves passes 19/20 (the one miss is "switch code with red"), so labels are right and the
+losses are conversion-induced unintelligibility — note the gate therefore preferentially drops the converted clips
+ASR finds hardest. Perturbations: ESC-50 noisy siblings at the fil50 rate (305 siblings on 648 clean, 47% vs. 44.5%)
+via the fil50 collate mixer; ambient babble overlay by the established `mix_ambient_noise` tool on the new rows only
+(same p_mix 0.5, SNR U[0,30] dB, 2 attempts, ASR-gated, existing corpus, seed 0): 515/634 stored (81.2% gate pass vs.
+90.2% in the original run). Every existing row is untouched (val/test byte-identical). Final manifest
+`out/conversions/v2/optionb-v3-vcmx-fil50-ambient-uservoice/manifest.csv`: 58,516 → 59,984 rows (+648 clean, +305
+noisy, +515 ambient), all train. Train class range 1110..4216 → 1211..4274 (max/min 3.80 → 3.53); COLOR (4031 →
+4274) edges past TEMPERATURE (4216) by 58 rows because the cap applies to converted pairs and the noisy/ambient
+siblings add rows beyond it.
+
+**Training.** Exactly the production recipe (`vcm.train --preset optiond --max-minutes 135 --seed 0 --p-rir 0.7`,
+all other hyperparameters default), GPU 6 → `out/vcm/option-d-fil50-ambient-rir-135m-uservoice`. Best val loss
+**0.25224 vs. 0.25202** for production (same val set), 62 epochs vs. 67 in the same 135-minute budget, NaN batches
+auto-recovered in both, 0 CTC-infeasible items. The working tree's `train.py`/`model.py` carried another session's
+uncommitted QuartzNet refactor during this run; reviewed by diff, behavior-identical for `optiond` (output_lengths
+is the identity for MatchboxNet; adds CTC-infeasibility counters and a `model_type` checkpoint key).
+
+**Results — headline convention (fil50 val/test, 3330 / 3494 targets, the manifest production's reports use).**
+Each model at its own clean-val-chosen threshold: old −0.1, new −0.075. Test exact clean 0.9868 → 0.9800, noisy
+0.9574 → 0.9347; test babble FA clean 3 → 1, noisy 10 → 0. **That comparison is confounded by the threshold
+move.** At a FIXED threshold the models are essentially equal (pooled over val+test × clean+noisy, 13,648 target
+rows, margin off):
+
+| threshold | old exact | new exact | delta | test-noisy reject FA old / new |
+|---|---|---|---|---|
+| −0.1 | 13,118 | 13,087 | −31 (−0.23 pp) | 16 / 16 |
+| −0.075 | 12,940 | 12,906 | −34 (−0.25 pp) | 7 / 4 |
+
+Weak intents at −0.1 (pooled n per intent): LIGHT_OFF +3 (450), CALL +4 (380), LIST_REMINDERS +4 (428), COLOR 0
+(1282), MESSAGE 0 (420), TIME −1 (432) → net +10 of 2,492 (+0.4 pp); PAUSE −3, STOP −2, NEXT +9. **No measurable
+headline improvement on the weak intents; no measurable regression either** (single seed, differences under
+~0.3 pp are within run-to-run noise). False accepts run slightly higher for the retrain at a given threshold (e.g.
+val/clean at −0.1: 22 vs. 13; at −0.2: 223 vs. 178), which is also why its Youden-optimal threshold moved to −0.075.
+Same-manifest official evals on the ambient-inclusive val/test (5,076 / 5,527 targets; each at its own threshold):
+old (−0.1) test accept 0.9790 / exact 0.9783, babble FA 3/255; new (−0.075) 0.9683 / 0.9676, babble FA 1/255 —
+the same threshold-move pattern. On the user's own 20 recordings both models classify 20/20 correctly; the retrain
+is far more confident on them (confidence ≈ 0 vs. −0.07 to −0.09 on "Call" and "What time is it"), expected since
+their prosody was in training via the conversions (so this is an in-distribution check, not held-out).
+
+**Why no bigger effect (hypotheses, not tested).** 648 clean rows (1.1% of train, from one speaker's prosody)
+against 1,110-4,200 rows per intent is small; the weak intents are already ≥ 94% exact on val/test; and the val/test
+sets contain no recordings of the user's voice, so they cannot show a benefit specific to it. A held-out set of the
+user's voice would be the right measurement and does not exist (all 20 clips were used). **Not done:** export/bench
+of the new checkpoint, the fixed-seed noisy gate on the ambient manifest, ghost/streaming checks, a control retrain
+of the old manifest at another seed to size run-to-run noise. Checkpoint is **not promoted**; production is unchanged.
