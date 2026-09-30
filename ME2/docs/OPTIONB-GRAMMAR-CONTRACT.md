@@ -25,18 +25,18 @@ divergences remain** -- `vcm.optionb.grammar.KNOWN_README_DIVERGENCES == []`
 | `$CMD_PAUSE` | Pause | Pause audio | Pause for now |
 | `$CMD_STOP` | Stop | Stop playing | End playback |
 | `$CMD_LIGHT_ON` | Lights on | Power on the lights | Turn on the lights |
-| `$CMD_LIGHT_OFF` | Lights out | Kill the lights | Shut off the lights |
-| `$CMD_BRIGHTNESS` | Brightness {percent} | Adjust brightness to {percent} | Brightness level {percent} |
-| `$CMD_COLOR` | Change color to {color} | Switch color to {color} | Set color to {color} |
+| `$CMD_LIGHT_OFF` | Lights out | Kill the lights | Shut off the lights (weak)| 
+|`$CMD_BRIGHTNESS` | Brightness {percent} | Adjust brightness to {percent} | Brightness level {percent} |
+| `$CMD_COLOR` | Change, color to {color} | Switch, color to {color} | Set color to {color} (weak) |
 | `$CMD_TEMPERATURE` | Temperature {degrees} | Change the temperature to {degrees} | Set the temperature to {degrees} |
 | `$CMD_WEATHER` | Weather | What's the weather? | Tell me the weather |
-| `$CMD_TIME` | Time | What time is it? | Tell me the time |
+| `$CMD_TIME` | Time | What time is it? (weak) | Tell me the time |
 | `$CMD_TIMER` | Timer {duration} | Countdown for {duration} | Start a timer for {duration} |
 | `$CMD_ALARM` | Alarm {time} | Wake me up at {time} | Set an alarm for {time} |
-| `$CMD_CALL` | Call | Place a call | Make a phone call |
-| `$CMD_MESSAGE` | Message | Send a message | Send my message |
+| `$CMD_CALL` | Call (weak) | Place a call | Make a phone call |
+| `$CMD_MESSAGE` | Message | Send a message | Send my message (weak) |
 | `$CMD_CREATE_REMINDER` | Reminder {task} | Remind me to {task} | Create a reminder to {task} |
-| `$CMD_LIST_REMINDERS` | Reminders | Show my reminders | List my reminders |
+| `$CMD_LIST_REMINDERS` | Reminders | Show my reminders (weak) | List my reminders |
 
 ## 2. Slot vocabularies (source of truth: `src/me2_voicegen/vcm/optionb/grammar.py`, `vcm/optionb/numbers.py`)
 
