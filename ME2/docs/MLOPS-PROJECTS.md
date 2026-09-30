@@ -471,6 +471,25 @@ Noisy = fixed-seed-0 `noisy_eval` (dumped cross-tree from `me2-iteration3`). Ful
   −1.504), and test noisy FA first appears at ~−1.42; tau* sits at a val FA cliff edge (−1.248 already has val
   clean FA 4 > 3), so the val selection may be optimistic. Test was already seen for D2; ghosts and the val-only
   selection are the independent parts.
+- **Implementation status + calibration checks for shipping D2 (2026-09-30; feature `dense-d2-loose-impl`,
+  plan `.scratch/dense-d2-loose-impl/PLAN.md`).** Tasks 1-3 landed as opt-in code, default behavior unchanged
+  (`score_mode` in `decode_utterance`/`decode`/pipeline/streaming/config/CLI/Makefile; `evaluate.py
+  --score-mode` with `PER_CHAR_THRESHOLD_GRID`). Two checks on the production checkpoint:
+  1. **Real-harness cross-check (`scripts/dense_pilot_harness_check.py`, `metadata/dense_harness_check.json`):
+     MATCH.** `python -m me2_voicegen.vcm.evaluate --score-mode per_char` (CPU, fil50 manifest, beam 50; report in
+     `dense_pilot/eval_per_char/metadata/`) agrees exactly with the offline D2 records on all 20 val sweep rows
+     (target accept rate and reject FA rate) and on the test counts at its own chosen threshold (Youden -> −1.1:
+     test accept 0.986, exact 0.985, babble FA 0/255, silence FA 0/324). So the offline pilot numbers describe the
+     real decoder path.
+  2. **tau* stability (`scripts/dense_pilot_stability.py`, rule frozen in `metadata/frozen_before_stability.txt`,
+     `metadata/dense_tau_stability.json`): UNSTABLE by one false accept.** tau* fit separately on two
+     speaker-disjoint val halves: −1.344 (half 0) and −1.074 (half 1), gap 0.27 (S1 <= 0.30 passes).
+     Applied to the other half: fit-half0→apply-half1 clean FA 3 vs. production 2 (S2 fails; noisy FA 2 vs. 5), the
+     other direction 0 vs. 1 clean and 1 vs. 3 noisy. Pooled held-out exact: clean 3273 vs. 3242, noisy 3078
+     vs. 2985 (S3 passes). Interpretation: the loose end of the range (~−1.34) leaks FAs; the val-full tau*
+     (−1.204) sits inside a −1.07..−1.34 band that a two-way split can't pin down. A more conservative tau is a
+     hypothesis, not a result: choosing it after seeing this would need a new pre-registered rule.
+  Test/val were both seen during pilots, so these are consistency checks, not fresh-data evidence.
 - MV2: 0 alignment failures on all 4 dumps. MV4: beam mass exceeds the Viterbi score by median 3.9 nats
   (p95 9.6, max 21.1) on clean val targets, so D1 is a loose proxy for beam belief.
 - Decision constants were frozen before test scoring (`metadata/frozen_before_test_scoring.txt`, sha256 of
