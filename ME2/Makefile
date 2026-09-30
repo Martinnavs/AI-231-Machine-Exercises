@@ -107,8 +107,15 @@ STREAM_ARGS ?=
 # override with a wav path for a deterministic file-replay run).
 APP_VENV_BIN ?= .venv/bin
 APP_PIPELINE_SOURCE ?= mic
+# Defaults are the original hardcoded app-pipeline values (mean_frame scoring).
+APP_PIPELINE_THRESHOLD ?= -0.075
+APP_PIPELINE_MARGIN ?= 4.0
+APP_PIPELINE_SCORE_MODE ?= mean_frame
+# Opt-in trial threshold for `make app-pipeline-perchar` (per-character scale, ~-1; see
+# docs/DENSE-SCORING-DECISION.md for the safe range).
+APP_PERCHAR_THRESHOLD ?= -1.204
 
-.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
+.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream app-pipeline-perchar wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
 
 WAKEWORD_CLONE_DIR ?= $(if $(TMPDIR),$(TMPDIR),/tmp)/me2_wakeword_clone
 WAKEWORD_POSITIVES_OUT_DIR ?= out/conversions/v2/wakeword/positives_real
@@ -267,7 +274,14 @@ app:
 # to stderr, so stdout stays clean JSONL for the pipe. Override
 # APP_PIPELINE_SOURCE with a wav path for a file-replay run.
 app-pipeline:
-	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model out/vcm/option-d-fil50-ambient-rir-135m --backend onnx --onnx-variant int8 --grammar optionb --threshold -0.075 --required-command-margin 4.0 --beam-width 50 --gate wakeword --policy single_period --gate-period 3 --wakeword-model out/wakeword-sesame --wakeword-backend onnx --log-periods --source "$(APP_PIPELINE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward
+	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model out/vcm/option-d-fil50-ambient-rir-135m --backend onnx --onnx-variant int8 --grammar optionb --threshold $(APP_PIPELINE_THRESHOLD) $(if $(APP_PIPELINE_MARGIN),--required-command-margin $(APP_PIPELINE_MARGIN),) --score-mode $(APP_PIPELINE_SCORE_MODE) --beam-width 50 --gate wakeword --policy single_period --gate-period 3 --wakeword-model out/wakeword-sesame --wakeword-backend onnx --log-periods --source "$(APP_PIPELINE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward
+
+# OPT-IN TRIAL (dense-d2-loose-impl): the same pipeline scored per character
+# instead of per frame, no incomplete-prefix margin gate. NOT the production
+# setting -- see docs/DENSE-SCORING-DECISION.md for the evidence, caveats, and
+# what to report back. Rollback = use `make app-pipeline` (unchanged defaults).
+app-pipeline-perchar:
+	$(MAKE) app-pipeline APP_PIPELINE_SCORE_MODE=per_char APP_PIPELINE_THRESHOLD=$(APP_PERCHAR_THRESHOLD) APP_PIPELINE_MARGIN=
 
 # Wakeword ("computer"-only) dataset-build targets. See
 # docs/WAKEWORD-DATASET-CONTRACT.md for the manifest schema/output layout
