@@ -94,6 +94,9 @@ def resolve_transcript(manifest_row: Mapping[str, str]) -> str | None:
       (noise is signaled via `_noisy` in `filename`, the same convention
       `optionb`'s own noisy rows use -- not a distinct source_dataset
       value the way wakeword's `_noisy` subsets are).
+    - user_voice_persona (feature `user-voice-weak-phrases`): the user's own
+      recordings voice-converted into fil50 persona voices; own manifest's
+      `transcript`, resolved exactly like `fil50_persona`.
     - optionb_ambient / vcm_balanced_ambient (feature `ambient-noise-overlay`):
       mixed siblings of an `optionb`/`vcm_balanced` base row carrying its
       `transcript` verbatim -> resolve through the base's branch (the
@@ -110,7 +113,7 @@ def resolve_transcript(manifest_row: Mapping[str, str]) -> str | None:
     if source_dataset == "filipino_speech_corpus":
         return None
 
-    if source_dataset in ("optionb", "vcm_balanced", "fil50_persona"):
+    if source_dataset in ("optionb", "vcm_balanced", "fil50_persona", "user_voice_persona"):
         return prepare_ctc_transcript(manifest_row["transcript"])
 
     if source_dataset in ("common_voice_negative", "youtube_institutional"):
