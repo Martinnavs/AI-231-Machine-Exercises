@@ -1,0 +1,48 @@
+{
+ "config": "C2",
+ "P1": false,
+ "P1_fa_ok": true,
+ "P1_exact_ok": true,
+ "P1_per_cell_fails": [
+  "MESSAGE@val/clean"
+ ],
+ "P2": true,
+ "ghost_fa": 5,
+ "B_ghost_fa": 27,
+ "S": {
+  "val/clean": [
+   3276,
+   2
+  ],
+  "val/noisy_s0": [
+   3094,
+   4
+  ],
+  "test/clean": [
+   3446,
+   0
+  ],
+  "test/noisy_s0": [
+   3344,
+   0
+  ]
+ },
+ "B": {
+  "val/clean": [
+   3242,
+   3
+  ],
+  "val/noisy_s0": [
+   2985,
+   8
+  ],
+  "test/clean": [
+   3434,
+   2
+  ],
+  "test/noisy_s0": [
+   3282,
+   4
+  ]
+ }
+}

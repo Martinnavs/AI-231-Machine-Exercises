@@ -490,6 +490,40 @@ Noisy = fixed-seed-0 `noisy_eval` (dumped cross-tree from `me2-iteration3`). Ful
      (−1.204) sits inside a −1.07..−1.34 band that a two-way split can't pin down. A more conservative tau is a
      hypothesis, not a result: choosing it after seeing this would need a new pre-registered rule.
   Test/val were both seen during pilots, so these are consistency checks, not fresh-data evidence.
+- **Task-5 validation gates, run sequentially for production B, conservative C1 (per_char −1.1, val-Youden from
+  the real harness) and current C2 (per_char −1.204); no margin gate on C1/C2 (`scripts/dense_pilot_gates.py`,
+  rule frozen in `metadata/frozen_before_gates.txt`, summary `metadata/dense_gates_summary.json`). Verdict per the
+  pre-registered strict per-cell rule: FAIL for BOTH candidates — on P1 only.** C1 was fixed from val-only
+  information, but the earlier loosening curve had printed test numbers near −1.1, so it is not test-blind.
+
+  | gate | B (production) | C1 (−1.1) | C2 (−1.204) |
+  |---|---|---|---|
+  | P1 offline, strict per-cell (val+test, clean+noisy) | — | **FAIL** (MESSAGE val/clean, val/noisy) | **FAIL** (MESSAGE val/clean) |
+  | ...FA <= B and exact >= B in every cell | — | pass | pass |
+  | P2 ghost FA of 141 (B = 27) | 27 | 4 pass | 5 pass |
+  | P3 real wakeword->VCM cascade soak, ACCEPT count | 0 | 0 | 0 |
+  | P3b VCM-only ambient soak triggers (4 recordings, ~3.5 h) | 303 | 14 pass | 17 pass |
+  | P4 streaming recall, INT8 CLI, gate none, 821 test clips: correct first trigger | 720 | 746 pass | 737 pass |
+  | ...wrong-intent triggers | 111 | 64 | 74 |
+  | ...PAUSE / STOP / TIME | 87 / 129 / 86 | 96 / 131 / 92 | 95 / 131 / 92 |
+
+  Caveats stated plainly. **P3 is vacuous:** on all 4 ambient recordings the wakeword never opened a listening
+  period (0 periods for every config), so the VCM never ran inside the real cascade; the earlier soak's 10
+  false triggers came from podcast speech that is not available here. **P3b was added after B's P3 result showed
+  that (amendment logged in `frozen_before_gates.txt`, before any candidate number existed)** — it runs the VCM
+  alone over the same audio, so it upper-bounds compound false actions (no wakeword filter). **A cascade
+  "sesame"+command composition test was tried and discarded:** the wakeword gate re-fires through the command
+  speech, restarting the 3 s period so it never closes on the command — it would have measured the wakeword, not
+  the scoring change. P4 is therefore a streaming-VCM test, not a full cascade recall. Composed clips are
+  mostly voice-cloned test audio (see Iteration 3 notes on synthetic share). **Clip-level vs. streaming:** on
+  whole clips D2 loses a few PAUSE/STOP accepts vs. production (see loosen probe), but in streaming windows
+  (2.5 s, mostly silence around the command) it wins on all three focus intents — the per-frame score is diluted
+  by non-speech frames there, which is what per_char removes. **The strict per-cell rule fails on a single
+  intent (MESSAGE, n=97 on val):** C1 is worse than C2 there (stricter threshold rejects more MESSAGE), so
+  "more conservative" does not fix it; MESSAGE also appeared in the val-half stability analysis. Not fixed;
+  candidates for follow-up are MESSAGE-specific (long/low-per-char phrasing) analysis or a per-intent floor
+  registered before looking at fresh data. All of val/test have now been seen many times; only ghosts, the
+  streaming clips and the ambient soak are independent of threshold selection.
 - MV2: 0 alignment failures on all 4 dumps. MV4: beam mass exceeds the Viterbi score by median 3.9 nats
   (p95 9.6, max 21.1) on clean val targets, so D1 is a loose proxy for beam belief.
 - Decision constants were frozen before test scoring (`metadata/frozen_before_test_scoring.txt`, sha256 of
