@@ -762,3 +762,14 @@ sets contain no recordings of the user's voice, so they cannot show a benefit sp
 user's voice would be the right measurement and does not exist (all 20 clips were used). **Not done:** export/bench
 of the new checkpoint, the fixed-seed noisy gate on the ambient manifest, ghost/streaming checks, a control retrain
 of the old manifest at another seed to size run-to-run noise. Checkpoint is **not promoted**; production is unchanged.
+
+## quartznet-ctc — QuartzNet-5x3-tiny stride-2 student vs. `optiond` (COMPLETE, PROMOTION PENDING)
+
+Full write-up: `docs/QUARTZNET-STUDENT.md`. A 911k-parameter QuartzNet-style CTC model with 2x temporal subsampling,
+trained with `optiond`'s exact data and recipe, beat `optiond` in both seeds on the fixed-seed noisy gate
+(two-seed mean noisy exact 97.8% vs. 94.8%; noisy babble FA 1 and 1 vs. 10 and 3), exports a smaller INT8 file
+(994,898 B vs. 1,042,226 B), and runs end to end 0.55x as long (p50 134.7 vs. 245.7 ms on EPYC, beam 50) because the
+grammar beam search sees half the frames. Ablations (stride-1 QuartzNet, `optiond` with a ~3 s receptive field) both
+landed near `optiond`, pointing at the 20 ms output frame rate as the source of the gain (not tested further).
+Not done: re-tuned threshold/margin, a real-audio cascade soak, Pi latency/RSS, and two tools that assume 10 ms per
+posterior frame; these are tickets in `.scratch/quartznet-promotion/`. Production still serves `optiond`.
