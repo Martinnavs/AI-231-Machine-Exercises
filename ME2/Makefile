@@ -118,12 +118,17 @@ APP_PIPELINE_SCORE_MODE ?= mean_frame
 # Opt-in trial threshold for `make app-pipeline-perchar` (per-character scale, ~-1; see
 # docs/DENSE-SCORING-DECISION.md for the safe range).
 APP_PERCHAR_THRESHOLD ?= -1.204
-# `app-pipeline-quartznet` operating point. PLACEHOLDERS until
-# quartznet-promotion ticket 02 fills them from the recalibration (see
-# docs/QUARTZNET-OPERATING-POINT.md once it lands); until then they carry the
-# seed-0 clean-val choice (-0.1) and optiond's margin (4.0).
+# `app-pipeline-quartznet` operating point (quartznet-promotion ticket 02,
+# docs/QUARTZNET-OPERATING-POINT.md): -0.1 is the seed-0 clean-val Youden
+# choice with full test gates in
+# out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/metadata/eval_report.json;
+# 20.0 is the incomplete-prefix gate's val selection on the real-target
+# manifest (val_selection.json in
+# out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/metadata/
+# incomplete_calibration_realtarget/; holdout test_report.json consistent:
+# target exact 116/129 -> 115/129, far_excl_digital_zero 0.0132 -> 0.0057).
 APP_QUARTZNET_THRESHOLD ?= -0.1
-APP_QUARTZNET_MARGIN ?= 4.0
+APP_QUARTZNET_MARGIN ?= 20.0
 
 .PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream app-pipeline-perchar app-pipeline-quartznet quartznet-eval-report wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
 
@@ -294,8 +299,8 @@ app-pipeline-perchar:
 	$(MAKE) app-pipeline APP_PIPELINE_SCORE_MODE=per_char APP_PIPELINE_THRESHOLD=$(APP_PERCHAR_THRESHOLD) APP_PIPELINE_MARGIN=
 
 # quartznet-promotion ticket 01: the same pipeline serving the stride-2
-# QuartzNet-5x3-tiny INT8 export. APP_QUARTZNET_THRESHOLD/APP_QUARTZNET_MARGIN
-# are placeholders until ticket 02's recalibration lands (see
+# QuartzNet-5x3-tiny INT8 export at ticket 02's recalibrated operating point
+# (APP_QUARTZNET_THRESHOLD/APP_QUARTZNET_MARGIN,
 # docs/QUARTZNET-OPERATING-POINT.md); the default `make app-pipeline` above is
 # unchanged. Run `make quartznet-eval-report` first so the run dir's
 # metadata/eval_report.json exists (see that target).
