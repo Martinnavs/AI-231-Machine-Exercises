@@ -12,6 +12,7 @@ from typing import Callable, Optional, Protocol
 import numpy as np
 
 from ...common.features import SAMPLE_RATE
+from me2_voicegen.vcm.alphabet import BLANK_ID
 from .gate import ListeningGate
 from me2_voicegen.vcm.decoder import DecodeResult
 
@@ -22,6 +23,7 @@ class WindowObservation:
     samples_seen: int
     result: DecodeResult  # decoded at threshold=-inf
     waveform: Optional[np.ndarray] = None  # window audio (ring-buffer snapshot) for the gate
+    logp: Optional[np.ndarray] = None  # (T, alphabet) log-posteriors the result was decoded from
 
 
 @dataclass(frozen=True)
@@ -245,3 +247,135 @@ class SinglePeriodPolicy(ThresholdPolicy):
 
     def reset(self) -> None:
         self._open_at = None
+
+
+class EndpointedPeriodPolicy(ThresholdPolicy):
+    """Wake-word period with a sliding decode and an early, endpointed exit.
+
+    The gate opening anchors a period. Every stride while it is active, the
+    policy requests a decode of the audio from the anchor to now (growing to
+    `window_s`, then sliding) and accepts the first window that is
+    (1) confident under `ThresholdPolicy`, (2) the same `(intent, slots)` for
+    `stable_strides` consecutive decodes, and (3) ended: the trailing `hold_ms`
+    of posteriors are all blank with probability >= `blank_floor`. Accepting
+    closes the period at once; reaching `period_s` after the last wake-word
+    detection closes it with no output. The period length is therefore a
+    time-out, not a wait, measured like `SinglePeriodPolicy`'s period (from
+    the gate's latest open time), so it never ends earlier than that one.
+
+    The anchor is the gate's first open time for an episode. Later re-arms
+    (the wake-word gate re-fires while the wake word is still in its trailing
+    window) are ignored so the window start does not drift into the command.
+    After a period closes, a new one needs a fresh detection: the gate must
+    first stop re-arming (the old wake word has left its window), then open
+    again after the close. Without this, the same wake word reopens a period
+    right after a fast accept and the command can fire twice.
+    """
+
+    def __init__(
+        self,
+        threshold: float,
+        *,
+        gate: ListeningGate,
+        period_s: float,
+        window_s: float = 2.5,
+        min_audio_s: float = 0.3,
+        stable_strides: int = 2,
+        hold_ms: float = 300.0,
+        blank_floor: float = 0.9,
+        on_period_event: Optional[PeriodEventCallback] = None,
+    ) -> None:
+        super().__init__(threshold)
+        if stable_strides < 1:
+            raise ValueError(f"stable_strides must be >= 1, got {stable_strides}")
+        if not 0.0 < blank_floor <= 1.0:
+            raise ValueError(f"blank_floor must be in (0, 1], got {blank_floor}")
+        if hold_ms < 0 or min_audio_s < 0:
+            raise ValueError("hold_ms and min_audio_s must be >= 0")
+        self._gate = gate
+        self.period_samples = int(period_s * SAMPLE_RATE)
+        self.window_samples = int(window_s * SAMPLE_RATE)
+        self.min_audio_samples = int(min_audio_s * SAMPLE_RATE)
+        self.stable_strides = stable_strides
+        self.hold_s = hold_ms / 1000.0
+        self.log_blank_floor = float(np.log(blank_floor))
+        self._on_period_event = on_period_event
+        self.reset()
+
+    def reset(self) -> None:
+        self._anchor: Optional[int] = None
+        self._deadline_from: int = 0
+        self._closed_at: int = -1
+        self._armed = True
+        self._last_open: Optional[int] = None
+        self._last_key = None
+        self._streak = 0
+
+    def _event(self, event: str, samples_seen: int, decision: Optional[PolicyDecision]) -> None:
+        if self._on_period_event is not None:
+            self._on_period_event(event, samples_seen, decision)
+
+    def _close(self, samples_seen: int, decision: PolicyDecision) -> None:
+        self._anchor = None
+        self._closed_at = samples_seen
+        self._armed = False
+        self._last_key = None
+        self._streak = 0
+        self._event("closed", samples_seen, decision)
+
+    def period_request(self, samples_seen: int, waveform: np.ndarray) -> Optional[PeriodRequest]:
+        state = self._gate.poll(samples_seen, waveform)
+        opened = state.open_at_samples if state.is_open else None
+        rearmed = opened is not None and opened != self._last_open
+        self._last_open = opened
+        if self._anchor is None:
+            if not self._armed:
+                if rearmed:
+                    # The closed period's wake word is still being detected:
+                    # these detections belong to that period, not a new one.
+                    self._closed_at = max(self._closed_at, opened)
+                    return None
+                self._armed = True
+            if opened is None or opened <= self._closed_at:
+                return None
+            self._anchor = opened
+            self._deadline_from = opened
+            self._event("open", samples_seen, None)
+        elif rearmed:
+            self._deadline_from = opened  # wake word still heard: time-out counts from here
+        if samples_seen >= self._deadline_from + self.period_samples:
+            self._close(samples_seen, PolicyDecision(accept=False, reason="endpointed: timed out"))
+            return None
+        if samples_seen - self._anchor < self.min_audio_samples:
+            return None
+        return PeriodRequest(max(self._anchor, samples_seen - self.window_samples), samples_seen)
+
+    def _ended(self, obs: WindowObservation) -> bool:
+        if obs.logp is None or obs.waveform is None or obs.logp.shape[0] == 0:
+            return False
+        n_frames = obs.logp.shape[0]
+        frame_s = obs.waveform.shape[-1] / SAMPLE_RATE / n_frames
+        hold_frames = max(1, int(np.ceil(self.hold_s / frame_s - 1e-9)))
+        if hold_frames > n_frames:
+            return False
+        return bool(np.all(obs.logp[-hold_frames:, BLANK_ID] >= self.log_blank_floor))
+
+    def observe(self, obs: WindowObservation) -> PolicyDecision:
+        base = super().observe(obs)
+        if not base.accept:
+            self._last_key, self._streak = None, 0
+            return base
+        key = (obs.result.intent, tuple(sorted(obs.result.slots.items())))
+        self._streak = self._streak + 1 if key == self._last_key else 1
+        self._last_key = key
+        if self._streak < self.stable_strides:
+            return PolicyDecision(
+                accept=False, reason=f"endpointed: stable {self._streak}/{self.stable_strides}"
+            )
+        if not self._ended(obs):
+            return PolicyDecision(accept=False, reason="endpointed: speech not ended")
+        return PolicyDecision(accept=True, reason=f"endpointed: {base.reason}")
+
+    def period_closed(self, samples_seen: int, decision: PolicyDecision) -> None:
+        if decision.accept:
+            self._close(samples_seen, decision)

@@ -467,6 +467,34 @@ mostly-`None` period never triggers) and
 `tests/test_vcm_streaming_integration.py` (the same rules, incl. the
 flush/re-press edges, through the real runner).
 
+### The endpointed policy (`EndpointedPeriodPolicy`, `--policy endpointed`)
+
+For a wake-word period that answers as soon as the command ends instead of after a fixed 3 s
+(feature `wakeword-sliding`, `.scratch/wakeword-sliding/PLAN.md`). It uses the same
+`period_request` / `period_closed` hooks as `SinglePeriodPolicy`, so the runner is unchanged apart
+from `WindowObservation` gaining an optional `logp` (the posteriors the result was decoded from).
+
+- **Window:** every stride while a period is active, decode the audio from the period anchor to
+  now, growing to `--window-s` and then sliding. Nothing is decoded until `--min-audio` (default
+  0.3 s) has passed since the anchor.
+- **Anchor:** the gate's *first* open time for the episode. The wake-word gate re-arms its open
+  time every stride while the wake word is still in its trailing 1.5 s window; those re-arms do not
+  move the window start (they would cut the start of the command).
+- **Accept** when all hold: `ThresholdPolicy`'s rule; the same `(intent, slots)` for
+  `--stable-strides` consecutive decodes (default 2); and the trailing `--hold-ms` (default 300 ms)
+  of posteriors all have blank probability >= `--blank-floor` (default 0.9). The frame duration
+  is taken from the window length and `logp`'s frame count, so stride-2 models work unchanged.
+  Stability is what keeps "time" from firing during "timer ten seconds" (both are accepted
+  phrases, and "time" is a character prefix of "timer").
+- **Close:** on accept (one event per period), or with no output at `--gate-period` seconds after
+  the gate's *latest* detection (the same end bound as `SinglePeriodPolicy`).
+- **Re-open:** a new period needs a fresh wake word: the gate must first stop re-arming, then open
+  after the close. Otherwise the same wake word reopens a period right after a fast accept.
+- Decision reasons: `endpointed: stable k/n`, `endpointed: speech not ended`,
+  `endpointed: timed out`, and `endpointed: <ThresholdPolicy accept reason>`.
+- Replay evaluation: `vcm.streaming.session_replay` (wake word + command sessions with a
+  forced-aligned end of speech) and `vcm.streaming.replay_eval` (runs this CLI per session).
+
 ## 5. JSONL event schema (owned by Task 04, shape fixed here)
 
 One JSON object per line, one line per emitted `TriggerEvent` (or, under

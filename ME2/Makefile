@@ -434,3 +434,18 @@ include kaggle.mk
 .DEFAULT_GOAL := help
 help: ## List documented targets
 	@grep -hE '^[a-zA-Z0-9_-]+:.*## ' $(MAKEFILE_LIST) | sed -E 's/:[^#]*## /\t/' | sort | awk -F'\t' '{printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
+
+# wakeword-sliding (docs/WAKEWORD-SLIDING.md): wake word + sliding window,
+# answers ~0.4 s after the command ends instead of after a fixed 3 s period.
+# QuartzNet INT8, settings chosen on val replay sessions (hold 200 ms, no
+# stability requirement). `make app-pipeline` is unchanged (rollback).
+APP_LIVE_MODEL ?= out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m
+APP_LIVE_THRESHOLD ?= -0.1
+APP_LIVE_MARGIN ?= 4.0
+APP_LIVE_HOLD_MS ?= 200
+APP_LIVE_STABLE ?= 1
+APP_LIVE_WAKEWORD ?= out/wakeword-sesame-ambient-rir-45m
+APP_LIVE_SOURCE ?= mic
+.PHONY: app-pipeline-live
+app-pipeline-live:
+	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model $(APP_LIVE_MODEL) --backend onnx --onnx-variant int8 --grammar optionb --threshold=$(APP_LIVE_THRESHOLD) --required-command-margin $(APP_LIVE_MARGIN) --beam-width 50 --gate wakeword --policy endpointed --gate-period 3 --hold-ms $(APP_LIVE_HOLD_MS) --stable-strides $(APP_LIVE_STABLE) --wakeword-model $(APP_LIVE_WAKEWORD) --wakeword-backend onnx --log-periods --source "$(APP_LIVE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward

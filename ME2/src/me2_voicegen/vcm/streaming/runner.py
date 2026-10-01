@@ -257,7 +257,7 @@ class StreamingRunner:
 
         obs = WindowObservation(
             window_index=self._window_index, samples_seen=samples_seen, result=result,
-            waveform=waveform
+            waveform=waveform, logp=logp
         )
         decision = self.policy.observe(obs)
         period_closed = getattr(self.policy, "period_closed", None)

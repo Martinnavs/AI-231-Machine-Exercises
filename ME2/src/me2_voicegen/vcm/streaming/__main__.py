@@ -25,6 +25,7 @@ from me2_voicegen.vcm.streaming.config import (
     _candidate_run_dir,
     resolve_grammar,
     resolve_model,
+    PERIOD_POLICIES,
     resolve_policy,
     resolve_threshold,
     resolve_wakeword_model,
@@ -135,6 +136,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument("--gate", type=str, default=None, choices=["none", "spacebar", "wakeword"])
     parser.add_argument("--gate-period", dest="gate_period_s", type=float, default=None)
+    # --policy endpointed: decode every stride inside the period, fire on the
+    # first confident, stable, ended command; --gate-period is the time-out.
+    parser.add_argument("--min-audio", dest="min_audio_s", type=float, default=None)
+    parser.add_argument("--stable-strides", dest="stable_strides", type=int, default=None)
+    parser.add_argument("--hold-ms", dest="hold_ms", type=float, default=None)
+    parser.add_argument("--blank-floor", dest="blank_floor", type=float, default=None)
     parser.add_argument(
         "--wakeword-model",
         dest="wakeword_model",
@@ -279,16 +286,16 @@ def main(argv: Optional[list[str]] = None) -> None:
 
     # Hard --gate/--policy cross-validation: both must fire before any side
     # effect (no model load, no TTY raw mode, no microphone).
-    if cfg.policy in ("mode_period", "single_period") and cfg.gate == "none":
+    if cfg.policy in PERIOD_POLICIES and cfg.gate == "none":
         raise SystemExit(
             f"--policy {cfg.policy} requires a listening gate: pass --gate "
             "spacebar (with --gate-period for the period length) -- --gate "
             "none is not a valid combination with --policy mode_period"
         )
-    if cfg.gate != "none" and cfg.policy not in ("mode_period", "single_period"):
+    if cfg.gate != "none" and cfg.policy not in PERIOD_POLICIES:
         raise SystemExit(
             f"--gate {cfg.gate} opens a bounded listening period that only "
-            "--policy mode_period or --policy single_period consumes: pass one, or "
+            "--policy mode_period, single_period or endpointed consumes: pass one, or "
             "use --gate none with --policy threshold"
         )
     if cfg.policy == "single_period" and cfg.gate_period_s != 3.0:
@@ -332,6 +339,13 @@ def main(argv: Optional[list[str]] = None) -> None:
         gate=gate,
         period_s=cfg.gate_period_s,
         on_period_event=_print_period_event if cfg.log_periods else None,
+        endpoint_options={
+            "window_s": cfg.window_s,
+            "min_audio_s": cfg.min_audio_s,
+            "stable_strides": cfg.stable_strides,
+            "hold_ms": cfg.hold_ms,
+            "blank_floor": cfg.blank_floor,
+        },
     )
 
     backend: InferenceBackend

@@ -44,6 +44,7 @@ from me2_voicegen.vcm.streaming import wakeword_gate
 from me2_voicegen.vcm.streaming.gate import DEFAULT_WAKEWORD_THRESHOLD, GATE_REGISTRY, ListeningGate
 from me2_voicegen.vcm.streaming.policy import (
     AcceptancePolicy,
+    EndpointedPeriodPolicy,
     ModePeriodPolicy,
     SinglePeriodPolicy,
     PeriodEventCallback,
@@ -68,10 +69,14 @@ WAKEWORD_MODEL_REGISTRY: dict[str, Path] = {
     "default": PROJECT_ROOT / "out" / "wakeword",
 }
 
+# Policies that consume a listening gate's bounded period.
+PERIOD_POLICIES = ("mode_period", "single_period", "endpointed")
+
 POLICY_REGISTRY: dict[str, type[AcceptancePolicy]] = {
     "threshold": ThresholdPolicy,
     "mode_period": ModePeriodPolicy,
     "single_period": SinglePeriodPolicy,
+    "endpointed": EndpointedPeriodPolicy,
 }
 
 DEFAULT_GRAMMAR_LABEL = "OPTIONB_GRAMMAR"
@@ -119,6 +124,10 @@ _FIELD_TYPES: dict[str, type] = {
     "wakeword_backend": str,
     "wakeword_onnx_variant": str,
     "wakeword_threshold": float,
+    "min_audio_s": float,
+    "stable_strides": int,
+    "hold_ms": float,
+    "blank_floor": float,
 }
 
 _FIELD_CHOICES: dict[str, tuple[str, ...]] = {
@@ -211,6 +220,11 @@ class StreamingConfig:
     wakeword_backend: str = "torch"
     wakeword_onnx_variant: str = "fp32"
     wakeword_threshold: float = DEFAULT_WAKEWORD_THRESHOLD
+    # --policy endpointed only (gate_period_s is its time-out)
+    min_audio_s: float = 0.3
+    stable_strides: int = 2
+    hold_ms: float = 300.0
+    blank_floor: float = 0.9
 
     @classmethod
     def from_json(cls, path: str | Path) -> "StreamingConfig":
@@ -388,6 +402,7 @@ def resolve_policy(
     gate: Optional[ListeningGate] = None,
     period_s: float = 5.0,
     on_period_event: Optional[PeriodEventCallback] = None,
+    endpoint_options: Optional[Mapping[str, Any]] = None,
 ) -> AcceptancePolicy:
     try:
         policy_cls = POLICY_REGISTRY[name]
@@ -395,7 +410,7 @@ def resolve_policy(
         raise SystemExit(
             f"unknown --policy {name!r}; choices are {sorted(POLICY_REGISTRY)}"
         ) from None
-    if name in ("mode_period", "single_period"):
+    if name in PERIOD_POLICIES:
         if gate is None:
             raise SystemExit(
                 f"--policy {name!r} requires a listening gate: pass --gate "
@@ -405,7 +420,8 @@ def resolve_policy(
         if name == "single_period" and period_s != 3.0:
             raise SystemExit("--policy single_period requires --gate-period 3 (the evaluated full-inference duration)")
         return policy_cls(
-            threshold, gate=gate, period_s=period_s, on_period_event=on_period_event
+            threshold, gate=gate, period_s=period_s, on_period_event=on_period_event,
+            **(dict(endpoint_options or {}) if name == "endpointed" else {}),
         )
     return policy_cls(threshold)
 
