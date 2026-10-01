@@ -155,8 +155,10 @@ lengths must come from `model.output_lengths(input_lengths)`, never from the
 feature lengths. Checkpoints carry a top-level `model_type` key
 (`"matchboxnet"` | `"quartznet"`); an absent key means `matchboxnet`. Anything
 that maps a posterior frame index to seconds must multiply by
-`10 ms * total_stride`. The ONNX I/O names stay `features` -> `logits`; a
-strided model's output time axis is named `time_out`.
+`10 ms * total_stride` -- use `vcm.pipeline.frame_hop_samples(model)` (waveform
+samples per posterior frame = `HOP_LENGTH * total_stride`, MatchboxNet treated
+as stride 1) rather than open-coding the factor. The ONNX I/O names stay
+`features` -> `logits`; a strided model's output time axis is named `time_out`.
 
 ## 7. Decoder input/output contract (source of truth: `vcm/decoder.py`)
 

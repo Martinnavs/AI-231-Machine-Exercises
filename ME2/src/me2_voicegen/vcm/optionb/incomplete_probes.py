@@ -214,13 +214,18 @@ def compute_crop(
     text: str,
     prefix: str,
     grace_frames: int,
+    frame_hop: int = HOP_LENGTH,
 ) -> CropResult | CropFailure:
     """Map the last character of `prefix` and the first character of the
     following word to aligned frames (state `2*char_index + 1` is character
     `char_index`, per `segment_scorer.ForcedAlignment.state_path`), then
     compute `crop_end_frame = min(last_char_frame + 1 + grace, next_word_
     first_char_frame)` -- the `min` guarantees the crop never reaches the
-    next word's own first aligned frame, for any `grace_frames`."""
+    next word's own first aligned frame, for any `grace_frames`.
+
+    `frame_hop` (waveform samples per posterior frame, from
+    `pipeline.frame_hop_samples`; `HOP_LENGTH` default = stride-1) converts
+    `crop_end_frame` -- a posterior frame index -- to a sample offset."""
     if not is_word_boundary_prefix(text, prefix):
         raise ValueError(f"{prefix!r} is not a word-boundary prefix of {text!r}")
 
@@ -242,7 +247,7 @@ def compute_crop(
         return CropFailure(FAILURE_NO_GAP)
 
     crop_end_frame = min(last_char_frame + 1 + grace_frames, next_word_first_char_frame)
-    crop_end_sample = crop_end_frame * HOP_LENGTH
+    crop_end_sample = crop_end_frame * frame_hop
 
     if crop_end_sample < int(round(MIN_CROP_S * SAMPLE_RATE)):
         return CropFailure(FAILURE_CROP_TOO_SHORT)
@@ -294,29 +299,37 @@ def find_quiet_window(
     window_s: float = QUIET_WINDOW_S,
     stride: int = HOP_LENGTH,
     relative_db: float = QUIET_RELATIVE_DB,
+    frame_hop: int = HOP_LENGTH,
 ) -> tuple[np.ndarray | None, str]:
     """Search both the lead-in (`[0, (start_frame - backoff_frames) *
-    HOP_LENGTH)`) and the tail (`[(end_frame + 1 + backoff_frames) *
-    HOP_LENGTH, len(waveform))`) for the minimum-RMS `window_s`-long window,
-    then accept it only if its RMS is at least `relative_db` dB below the
-    aligned speech span's RMS (R2-5: existence alone does not mean quiet --
-    a same-level-as-speech "silence" pad is worse than no fix at all).
+    frame_hop)`) and the tail (`[(end_frame + 1 + backoff_frames) * frame_hop,
+    len(waveform))`) for the minimum-RMS `window_s`-long window, then accept
+    it only if its RMS is at least `relative_db` dB below the aligned speech
+    span's RMS (R2-5: existence alone does not mean quiet -- a
+    same-level-as-speech "silence" pad is worse than no fix at all).
     Returns `(None, SILENCE_SOURCE_DIGITAL_ZERO)` if neither region yields an
     acceptable window (including when the speech span itself measures as
     silence, since a relative threshold is meaningless against a zero
-    reference)."""
+    reference).
+
+    `alignment.start_frame`/`end_frame` are posterior frame indices, so every
+    frame-to-sample boundary here uses `frame_hop` (waveform samples per
+    posterior frame, from `pipeline.frame_hop_samples`; the `HOP_LENGTH`
+    default is the stride-1 behavior). The `stride` parameter is a different
+    thing -- the search step size in sample space, not a posterior-frame
+    conversion -- and stays independent of the model's stride."""
     waveform = np.asarray(waveform)
     window_samples = int(round(window_s * sample_rate))
-    backoff_samples = backoff_frames * HOP_LENGTH
+    backoff_samples = backoff_frames * frame_hop
 
-    lead_in_end = alignment.start_frame * HOP_LENGTH - backoff_samples
+    lead_in_end = alignment.start_frame * frame_hop - backoff_samples
     lead_in_region = waveform[: max(lead_in_end, 0)]
 
-    tail_start = (alignment.end_frame + 1) * HOP_LENGTH + backoff_samples
+    tail_start = (alignment.end_frame + 1) * frame_hop + backoff_samples
     tail_region = waveform[min(tail_start, waveform.size) :]
 
-    speech_start = alignment.start_frame * HOP_LENGTH
-    speech_end = (alignment.end_frame + 1) * HOP_LENGTH
+    speech_start = alignment.start_frame * frame_hop
+    speech_end = (alignment.end_frame + 1) * frame_hop
     speech_rms = _rms(waveform[speech_start:speech_end])
 
     candidates: list[tuple[float, np.ndarray, str]] = []
@@ -418,11 +431,17 @@ def generate_probes(
     load_waveform: Callable[[Mapping[str, str]], np.ndarray],
     compute_logp: Callable[[np.ndarray], np.ndarray],
     resolve_and_normalize: Callable[[Mapping[str, str]], str | None],
+    frame_hop: int = HOP_LENGTH,
 ) -> GenerationResult:
     """Build every probe variant for every `spec`. Every failure mode named
     in the ticket (missing audio, `force_align` `ValueError`, no gap, crop
     too short) is caught here and counted, never raised out of this
-    function -- one bad source row must not abort the whole run."""
+    function -- one bad source row must not abort the whole run.
+
+    `frame_hop` (waveform samples per posterior frame, from
+    `pipeline.frame_hop_samples`; `HOP_LENGTH` default = stride-1) is
+    forwarded to `compute_crop` and `find_quiet_window` for their
+    frame-index-to-sample conversions."""
     result = GenerationResult()
 
     for spec in specs:
@@ -472,7 +491,7 @@ def generate_probes(
             )
             continue
 
-        crop = compute_crop(alignment, text, spec.prefix, grace_frames)
+        crop = compute_crop(alignment, text, spec.prefix, grace_frames, frame_hop=frame_hop)
         if isinstance(crop, CropFailure):
             result.failure_counts[crop.reason] += 1
             result.failures.append(
@@ -485,7 +504,7 @@ def generate_probes(
             )
             continue
 
-        quiet_window, quiet_source = find_quiet_window(waveform, alignment)
+        quiet_window, quiet_source = find_quiet_window(waveform, alignment, frame_hop=frame_hop)
         cropped = np.asarray(waveform)[: crop.crop_end_sample]
 
         for bucket_s in silence_buckets:
@@ -654,13 +673,14 @@ def _resolve_and_normalize_row(row: Mapping[str, str]) -> str | None:
     return normalize_text(transcript)
 
 
-def _compute_logp_fn(checkpoint_path: Path, device: str) -> Callable[[np.ndarray], np.ndarray]:
+def _compute_logp_fn(model, device: str) -> Callable[[np.ndarray], np.ndarray]:
+    """Adapter around a caller-loaded `model` (see `main`): keeps torch and
+    the feature extractor out of the pure core's import surface."""
     import torch
 
     from me2_voicegen.common.features import LogMelFeatureExtractor
-    from me2_voicegen.vcm.pipeline import load_checkpoint, logp_for_waveform
+    from me2_voicegen.vcm.pipeline import logp_for_waveform
 
-    model, _checkpoint = load_checkpoint(checkpoint_path, device=device, weights_only=True)
     feature_extractor = LogMelFeatureExtractor()
 
     def _compute(waveform: np.ndarray) -> np.ndarray:
@@ -717,8 +737,12 @@ def main(argv: list[str] | None = None) -> int:
         seed=args.seed,
     )
 
+    from me2_voicegen.vcm.pipeline import frame_hop_samples, load_checkpoint
+
     checkpoint_sha256 = sha256_of_file(args.checkpoint)
-    compute_logp = _compute_logp_fn(args.checkpoint, args.device)
+    model, _checkpoint = load_checkpoint(args.checkpoint, device=args.device, weights_only=True)
+    frame_hop = frame_hop_samples(model)
+    compute_logp = _compute_logp_fn(model, args.device)
     load_waveform = _load_waveform_from_row(audio_root)
 
     result = generate_probes(
@@ -731,6 +755,7 @@ def main(argv: list[str] | None = None) -> int:
         load_waveform=load_waveform,
         compute_logp=compute_logp,
         resolve_and_normalize=_resolve_and_normalize_row,
+        frame_hop=frame_hop,
     )
 
     write_probe_audio(result.audio, out_dir, args.split)

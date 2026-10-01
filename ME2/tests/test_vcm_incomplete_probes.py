@@ -198,6 +198,25 @@ def test_compute_crop_too_short_failure():
     assert result.reason == ip.FAILURE_CROP_TOO_SHORT
 
 
+def test_compute_crop_frame_hop_stride2_doubles_sample_offset():
+    # quartznet-promotion ticket 01: for the SAME alignment (same frame
+    # indices), a stride-2 frame_hop (320 samples/frame) must give exactly 2x
+    # the stride-1 crop_end_sample, and the frame-level crop is unchanged.
+    text = "turn the volume up"
+    prefix = "turn the volume"
+    alignment = force_align(make_posterior(text), text)
+
+    stride1 = ip.compute_crop(alignment, text, prefix, grace_frames=2)
+    stride2 = ip.compute_crop(alignment, text, prefix, grace_frames=2, frame_hop=2 * 160)
+
+    assert isinstance(stride1, ip.CropResult)
+    assert isinstance(stride2, ip.CropResult)
+    assert stride2.crop_end_frame == stride1.crop_end_frame
+    assert stride1.crop_end_sample == stride1.crop_end_frame * 160
+    assert stride2.crop_end_sample == stride2.crop_end_frame * 320
+    assert stride2.crop_end_sample == 2 * stride1.crop_end_sample
+
+
 # ---------------------------------------------------------------------------
 # find_quiet_window: R2-1 (excludes onset/tail-adjacent frames) + R2-5
 # (existence of a candidate region is not enough -- it must also measure at
@@ -274,6 +293,32 @@ def test_find_quiet_window_none_when_speech_span_itself_is_silent():
     window, source = ip.find_quiet_window(waveform, alignment)
     assert window is None
     assert source == ip.SILENCE_SOURCE_DIGITAL_ZERO
+
+
+def test_find_quiet_window_frame_hop_scales_region_boundaries():
+    # quartznet-promotion ticket 01: start_frame/end_frame are posterior
+    # frames, so with frame_hop=320 (stride 2) every region boundary doubles
+    # versus the stride-1 default. Same waveform + alignment:
+    #   stride 1: speech span [0, 3200), backoff 3200, tail search from
+    #             20*160 + 3200 = 6400 -- the quiet region [6400, 11200) is
+    #             found.
+    #   stride 2: speech span [0, 6400), backoff 6400, tail search from
+    #             20*320 + 6400 = 12800 -- past the end of the waveform, so
+    #             no region is long enough and it falls back to digital zero.
+    speech = np.full(3200, SPEECH_AMPLITUDE, dtype=np.float32)  # frames 0..19
+    loud_buffer = np.full(3200, SPEECH_AMPLITUDE, dtype=np.float32)
+    quiet_tail = np.full(4800, QUIET_AMPLITUDE, dtype=np.float32)
+    waveform = np.concatenate([speech, loud_buffer, quiet_tail])
+    alignment = _dummy_alignment(tuple(range(20)), start_frame=0, end_frame=19)
+
+    window, source = ip.find_quiet_window(waveform, alignment)
+    assert source == ip.SILENCE_SOURCE_TAIL
+    assert window is not None
+    assert float(np.sqrt(np.mean(np.square(window)))) == pytest.approx(QUIET_AMPLITUDE, abs=1e-6)
+
+    window_s2, source_s2 = ip.find_quiet_window(waveform, alignment, frame_hop=2 * 160)
+    assert window_s2 is None
+    assert source_s2 == ip.SILENCE_SOURCE_DIGITAL_ZERO
 
 
 # ---------------------------------------------------------------------------

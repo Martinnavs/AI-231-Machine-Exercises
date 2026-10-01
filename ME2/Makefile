@@ -107,6 +107,10 @@ STREAM_ARGS ?=
 # override with a wav path for a deterministic file-replay run).
 APP_VENV_BIN ?= .venv/bin
 APP_PIPELINE_SOURCE ?= mic
+# Run dir `app-pipeline` serves. Default is the production optiond run, which
+# is also the original hardcoded value, so `make -n app-pipeline` output is
+# byte-identical to before the variable existed (quartznet-promotion ticket 01).
+APP_PIPELINE_MODEL ?= out/vcm/option-d-fil50-ambient-rir-135m
 # Defaults are the original hardcoded app-pipeline values (mean_frame scoring).
 APP_PIPELINE_THRESHOLD ?= -0.075
 APP_PIPELINE_MARGIN ?= 4.0
@@ -114,8 +118,14 @@ APP_PIPELINE_SCORE_MODE ?= mean_frame
 # Opt-in trial threshold for `make app-pipeline-perchar` (per-character scale, ~-1; see
 # docs/DENSE-SCORING-DECISION.md for the safe range).
 APP_PERCHAR_THRESHOLD ?= -1.204
+# `app-pipeline-quartznet` operating point. PLACEHOLDERS until
+# quartznet-promotion ticket 02 fills them from the recalibration (see
+# docs/QUARTZNET-OPERATING-POINT.md once it lands); until then they carry the
+# seed-0 clean-val choice (-0.1) and optiond's margin (4.0).
+APP_QUARTZNET_THRESHOLD ?= -0.1
+APP_QUARTZNET_MARGIN ?= 4.0
 
-.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream app-pipeline-perchar wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
+.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream app-pipeline-perchar app-pipeline-quartznet quartznet-eval-report wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
 
 WAKEWORD_CLONE_DIR ?= $(if $(TMPDIR),$(TMPDIR),/tmp)/me2_wakeword_clone
 WAKEWORD_POSITIVES_OUT_DIR ?= out/conversions/v2/wakeword/positives_real
@@ -274,7 +284,7 @@ app:
 # to stderr, so stdout stays clean JSONL for the pipe. Override
 # APP_PIPELINE_SOURCE with a wav path for a file-replay run.
 app-pipeline:
-	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model out/vcm/option-d-fil50-ambient-rir-135m --backend onnx --onnx-variant int8 --grammar optionb --threshold $(APP_PIPELINE_THRESHOLD) $(if $(APP_PIPELINE_MARGIN),--required-command-margin $(APP_PIPELINE_MARGIN),) --score-mode $(APP_PIPELINE_SCORE_MODE) --beam-width 50 --gate wakeword --policy single_period --gate-period 3 --wakeword-model out/wakeword-sesame --wakeword-backend onnx --log-periods --source "$(APP_PIPELINE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward
+	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model $(APP_PIPELINE_MODEL) --backend onnx --onnx-variant int8 --grammar optionb --threshold $(APP_PIPELINE_THRESHOLD) $(if $(APP_PIPELINE_MARGIN),--required-command-margin $(APP_PIPELINE_MARGIN),) --score-mode $(APP_PIPELINE_SCORE_MODE) --beam-width 50 --gate wakeword --policy single_period --gate-period 3 --wakeword-model out/wakeword-sesame --wakeword-backend onnx --log-periods --source "$(APP_PIPELINE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward
 
 # OPT-IN TRIAL (dense-d2-loose-impl): the same pipeline scored per character
 # instead of per frame, no incomplete-prefix margin gate. NOT the production
@@ -282,6 +292,26 @@ app-pipeline:
 # what to report back. Rollback = use `make app-pipeline` (unchanged defaults).
 app-pipeline-perchar:
 	$(MAKE) app-pipeline APP_PIPELINE_SCORE_MODE=per_char APP_PIPELINE_THRESHOLD=$(APP_PERCHAR_THRESHOLD) APP_PIPELINE_MARGIN=
+
+# quartznet-promotion ticket 01: the same pipeline serving the stride-2
+# QuartzNet-5x3-tiny INT8 export. APP_QUARTZNET_THRESHOLD/APP_QUARTZNET_MARGIN
+# are placeholders until ticket 02's recalibration lands (see
+# docs/QUARTZNET-OPERATING-POINT.md); the default `make app-pipeline` above is
+# unchanged. Run `make quartznet-eval-report` first so the run dir's
+# metadata/eval_report.json exists (see that target).
+app-pipeline-quartznet:
+	$(MAKE) app-pipeline APP_PIPELINE_MODEL=out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m APP_PIPELINE_THRESHOLD=$(APP_QUARTZNET_THRESHOLD) APP_PIPELINE_MARGIN=$(APP_QUARTZNET_MARGIN)
+
+# quartznet-promotion ticket 01: materialize
+# out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/metadata/eval_report.json --
+# the layout the streaming CLI's resolve_threshold() reads (see
+# docs/STREAMING-CONTRACT.md section 2). The noisy-gate copy already under
+# <run_dir>/noisy_eval/ is a subdir and is NOT what gets read; without this
+# artifact a QuartzNet serve with no explicit --threshold would fall back to
+# FALLBACK_THRESHOLD (0.0, accepts almost nothing). ~45-60 min on a GPU; use
+# a free non-6 GPU (VCM_DEVICE=cuda:N).
+quartznet-eval-report:
+	$(UV) run python -m me2_voicegen.vcm.evaluate --manifest out/conversions/v2/optionb-v3-vcmx-fil50/manifest.csv --checkpoint out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/checkpoints/checkpoint.pt --out-dir out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m --device $(VCM_DEVICE) --beam-width 50 --grammar optionb --noisy-eval-seed 0
 
 # Wakeword ("computer"-only) dataset-build targets. See
 # docs/WAKEWORD-DATASET-CONTRACT.md for the manifest schema/output layout

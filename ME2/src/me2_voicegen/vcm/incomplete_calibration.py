@@ -46,7 +46,7 @@ import numpy as np
 import torch
 import torchaudio
 
-from me2_voicegen.common.features import HOP_LENGTH, SAMPLE_RATE, LogMelFeatureExtractor
+from me2_voicegen.common.features import SAMPLE_RATE, LogMelFeatureExtractor
 from me2_voicegen.common.grammar_core import Grammar
 from me2_voicegen.vcm.decoder import DecodeResult, decode_utterance
 from me2_voicegen.vcm.evaluate import (
@@ -68,7 +68,7 @@ from me2_voicegen.vcm.optionb.incomplete_probes import (
 )
 from me2_voicegen.vcm.optionb.text import normalize_text as optionb_normalize_text
 from me2_voicegen.vcm.optionb.transcript import prepare_ctc_transcript
-from me2_voicegen.vcm.pipeline import load_checkpoint, logp_for_waveform
+from me2_voicegen.vcm.pipeline import frame_hop_samples, load_checkpoint, logp_for_waveform
 from me2_voicegen.vcm.segment_scorer import force_align
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
@@ -80,7 +80,6 @@ DEFAULT_OUT_DIR = PROJECT_ROOT / "out" / "vcm" / "optionb-optiond" / "metadata" 
 BEAM_WIDTH = 25
 REGRESSION_BUDGET_PP = 1.0
 NEG_INF_THRESHOLD = float("-inf")
-FRAME_DURATION_S = HOP_LENGTH / SAMPLE_RATE
 
 DEFAULT_MARGIN_GRID: tuple[float, ...] = (-10.0, -5.0, -3.0, -2.0, -1.0, -0.5, 0.0, 0.5, 1.0, 2.0, 3.0, 5.0)
 DEFAULT_TRAILING_SILENCE_BUCKET_EDGES: tuple[float, ...] = (0.2, 0.5, 1.0, 2.0)
@@ -225,7 +224,9 @@ def decode_dataset_rows(
       silence (seconds) for `TARGET_BUCKET` Option B rows, `None` for every
       other row or on an alignment failure (Established:
       `segment_scorer.force_align` raises on an impossible alignment; that
-      is caught and counted, not propagated).
+      is caught and counted, not propagated). The seconds value scales by
+      the model's total stride via `pipeline.frame_hop_samples`, so it is
+      correct for strided (QuartzNet) checkpoints, not just stride-1.
     - `benchmark_logp_subset` is the first `benchmark_subset_size` target
       rows' raw `logp` arrays, kept for the micro-benchmark so it never
       re-runs the model forward pass.
@@ -252,8 +253,14 @@ def decode_dataset_rows(
             try:
                 transcript = optionb_normalize_text(prepare_ctc_transcript(row.get("transcript", "")))
                 alignment = force_align(logp, transcript)
+                # `alignment.end_frame` and `logp.shape[0]` are posterior
+                # frames, so one frame spans `frame_hop_samples(model)`
+                # waveform samples (10 ms for stride-1 MatchboxNet, 20 ms for
+                # stride-2 QuartzNet). The `(hop / SAMPLE_RATE)` division is
+                # kept innermost so the stride-1 value stays bit-identical to
+                # the old `FRAME_DURATION_S` arithmetic.
                 trailing_frames = logp.shape[0] - 1 - alignment.end_frame
-                trailing_s = trailing_frames * FRAME_DURATION_S
+                trailing_s = trailing_frames * (frame_hop_samples(model) / SAMPLE_RATE)
             except (ValueError, AssertionError):
                 trailing_s = None
         silences.append(trailing_s)

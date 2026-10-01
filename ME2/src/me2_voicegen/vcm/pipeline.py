@@ -31,7 +31,7 @@ from pathlib import Path
 import numpy as np
 import torch
 
-from me2_voicegen.common.features import SAMPLE_RATE, LogMelFeatureExtractor
+from me2_voicegen.common.features import HOP_LENGTH, SAMPLE_RATE, LogMelFeatureExtractor
 from me2_voicegen.common.grammar_core import Grammar
 from me2_voicegen.vcm.decoder import DecodeResult, decode
 from me2_voicegen.vcm.model import MODEL_TYPE_KEY, build_model_from_config
@@ -43,6 +43,20 @@ DEFAULT_REFRACTORY_S = 1.0
 
 WINDOW_SAMPLES = int(round(WINDOW_S * SAMPLE_RATE))
 STRIDE_SAMPLES = int(round(STRIDE_S * SAMPLE_RATE))
+
+
+def frame_hop_samples(model: torch.nn.Module) -> int:
+    """Waveform samples spanned by ONE output (posterior) frame of `model`.
+
+    Every acoustic model emits one log-posterior frame per `total_stride`
+    input feature frames, and one feature frame is `HOP_LENGTH` waveform
+    samples (10 ms at 16 kHz). `QuartzNetCTC` exposes `total_stride`;
+    `MatchboxNetCTC` has no such attribute and is stride 1, hence the
+    `getattr(..., 1)`. Anything that turns a posterior frame index -- a
+    `force_align` `start_frame`/`end_frame`, a `logp` row, a
+    `crop_end_frame` -- into seconds or sample offsets must scale by this
+    value (docs/VCM-CONTRACT.md, model-seam note)."""
+    return HOP_LENGTH * getattr(model, "total_stride", 1)
 
 
 def load_checkpoint(

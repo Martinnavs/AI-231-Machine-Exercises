@@ -202,6 +202,12 @@ class _StubCTCModel(torch.nn.Module):
     script an exact target decode deterministically without a real
     checkpoint. `forced_ids` is repeated to fill however many frames the
     input actually has, so callers don't need to know T in advance.
+
+    `total_stride=None` (default) leaves the attribute unset, mirroring
+    `MatchboxNetCTC` (stride 1, no `total_stride` attribute); `total_stride=2`
+    sets it, mirroring `QuartzNetCTC` -- for `pipeline.frame_hop_samples`
+    tests. NOTE: the stub never actually subsamples time; it advertises the
+    stride, it does not change T.
     """
 
     def __init__(
@@ -209,11 +215,14 @@ class _StubCTCModel(torch.nn.Module):
         alphabet_size: int = 29,
         forced_ids: list[int] | None = None,
         peak: float = 12.0,
+        total_stride: int | None = None,
     ) -> None:
         super().__init__()
         self.alphabet_size = alphabet_size
         self.forced_ids = forced_ids
         self.peak = peak
+        if total_stride is not None:
+            self.total_stride = total_stride
 
     def forward(self, features: torch.Tensor) -> torch.Tensor:
         batch, _, frames = features.shape
@@ -227,16 +236,19 @@ class _StubCTCModel(torch.nn.Module):
 
 @pytest.fixture
 def vcm_stub_model_factory():
-    """Factory: `make(forced_ids=None, alphabet_size=29, peak=12.0) ->
-    _StubCTCModel`. CPU-only, no real checkpoint required; see
-    `_StubCTCModel` docstring for behavior."""
+    """Factory: `make(forced_ids=None, alphabet_size=29, peak=12.0,
+    total_stride=None) -> _StubCTCModel`. CPU-only, no real checkpoint
+    required; see `_StubCTCModel` docstring for behavior."""
 
     def make(
         forced_ids: list[int] | None = None,
         alphabet_size: int = 29,
         peak: float = 12.0,
+        total_stride: int | None = None,
     ) -> _StubCTCModel:
-        return _StubCTCModel(alphabet_size=alphabet_size, forced_ids=forced_ids, peak=peak)
+        return _StubCTCModel(
+            alphabet_size=alphabet_size, forced_ids=forced_ids, peak=peak, total_stride=total_stride
+        )
 
     return make
 
