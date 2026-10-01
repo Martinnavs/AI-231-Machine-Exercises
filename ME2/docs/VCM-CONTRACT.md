@@ -146,6 +146,18 @@ or padded `vcm.alphabet.encode` output per example) + `target_len`
 shape (`nn.CTCLoss` expects exactly this: padded input + input_lengths +
 target + target_lengths).
 
+### Model seam: output time may be shorter than input time
+
+Acoustic models (`vcm.model.CTCAcousticModel`) map `(B, 40, T)` features to
+`(B, T', 29)` logits. `T' == T` for MatchboxNet; the strided
+`vcm.quartznet.QuartzNetCTC` gives `T' = ceil(T / total_stride)`. CTC input
+lengths must come from `model.output_lengths(input_lengths)`, never from the
+feature lengths. Checkpoints carry a top-level `model_type` key
+(`"matchboxnet"` | `"quartznet"`); an absent key means `matchboxnet`. Anything
+that maps a posterior frame index to seconds must multiply by
+`10 ms * total_stride`. The ONNX I/O names stay `features` -> `logits`; a
+strided model's output time axis is named `time_out`.
+
 ## 7. Decoder input/output contract (source of truth: `vcm/decoder.py`)
 
 - **Input:** a CTC posterior/log-prob array over the 29-token alphabet

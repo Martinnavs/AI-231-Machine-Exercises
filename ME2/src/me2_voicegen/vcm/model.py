@@ -13,10 +13,9 @@ out of this module so it stays reusable for both training and inference,
 where the two call sites want different shapes/dtypes around the same
 core logits).
 
-This model never changes the time dimension: every conv here uses
-`stride=1` and `padding` chosen to preserve length, so `input_lengths`
-computed pre-model (from `vcm.dataset.collate_fn`) remain valid
-post-model with no separate output-length bookkeeping.
+This model never changes the time dimension (`output_lengths` is the
+identity); the strided `vcm.quartznet.QuartzNetCTC` does, so CTC callers must
+always use `model.output_lengths(input_lengths)`.
 
 Four presets:
     - default: sized for this toy's ~32 minutes of training audio,
@@ -39,12 +38,18 @@ Four presets:
 
 from __future__ import annotations
 
+import dataclasses
 from dataclasses import dataclass, field
+from typing import Protocol
 
 import torch
 from torch import nn
 
 from me2_voicegen.vcm.alphabet import ALPHABET_SIZE
+from me2_voicegen.vcm.quartznet import QUARTZNET5X3_CONFIG, QuartzNetConfig, QuartzNetCTC
+
+MODEL_TYPE_KEY = "model_type"
+LEGACY_MODEL_TYPE = "matchboxnet"
 
 
 @dataclass
@@ -115,12 +120,35 @@ OPTIOND_CONFIG = MatchboxNetConfig(
 )
 """~1.01M params -- the normal-scale MatchboxNetCTC config."""
 
-PRESETS: dict[str, MatchboxNetConfig] = {
+OPTIOND_WIDE_CONFIG = MatchboxNetConfig(
+    n_mels=40,
+    n_blocks=5,
+    channels=128,
+    kernel_sizes=[61, 61, 61, 61, 61],
+    prologue_channels=64,
+    epilogue_channels=224,
+)
+"""Ablation control (not a shipping preset): `optiond` with block kernels widened
+to 61 (receptive field ~3 s vs ~1.1 s), epilogue unchanged. ~1.036M params,
+26k over the optiond budget, so its INT8 export exceeds the size gate."""
+
+PRESETS: dict[str, MatchboxNetConfig | QuartzNetConfig] = {
     "default": DEFAULT_CONFIG,
     "spec-scale": SPEC_SCALE_CONFIG,
     "optionc": OPTIONC_CONFIG,
     "optiond": OPTIOND_CONFIG,
+    "quartznet5x3": QUARTZNET5X3_CONFIG,
+    "optiond-wide": OPTIOND_WIDE_CONFIG,
+    "quartznet5x3-s1": dataclasses.replace(QUARTZNET5X3_CONFIG, time_stride=1),
 }
+
+
+class CTCAcousticModel(Protocol):
+    """The seam every VCM acoustic model exposes to train/export/inference."""
+
+    def forward(self, features: torch.Tensor) -> torch.Tensor: ...
+
+    def output_lengths(self, input_lengths: torch.Tensor) -> torch.Tensor: ...
 
 
 class TCSConvBlock(nn.Module):
@@ -214,11 +242,44 @@ class MatchboxNetCTC(nn.Module):
         x = x.transpose(1, 2)
         return self.classifier(x)
 
+    def output_lengths(self, input_lengths: torch.Tensor) -> torch.Tensor:
+        """Every conv is stride 1 with length-preserving padding: identity."""
+        return input_lengths.clone()
 
-def build_model(preset: str = "default") -> MatchboxNetCTC:
+
+ARCHITECTURES: dict[str, tuple[type, type[nn.Module]]] = {
+    LEGACY_MODEL_TYPE: (MatchboxNetConfig, MatchboxNetCTC),
+    "quartznet": (QuartzNetConfig, QuartzNetCTC),
+}
+
+
+def model_type_for_config(config: MatchboxNetConfig | QuartzNetConfig) -> str:
+    for name, (config_cls, _) in ARCHITECTURES.items():
+        if isinstance(config, config_cls):
+            return name
+    raise ValueError(f"unsupported model config type {type(config).__name__}")
+
+
+def build_model_from_config(config: dict, model_type: str | None = None) -> nn.Module:
+    """Build a model from a checkpoint's `config` dict and `model_type` key.
+
+    `model_type=None` (checkpoints written before the key existed) means
+    MatchboxNet. The class comes from the closed `ARCHITECTURES` table, never
+    from checkpoint-supplied names.
+    """
+    key = LEGACY_MODEL_TYPE if model_type is None else model_type
+    if key not in ARCHITECTURES:
+        raise ValueError(f"unknown model_type {key!r}, expected one of {sorted(ARCHITECTURES)}")
+    config_cls, model_cls = ARCHITECTURES[key]
+    return model_cls(config_cls(**config))
+
+
+def build_model(preset: str = "default") -> nn.Module:
     if preset not in PRESETS:
         raise ValueError(f"unknown preset {preset!r}, expected one of {sorted(PRESETS)}")
-    return MatchboxNetCTC(PRESETS[preset])
+    config = PRESETS[preset]
+    _, model_cls = ARCHITECTURES[model_type_for_config(config)]
+    return model_cls(config)
 
 
 def param_count(model: nn.Module) -> int:

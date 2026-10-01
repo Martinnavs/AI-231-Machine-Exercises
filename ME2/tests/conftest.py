@@ -329,3 +329,27 @@ def wakeword_fake_manifest_factory(tmp_path, vcm_wav_factory):
         return manifest_path
 
     return build
+
+
+@pytest.fixture
+def vcm_quartznet_checkpoint(tmp_path, vcm_fake_manifest_factory):
+    """A real QuartzNet checkpoint produced by calling `vcm.train.main` (one
+    CPU epoch on a tiny fake manifest) -- never a hand-built dict. Returns
+    `(checkpoint_path, manifest_path, out_dir)`."""
+    from me2_voicegen.vcm import train
+
+    specs = [
+        {"bucket": "target_commands", "source_dataset": "optionb", "label": "STOP",
+         "split": split, "transcript": "stop", "duration_s": 1.0}
+        for split in ["train"] * 6 + ["val"] * 4
+    ]
+    manifest = vcm_fake_manifest_factory(specs)
+    out_dir = tmp_path / "quartznet_run"
+    train.main(
+        [
+            "--manifest", str(manifest), "--out-dir", str(out_dir),
+            "--preset", "quartznet5x3", "--max-epochs", "1", "--device", "cpu",
+            "--num-workers", "0", "--batch-size", "2", "--max-minutes", "5",
+        ]
+    )
+    return out_dir / "checkpoints" / "checkpoint.pt", manifest, out_dir

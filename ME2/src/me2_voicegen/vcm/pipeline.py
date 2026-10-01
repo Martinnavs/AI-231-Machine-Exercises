@@ -34,7 +34,7 @@ import torch
 from me2_voicegen.common.features import SAMPLE_RATE, LogMelFeatureExtractor
 from me2_voicegen.common.grammar_core import Grammar
 from me2_voicegen.vcm.decoder import DecodeResult, decode
-from me2_voicegen.vcm.model import MatchboxNetConfig, MatchboxNetCTC
+from me2_voicegen.vcm.model import MODEL_TYPE_KEY, build_model_from_config
 from me2_voicegen.vcm.streaming.debounce import Debouncer
 
 WINDOW_S = 1.5
@@ -50,7 +50,7 @@ def load_checkpoint(
     device: str | torch.device = "cpu",
     weights_only: bool = False,
     allow_unsafe_load: bool = False,
-) -> tuple[MatchboxNetCTC, dict]:
+) -> tuple[torch.nn.Module, dict]:
     """Load a `vcm.train`-written checkpoint. Returns `(model, checkpoint)`
     -- `model` is in `eval()` mode on `device`; `checkpoint` is the raw
     dict (carries `license`, `preset`, `val_loss`, `epoch`, etc. for report
@@ -108,8 +108,7 @@ def load_checkpoint(
             checkpoint = torch.load(path, map_location=device)
     else:
         checkpoint = torch.load(path, map_location=device)
-    config = MatchboxNetConfig(**checkpoint["config"])
-    model = MatchboxNetCTC(config)
+    model = build_model_from_config(checkpoint["config"], checkpoint.get(MODEL_TYPE_KEY))
     model.load_state_dict(checkpoint["model_state_dict"])
     model.to(device)
     model.eval()
@@ -118,7 +117,7 @@ def load_checkpoint(
 
 @torch.no_grad()
 def logp_for_waveform(
-    model: MatchboxNetCTC,
+    model: torch.nn.Module,
     feature_extractor: LogMelFeatureExtractor,
     waveform: torch.Tensor,
     device: str | torch.device = "cpu",
@@ -133,7 +132,7 @@ def logp_for_waveform(
 
 @torch.no_grad()
 def infer_waveform(
-    model: MatchboxNetCTC,
+    model: torch.nn.Module,
     feature_extractor: LogMelFeatureExtractor,
     waveform: torch.Tensor,
     grammar: Grammar,
@@ -187,7 +186,7 @@ class SlidingWindowPipeline:
 
     def __init__(
         self,
-        model: MatchboxNetCTC,
+        model: torch.nn.Module,
         feature_extractor: LogMelFeatureExtractor,
         grammar: Grammar,
         threshold: float,

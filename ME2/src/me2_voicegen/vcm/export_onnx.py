@@ -37,7 +37,7 @@ import torch
 
 from me2_voicegen.vcm.dataset import VCMDataset
 from me2_voicegen.common.features import SAMPLE_RATE, LogMelFeatureExtractor
-from me2_voicegen.vcm.model import MatchboxNetConfig, MatchboxNetCTC
+from me2_voicegen.vcm.model import MODEL_TYPE_KEY, build_model_from_config
 
 WINDOW_SECONDS = 1.5
 WINDOW_SAMPLES = int(WINDOW_SECONDS * SAMPLE_RATE)
@@ -52,8 +52,7 @@ def load_checkpoint(
 ) -> tuple[torch.nn.Module, dict]:
     ckpt = torch.load(checkpoint_path, map_location="cpu")
     if model_family == "vcm":
-        config = MatchboxNetConfig(**ckpt["config"])
-        model = MatchboxNetCTC(config)
+        model = build_model_from_config(ckpt["config"], ckpt.get(MODEL_TYPE_KEY))
     elif model_family == "wakeword":
         from me2_voicegen.wakeword.model import DSCNN, DSCNNConfig
 
@@ -98,6 +97,13 @@ call site keeps today's exact export graph. `wakeword`'s call site passes
 its own dict instead (`{"features": {0: "batch"}}` -- fixed window length,
 static `(B, 3)` classifier output, no time axis anywhere)."""
 
+STRIDED_DYNAMIC_AXES = {
+    "features": {0: "batch", 2: "time"},
+    "logits": {0: "batch", 1: "time_out"},
+}
+"""Axes for a temporally-subsampled model: the output time axis gets its own
+symbol so ONNX shape inference does not assume it equals the input's."""
+
 
 def export_fp32(
     model: torch.nn.Module,
@@ -116,7 +122,9 @@ def export_fp32(
         str(out_path),
         input_names=["features"],
         output_names=output_names if output_names is not None else ["logits"],
-        dynamic_axes=dynamic_axes if dynamic_axes is not None else DEFAULT_DYNAMIC_AXES,
+        dynamic_axes=dynamic_axes
+        if dynamic_axes is not None
+        else (STRIDED_DYNAMIC_AXES if getattr(model, "total_stride", 1) != 1 else DEFAULT_DYNAMIC_AXES),
         opset_version=17,
         do_constant_folding=True,
     )

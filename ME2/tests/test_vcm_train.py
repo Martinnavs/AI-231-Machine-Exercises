@@ -240,3 +240,87 @@ def test_onecycle_schedule_tracking_max_epochs_does_not_freeze_near_zero():
 
     new_sizing_lr = lr_after_n_steps(total_steps=steps_per_epoch * max_epochs, n_steps=n_steps)
     assert new_sizing_lr > max_lr * 0.05  # nowhere near annealed yet at the same step count
+
+
+# ---- stride-aware CTC (QuartzNet) -------------------------------------------
+
+from unittest import mock  # noqa: E402
+
+from me2_voicegen.vcm import train as train_mod  # noqa: E402
+from me2_voicegen.vcm.train import count_ctc_infeasible, ctc_min_frames  # noqa: E402
+
+
+def test_ctc_min_frames_counts_adjacent_repeats():
+    assert ctc_min_frames([]) == 0
+    assert ctc_min_frames([3, 4, 5]) == 3
+    assert ctc_min_frames([3, 3, 4]) == 4
+    assert ctc_min_frames([3, 3, 3]) == 5
+
+
+def test_count_ctc_infeasible():
+    target_ids = torch.tensor([3, 3, 4, 5, 6])  # item0 = [3,3,4] needs 4, item1 = [5,6] needs 2
+    target_len = torch.tensor([3, 2])
+    assert count_ctc_infeasible(torch.tensor([4, 2]), target_ids, target_len) == 0
+    assert count_ctc_infeasible(torch.tensor([3, 1]), target_ids, target_len) == 2
+
+
+def test_train_uses_output_lengths_for_ctc(vcm_fake_manifest_factory, tmp_path):
+    specs = [
+        {"bucket": "target_commands", "source_dataset": "optionb", "label": "STOP",
+         "split": split, "transcript": "stop", "duration_s": 1.0}
+        for split in ["train"] * 4 + ["val"] * 2
+    ]
+    manifest = vcm_fake_manifest_factory(specs)
+
+    def run(preset):
+        seen = []
+        real = torch.nn.CTCLoss.forward
+
+        def spy(self, log_probs, targets, input_lengths, target_lengths):
+            seen.append((int(input_lengths.max()), log_probs.shape[0]))
+            return real(self, log_probs, targets, input_lengths, target_lengths)
+
+        with mock.patch.object(torch.nn.CTCLoss, "forward", spy):
+            train_mod.main(
+                ["--manifest", str(manifest), "--out-dir", str(tmp_path / preset),
+                 "--preset", preset, "--max-epochs", "1", "--device", "cpu",
+                 "--num-workers", "0", "--batch-size", "2", "--max-minutes", "5"]
+            )
+        return seen
+
+    for max_len, t_out in run("quartznet5x3"):
+        assert max_len <= t_out and t_out == 51  # ceil(101 / 2)
+    for max_len, t_out in run("default"):
+        assert max_len == t_out == 101  # stride-1 regression guard
+
+
+def test_quartznet_checkpoint_metadata(vcm_quartznet_checkpoint):
+    import json
+
+    ckpt_path, _, out_dir = vcm_quartznet_checkpoint
+    ckpt = torch.load(ckpt_path, weights_only=True)
+    assert ckpt["model_type"] == "quartznet" and ckpt["preset"] == "quartznet5x3"
+    hist = json.loads((out_dir / "metadata" / "loss_history.json").read_text())
+    assert hist["model_type"] == "quartznet" and hist["total_stride"] == 2
+    assert hist["ctc_infeasible_total_train"] == 0
+    assert "ctc_infeasible_val" in hist["history"][0]
+
+
+def test_matchbox_checkpoint_keeps_config_keys(vcm_fake_manifest_factory, tmp_path):
+    from dataclasses import asdict
+
+    from me2_voicegen.vcm.model import MatchboxNetConfig
+
+    specs = [
+        {"bucket": "target_commands", "source_dataset": "optionb", "label": "STOP",
+         "split": s, "transcript": "stop", "duration_s": 1.0}
+        for s in ["train"] * 2 + ["val"] * 2
+    ]
+    manifest = vcm_fake_manifest_factory(specs)
+    train_mod.main(
+        ["--manifest", str(manifest), "--out-dir", str(tmp_path / "m"), "--preset", "default",
+         "--max-epochs", "1", "--device", "cpu", "--num-workers", "0", "--batch-size", "2"]
+    )
+    ckpt = torch.load(tmp_path / "m" / "checkpoints" / "checkpoint.pt", weights_only=True)
+    assert set(ckpt["config"]) == set(asdict(MatchboxNetConfig()))
+    assert ckpt["model_type"] == "matchboxnet"

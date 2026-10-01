@@ -1020,6 +1020,78 @@ def render_markdown(report: dict) -> str:
             lines.append(f"| {label} | {pred_str} |")
         lines.append("")
 
+    noisy = report.get("noisy_eval")
+    if noisy:
+        lines.append(f"## Noisy/reverb eval gate (fixed seed {noisy['seed']})")
+        lines.append("")
+        lines.append(
+            "> **What this is:** a separate eval pass over a DETERMINISTIC "
+            "perturbed copy of the val and test splits -- "
+            f"{noisy['perturbation']}. The perturbation is fixed by "
+            f"(`manifest, seed {noisy['seed']}`): identical inputs give a "
+            "bit-identical perturbed signal on every run, so these numbers "
+            "are comparable checkpoint-to-checkpoint. SpecAugment and "
+            "time-stretch are deliberately NOT part of this pass (training "
+            "regularizers, not real acoustic conditions). "
+            f"**Threshold rule:** {noisy['threshold_rule']}."
+        )
+        lines.append("")
+        clean_by_grammar = {s["grammar"]: s for s in report["grammar_sections"]}
+        for section in noisy["sections"]:
+            clean = clean_by_grammar.get(section["grammar"])
+            lines.append(
+                f"### {section['grammar']} "
+                f"(clean-val chosen threshold {section['threshold']})"
+            )
+            lines.append("")
+            if clean is not None:
+                clean_ts = clean["test_split"]
+                noisy_ts = section["test_split"]
+                lines.append("### Clean vs. noisy (test split, same threshold)")
+                lines.append("")
+                lines.append("| metric | clean | noisy | delta (noisy - clean) |")
+                lines.append("|---|---|---|---|")
+                metric_keys = [
+                    ("target accept_rate", "accept_rate"),
+                    ("target exact_accuracy", "exact_accuracy"),
+                    ("babble false-accept rate", "false_accept_rate_babble"),
+                    ("silence false-accept rate", "false_accept_rate_silence"),
+                ]
+                for name, key in metric_keys:
+                    c = clean_ts[key]["rate"] if key.startswith("false_accept") else clean_ts[key]
+                    n = noisy_ts[key]["rate"] if key.startswith("false_accept") else noisy_ts[key]
+                    c_s = f"{c:.3f}" if c is not None else "n/a"
+                    n_s = f"{n:.3f}" if n is not None else "n/a"
+                    delta_s = f"{n - c:+.3f}" if (c is not None and n is not None) else "n/a"
+                    lines.append(f"| {name} | {c_s} | {n_s} | {delta_s} |")
+                lines.append("")
+            nts = section["test_split"]
+            nv = section["val_split"]
+            _rate = lambda d: "n/a" if d is None else f"{d:.3f}"  # noqa: E731
+            lines.append(
+                f"- Noisy test split: {nts['n_accepted']}/{nts['n_target_commands']} targets "
+                f"accepted ({_rate(nts['accept_rate'])} accept rate), "
+                f"{nts['n_exact_correct']} exact-intent-correct "
+                f"({_rate(nts['exact_accuracy'])} exact accuracy)"
+            )
+            lines.append(
+                f"- Noisy false-accept rates: babble "
+                f"{nts['false_accept_rate_babble']['false_accepts']}/"
+                f"{nts['false_accept_rate_babble']['n']} "
+                f"({_rate(nts['false_accept_rate_babble']['rate'])}), silence "
+                f"{nts['false_accept_rate_silence']['false_accepts']}/"
+                f"{nts['false_accept_rate_silence']['n']} "
+                f"({_rate(nts['false_accept_rate_silence']['rate'])})"
+            )
+            lines.append(
+                f"- Noisy val split at the same threshold (diagnostic -- does the "
+                f"clean-chosen operating point still behave on noisy val?): "
+                f"accept_rate={_rate(nv['accept_rate'])}, "
+                f"babble_FAR={_rate(nv['false_accept_rate_babble']['rate'])}, "
+                f"silence_FAR={_rate(nv['false_accept_rate_silence']['rate'])}"
+            )
+            lines.append("")
+
     if report.get("slot_eval_sections"):
         lines.append("## Slot-eval-set (Task 07) results")
         lines.append("")
@@ -1059,8 +1131,9 @@ def build_report(
     grammar_sections: list[dict],
     slot_eval_sections: list[dict] | None,
     slot_eval_skipped_reason: str | None,
+    noisy_eval: dict | None = None,
 ) -> dict:
-    return {
+    report = {
         "license_note": LICENSE_NOTE,
         "checkpoint_path": str(checkpoint_path),
         "checkpoint_meta": {
@@ -1075,6 +1148,11 @@ def build_report(
         "slot_eval_sections": slot_eval_sections,
         "slot_eval_skipped_reason": slot_eval_skipped_reason,
     }
+    # Absent (None) => key omitted entirely: clean-only runs serialize and
+    # render exactly as before.
+    if noisy_eval is not None:
+        report["noisy_eval"] = noisy_eval
+    return report
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
@@ -1110,6 +1188,31 @@ def build_arg_parser() -> argparse.ArgumentParser:
         type=Path,
         default=DEFAULT_SLOT_EVAL_MANIFEST,
         help="Task 07's optional slot-eval-set manifest; skipped gracefully if missing",
+    )
+    parser.add_argument(
+        "--noisy-eval-seed",
+        type=int,
+        default=None,
+        help=(
+            "fixed seed for the separate noisy/reverb eval pass "
+            "(vcm.noisy_eval): one deterministic RIR+additive-noise "
+            "perturbation per val/test row, scored at each grammar's "
+            "clean-val chosen threshold. Default: off (no noisy section in "
+            "the report). Same manifest + same seed => bit-identical "
+            "perturbed signal on every run, so scores are comparable "
+            "checkpoint-to-checkpoint"
+        ),
+    )
+    parser.add_argument(
+        "--noisy-eval-rir-pool-size",
+        type=int,
+        default=200,
+        help=(
+            "RIR pool size for the noisy eval pass (default 200, same as "
+            "the training augmenter). The pool size is part of the result's "
+            "identity -- changing it changes the perturbation, so keep it "
+            "fixed when comparing checkpoints"
+        ),
     )
     parser.add_argument(
         "--threshold-grid",
@@ -1191,6 +1294,69 @@ def main(argv: list[str] | None = None) -> None:
             f"silence_far={ts['false_accept_rate_silence']['rate']}"
         )
 
+    noisy_eval: dict | None = None
+    if args.noisy_eval_seed is not None:
+        # Lazy import: vcm.noisy_eval imports helpers from this module, so a
+        # top-level import here would be circular.
+        from me2_voicegen.vcm.noisy_eval import (
+            NOISY_EVAL_RIR_POOL_SIZE,
+            PERTURBATION_DOC,
+            THRESHOLD_RULE,
+            build_rir_pool_for_seed,
+            evaluate_noisy_at_threshold,
+        )
+        from me2_voicegen.common.augment import RT60_MAX, RT60_MIN, SNR_MAX_DB, SNR_MIN_DB
+
+        noisy_rir_pool_size = (
+            args.noisy_eval_rir_pool_size
+            if args.noisy_eval_rir_pool_size > 0
+            else NOISY_EVAL_RIR_POOL_SIZE
+        )
+        noisy_rir_pool = build_rir_pool_for_seed(args.noisy_eval_seed, noisy_rir_pool_size)
+        noisy_sections = []
+        for (grammar, label, _intent_labels), section in zip(selected_grammars, grammar_sections):
+            print(
+                f"evaluating {label} (noisy/reverb, seed={args.noisy_eval_seed}, "
+                f"threshold={section['chosen_operating_threshold']}) ..."
+            )
+            noisy_sections.append(
+                evaluate_noisy_at_threshold(
+                    model,
+                    feature_extractor,
+                    val_dataset,
+                    test_dataset,
+                    grammar,
+                    label,
+                    args.beam_width,
+                    args.device,
+                    noisy_rir_pool,
+                    args.noisy_eval_seed,
+                    section["chosen_operating_threshold"],
+                    args.required_command_margin,
+                    args.score_mode,
+                )
+            )
+            ts = noisy_sections[-1]["test_split"]
+
+            def _f3(v) -> str:
+                return "n/a" if v is None else f"{v:.3f}"
+
+            print(
+                f"  {label} (noisy): accept_rate={_f3(ts['accept_rate'])} "
+                f"exact_accuracy={_f3(ts['exact_accuracy'])} "
+                f"babble_far={_f3(ts['false_accept_rate_babble']['rate'])} "
+                f"silence_far={_f3(ts['false_accept_rate_silence']['rate'])}"
+            )
+        noisy_eval = {
+            "seed": args.noisy_eval_seed,
+            "rir_pool_size": noisy_rir_pool_size,
+            "snr_range_db": [SNR_MIN_DB, SNR_MAX_DB],
+            "rt60_range_s": [RT60_MIN, RT60_MAX],
+            "perturbation": PERTURBATION_DOC,
+            "threshold_rule": THRESHOLD_RULE,
+            "sections": noisy_sections,
+        }
+
     slot_eval_sections: list[dict] | None = None
     slot_eval_skipped_reason: str | None = None
     if not args.slot_eval_manifest.exists():
@@ -1228,6 +1394,7 @@ def main(argv: list[str] | None = None) -> None:
         grammar_sections,
         slot_eval_sections,
         slot_eval_skipped_reason,
+        noisy_eval,
     )
 
     json_path = metadata_dir / "eval_report.json"

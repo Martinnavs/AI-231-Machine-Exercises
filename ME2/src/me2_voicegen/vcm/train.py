@@ -34,7 +34,14 @@ from me2_voicegen.common.augment import Augmenter
 from me2_voicegen.common.features import LogMelFeatureExtractor
 from me2_voicegen.vcm import alphabet
 from me2_voicegen.vcm.dataset import VCMDataset, collate_fn
-from me2_voicegen.vcm.model import PRESETS, MatchboxNetCTC, estimated_int8_bytes, param_count
+from me2_voicegen.vcm.model import (
+    MODEL_TYPE_KEY,
+    PRESETS,
+    build_model,
+    estimated_int8_bytes,
+    model_type_for_config,
+    param_count,
+)
 from me2_voicegen.vcm.text import normalize_text, resolve_transcript
 
 LICENSE_NOTE = (
@@ -106,12 +113,34 @@ def restore_batchnorm_stats(model: nn.Module, snapshot: BatchNormSnapshot) -> No
         module.num_batches_tracked.copy_(num_batches_tracked)
 
 
+def ctc_min_frames(target_ids: list[int]) -> int:
+    """Minimum output frames CTC needs for a target: its length plus one blank
+    between each pair of adjacent repeated symbols."""
+    return len(target_ids) + sum(1 for a, b in zip(target_ids, target_ids[1:]) if a == b)
+
+
+def count_ctc_infeasible(
+    output_lengths: torch.Tensor, target_ids: torch.Tensor, target_len: torch.Tensor
+) -> int:
+    """Count batch items whose (concatenated) target cannot fit in its output
+    length. `zero_infinity=True` silently zeroes these, so callers log the count."""
+    count = 0
+    offset = 0
+    ids = target_ids.tolist()
+    for out_len, n in zip(output_lengths.tolist(), target_len.tolist()):
+        if ctc_min_frames(ids[offset : offset + n]) > out_len:
+            count += 1
+        offset += n
+    return count
+
+
 @torch.no_grad()
 def run_eval(
     model: nn.Module,
     loader: DataLoader,
     criterion: nn.CTCLoss,
     device: torch.device,
+    stats: dict | None = None,
 ) -> float:
     model.eval()
     total_loss = 0.0
@@ -124,7 +153,12 @@ def run_eval(
 
         logits = model(features)
         log_probs = logits.log_softmax(dim=-1).transpose(0, 1)
-        loss = criterion(log_probs, target_ids, input_lengths, target_len)
+        output_lengths = model.output_lengths(input_lengths)
+        if stats is not None:
+            stats["ctc_infeasible"] = stats.get("ctc_infeasible", 0) + count_ctc_infeasible(
+                output_lengths, target_ids, target_len
+            )
+        loss = criterion(log_probs, target_ids, output_lengths, target_len)
 
         n = features.shape[0]
         total_loss += float(loss.item()) * n
@@ -164,7 +198,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--preset",
         default="default",
-        choices=["default", "spec-scale", "optionc", "optiond"],
+        choices=sorted(PRESETS),
     )
     parser.add_argument("--seed", type=int, default=0)
     parser.add_argument("--max-minutes", type=float, default=30.0)
@@ -245,7 +279,9 @@ def main(argv: list[str] | None = None) -> None:
     )
 
     config = PRESETS[args.preset]
-    model = MatchboxNetCTC(config).to(device)
+    model = build_model(args.preset).to(device)
+    model_type = model_type_for_config(config)
+    total_stride = getattr(model, "total_stride", 1)
     print(f"model preset={args.preset} params={param_count(model):,} est_int8_bytes={estimated_int8_bytes(model):,}")
 
     criterion = nn.CTCLoss(blank=0, zero_infinity=True)
@@ -267,7 +303,10 @@ def main(argv: list[str] | None = None) -> None:
     scaler = torch.cuda.amp.GradScaler(enabled=use_amp)
     scheduler_steps_taken = 0
 
-    epoch0_val_loss = run_eval(model, val_loader, criterion, device)
+    epoch0_val_stats: dict = {}
+    epoch0_val_loss = run_eval(model, val_loader, criterion, device, epoch0_val_stats)
+    if epoch0_val_stats.get("ctc_infeasible"):
+        print(f"WARNING: {epoch0_val_stats['ctc_infeasible']} CTC-infeasible val items")
     print(f"epoch 0 (pre-train) val_loss={epoch0_val_loss:.4f}")
 
     history: list[dict] = []
@@ -278,6 +317,7 @@ def main(argv: list[str] | None = None) -> None:
     nan_or_inf_seen = False
     checkpoint_written = False
     epoch = 0
+    ctc_infeasible_total_train = 0
 
     for epoch in range(1, args.max_epochs + 1):
         elapsed_s = time.monotonic() - start_time
@@ -288,6 +328,7 @@ def main(argv: list[str] | None = None) -> None:
         model.train()
         train_loss_total = 0.0
         train_examples = 0
+        ctc_infeasible_train = 0
         for step, batch in enumerate(train_loader):
             if step % args.time_check_every == 0:
                 if time.monotonic() - start_time >= args.max_minutes * 60:
@@ -301,10 +342,14 @@ def main(argv: list[str] | None = None) -> None:
 
             bn_snapshot = snapshot_batchnorm_stats(model)
             optimizer.zero_grad(set_to_none=True)
+            output_lengths = model.output_lengths(input_lengths)
+            ctc_infeasible_train += count_ctc_infeasible(
+                output_lengths.cpu(), target_ids.cpu(), target_len.cpu()
+            )
             with torch.cuda.amp.autocast(enabled=use_amp):
                 logits = model(features)
                 log_probs = logits.log_softmax(dim=-1).transpose(0, 1)
-                loss = criterion(log_probs, target_ids, input_lengths, target_len)
+                loss = criterion(log_probs, target_ids, output_lengths, target_len)
 
             if not torch.isfinite(loss):
                 nan_or_inf_seen = True
@@ -332,7 +377,15 @@ def main(argv: list[str] | None = None) -> None:
             break
 
         train_loss = train_loss_total / max(train_examples, 1)
-        val_loss = run_eval(model, val_loader, criterion, device)
+        val_stats: dict = {}
+        val_loss = run_eval(model, val_loader, criterion, device, val_stats)
+        ctc_infeasible_val = val_stats.get("ctc_infeasible", 0)
+        ctc_infeasible_total_train += ctc_infeasible_train
+        if ctc_infeasible_train or ctc_infeasible_val:
+            print(
+                f"WARNING: {ctc_infeasible_train} train / {ctc_infeasible_val} val "
+                "CTC-infeasible items (zeroed by zero_infinity)"
+            )
         elapsed_s = time.monotonic() - start_time
 
         samples = sample_decodes(model, val_dataset, feature_extractor, device)
@@ -346,6 +399,8 @@ def main(argv: list[str] | None = None) -> None:
                 "train_loss": train_loss,
                 "val_loss": val_loss,
                 "elapsed_s": elapsed_s,
+                "ctc_infeasible_train": ctc_infeasible_train,
+                "ctc_infeasible_val": ctc_infeasible_val,
                 "samples": [{"expected": e, "decoded": d} for e, d in samples],
             }
         )
@@ -357,6 +412,7 @@ def main(argv: list[str] | None = None) -> None:
                 {
                     "model_state_dict": model.state_dict(),
                     "preset": args.preset,
+                    MODEL_TYPE_KEY: model_type,
                     "config": dataclasses.asdict(config),
                     "alphabet_size": alphabet.ALPHABET_SIZE,
                     "seed": args.seed,
@@ -378,9 +434,13 @@ def main(argv: list[str] | None = None) -> None:
         "license": LICENSE_NOTE,
         "seed": args.seed,
         "preset": args.preset,
+        "model_type": model_type,
+        "total_stride": total_stride,
+        "ctc_infeasible_total_train": ctc_infeasible_total_train,
         "device": str(device),
         "max_minutes": args.max_minutes,
         "epoch0_val_loss": epoch0_val_loss,
+        "epoch0_ctc_infeasible_val": epoch0_val_stats.get("ctc_infeasible", 0),
         "epochs_run": epoch,
         "deadline_hit": deadline_hit,
         "nan_or_inf_seen": nan_or_inf_seen,
