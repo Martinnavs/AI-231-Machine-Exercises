@@ -115,7 +115,7 @@ APP_PIPELINE_SCORE_MODE ?= mean_frame
 # docs/DENSE-SCORING-DECISION.md for the safe range).
 APP_PERCHAR_THRESHOLD ?= -1.204
 
-.PHONY: sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream app-pipeline-perchar wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
+.PHONY: help sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream app-pipeline-perchar wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
 
 WAKEWORD_CLONE_DIR ?= $(if $(TMPDIR),$(TMPDIR),/tmp)/me2_wakeword_clone
 WAKEWORD_POSITIVES_OUT_DIR ?= out/conversions/v2/wakeword/positives_real
@@ -150,7 +150,7 @@ WAKEWORD_CHECKPOINT ?= $(WAKEWORD_TRAIN_OUT_DIR)/checkpoints/checkpoint.pt
 WAKEWORD_BENCH_CALIBRATION_SAMPLES ?= 32
 WAKEWORD_BENCH_N_ITERS ?= 100
 
-sync:
+sync: ## uv sync the local environment
 	$(UV) sync
 
 vendor:
@@ -175,13 +175,13 @@ generate-personas:
 generate-conversions:
 	$(UV) run python -m me2_voicegen.generation.generate_conversions --raw-dir "$(RAW_DIR)" --refs-dir "$(REFS_DIR)" --backend $(BACKEND) --resynth-prob $(RESYNTH_PROB) $(if $(SEED),--seed $(SEED))
 
-vcm-train:
+vcm-train: ## Train the VCM on VCM_MANIFEST
 	$(UV) run python -m me2_voicegen.vcm.train --manifest "$(VCM_MANIFEST)" --out-dir "$(VCM_OUT_DIR)" --preset $(VCM_PRESET) --device $(VCM_DEVICE) --max-minutes $(VCM_MAX_MINUTES) --seed $(VCM_SEED)
 
 vcm-bench:
 	$(UV) run python -m me2_voicegen.vcm.benchmark --checkpoint "$(VCM_CHECKPOINT)" --out-dir "$(VCM_OUT_DIR)" --manifest "$(VCM_MANIFEST)" --calibration-samples $(VCM_BENCH_CALIBRATION_SAMPLES) --n-iters $(VCM_BENCH_N_ITERS)
 
-vcm-eval:
+vcm-eval: ## Evaluate VCM_CHECKPOINT
 	$(UV) run python -m me2_voicegen.vcm.evaluate --manifest "$(VCM_MANIFEST)" --checkpoint "$(VCM_CHECKPOINT)" --out-dir "$(VCM_OUT_DIR)" --device $(VCM_DEVICE) --beam-width $(VCM_EVAL_BEAM_WIDTH) --slot-eval-manifest "$(VCM_SLOT_EVAL_MANIFEST)" --grammar $(VCM_GRAMMAR) $(if $(VCM_EVAL_REQUIRED_COMMAND_MARGIN),--required-command-margin $(VCM_EVAL_REQUIRED_COMMAND_MARGIN),) $(if $(VCM_EVAL_SCORE_MODE),--score-mode $(VCM_EVAL_SCORE_MODE),)
 
 # Option B convenience targets: same vcm-train/vcm-eval machinery, pointed
@@ -191,10 +191,10 @@ vcm-eval:
 # override. `optionb-eval` intentionally has no --slot-eval-manifest
 # default override -- Task 07's slot-eval-set is VCM-specific and does not
 # exist for Option B; evaluate.py skips it gracefully when absent.
-optionb-train:
+optionb-train: ## Train on the Option B manifest
 	$(UV) run python -m me2_voicegen.vcm.train --manifest "$(OPTIONB_MANIFEST)" --out-dir "$(OPTIONB_OUT_DIR)" --preset $(VCM_PRESET) --device $(VCM_DEVICE) --max-minutes $(VCM_MAX_MINUTES) --seed $(VCM_SEED)
 
-optionb-eval:
+optionb-eval: ## Evaluate the Option B checkpoint
 	$(UV) run python -m me2_voicegen.vcm.evaluate --manifest "$(OPTIONB_MANIFEST)" --checkpoint "$(OPTIONB_OUT_DIR)/checkpoints/checkpoint.pt" --out-dir "$(OPTIONB_OUT_DIR)" --device $(VCM_DEVICE) --beam-width $(VCM_EVAL_BEAM_WIDTH) --slot-eval-manifest "$(OPTIONB_OUT_DIR)/metadata/slot_eval/manifest.csv" --grammar optionb $(if $(VCM_EVAL_REQUIRED_COMMAND_MARGIN),--required-command-margin $(VCM_EVAL_REQUIRED_COMMAND_MARGIN),) $(if $(VCM_EVAL_SCORE_MODE),--score-mode $(VCM_EVAL_SCORE_MODE),)
 
 # Re-fetch Option B from the live upstream repo (docs/OPTIONB-GRAMMAR-CONTRACT.md
@@ -422,8 +422,15 @@ SOAK_TALLY_OUT ?= soak-test/podcast_$(SOAK_TALLY_PODCAST)/phase1_three_way_repor
 soak-tally:
 	$(UV) run python .scratch/soak-test-tally/three_way_scorer.py "$(SOAK_TALLY_JSONL)" "$(SOAK_TALLY_TRANSCRIPT)" --tolerance-s $(SOAK_TALLY_TOLERANCE_S) --out "$(SOAK_TALLY_OUT)"
 
-test:
+test: ## Run the test suite
 	$(UV) run pytest
 
 clean:
 	rm -rf .venv vendor models out .pytest_cache
+
+# Kaggle / one-shot experiment workflow (kaggle-setup, experiment, kaggle, ...).
+include kaggle.mk
+
+.DEFAULT_GOAL := help
+help: ## List documented targets
+	@grep -hE '^[a-zA-Z0-9_-]+:.*## ' $(MAKEFILE_LIST) | sed -E 's/:[^#]*## /\t/' | sort | awk -F'\t' '{printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'

@@ -22,3 +22,6 @@ personas/
 *.flac
 *.ogg
 *.m4a
+
+# Kaggle dataset staging (make kaggle-pack-*)
+dist/
