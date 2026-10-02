@@ -1,0 +1,6 @@
+{
+ "checkpoint_meta": {
+  "preset": "quartznet5x3-heads",
+  "license": "Trained on the public airimonda/ai231-me2-voice-commands dataset (commit 6947f130), including its synthetic_negatives noise and babble clips; no ESC-50 or other external noise. Each dataset source keeps its own license (several are non-commercial; DEMAND noise is CC BY-SA 3.0): see the dataset card and verify before redistribution or commercial use."
+ }
+}

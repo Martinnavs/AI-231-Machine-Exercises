@@ -269,6 +269,39 @@ and should be judged on streaming replay, not whole clips; it has not been start
 heads vs CTC, run more seeds (two are not enough) and, if accent coverage matters, add Filipino-accented training data
 (the fil50 persona export; provenance of its 17 reference voices is still open).
 
+## Run the checked-in model in streaming
+
+`out/vcm/v2s1-heads-A/` is a normal run directory (`export/vcm_model.{fp32,int8}.onnx`, `metadata/eval_report.json` with the
+checkpoint's preset and licence note), so the existing streaming CLI takes it as `--model`. The ONNX holds the CTC path only;
+the intent and slot heads are not exported, so streaming uses the same grammar-constrained beam search as every other
+QuartzNet model here. The settings below are the repo's current live ones (`make app-pipeline-live`): the `endpointed`
+policy, threshold -0.1, incomplete-prefix margin 4.0, hold 200 ms, wake word gate.
+
+```bash
+# live microphone, wake word then command, answers when the command ends
+uv run python -m me2_voicegen.vcm.streaming \
+  --model out/vcm/v2s1-heads-A --backend onnx --onnx-variant int8 \
+  --grammar optionb --threshold=-0.1 --required-command-margin 4.0 --beam-width 50 \
+  --gate wakeword --policy endpointed --gate-period 3 --hold-ms 200 --stable-strides 1 \
+  --wakeword-model out/wakeword-sesame-ambient-rir-45m --wakeword-backend onnx --log-periods \
+  --source mic
+
+# same through the app pipeline (pipes events to app.forward)
+make app-pipeline-live APP_LIVE_MODEL=out/vcm/v2s1-heads-A
+
+# deterministic file replay without the wake word (a clip that contains only the command)
+uv run python -m me2_voicegen.vcm.streaming \
+  --model out/vcm/v2s1-heads-A --backend onnx --onnx-variant int8 \
+  --grammar optionb --threshold=-0.1 --required-command-margin 4.0 --beam-width 50 \
+  --gate none --source path/to/command.wav
+```
+
+What has and has not been checked: the file-replay command (last one) was run on this model; 8 of 8 synthetic holdout
+commands (one per intent) fired the right intent within 0.5-0.75 s, and a real-speaker TIMER clip fired nothing, in line with
+the holdout results above. The wake word gate, the live microphone and the `make` target were **not** run for this model, and
+latency, false actions on ambient audio and real-time factor on the target hardware are unmeasured. The threshold and margin
+are the v1 production values, not re-tuned for this model. Use `--onnx-variant fp32` to rule out quantisation effects.
+
 ## Commands
 
 ```bash
