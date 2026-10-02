@@ -106,7 +106,7 @@ CMD_NEXT = with_intent(
 
 CMD_PAUSE = with_intent(
     "PAUSE",
-    alt(literal("pause"), literal("pause", "audio"), literal("pause", "for", "now")),
+    alt(literal("pause"), literal("pause", "audio"), literal("pause", "song")),
 )
 
 CMD_STOP = with_intent(
@@ -181,7 +181,7 @@ CMD_ALARM = with_intent(
 
 CMD_CALL = with_intent(
     "CALL",
-    alt(literal("call"), literal("place", "a", "call"), literal("make", "a", "phone", "call")),
+    alt(literal("call"), literal("make", "a", "call"), literal("make", "a", "phone", "call")),
 )
 
 CMD_MESSAGE = with_intent(

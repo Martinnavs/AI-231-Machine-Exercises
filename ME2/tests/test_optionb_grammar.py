@@ -47,7 +47,7 @@ CANONICAL_93: list[tuple[str, str, dict]] = [
     ("play next song", "NEXT", {}),
     ("pause", "PAUSE", {}),
     ("pause audio", "PAUSE", {}),
-    ("pause for now", "PAUSE", {}),
+    ("pause song", "PAUSE", {}),
     ("stop", "STOP", {}),
     ("stop playing", "STOP", {}),
     ("end playback", "STOP", {}),
@@ -64,7 +64,7 @@ CANONICAL_93: list[tuple[str, str, dict]] = [
     ("what time is it", "TIME", {}),
     ("tell me the time", "TIME", {}),
     ("call", "CALL", {}),
-    ("place a call", "CALL", {}),
+    ("make a call", "CALL", {}),
     ("make a phone call", "CALL", {}),
     ("message", "MESSAGE", {}),
     ("send a message", "MESSAGE", {}),
@@ -313,7 +313,7 @@ def test_all_129_distinct_and_normalization_stable():
 # Re-derived for the live-upstream refresh (grammar @ b9d86ea or later; PAUSE
 # and STOP phrasings changed). "pause"/"pause the music" and
 # "pause"/"pause this song" no longer exist -- PAUSE's v2/v3 are now "pause
-# audio"/"pause for now", both still strict extensions of "pause" itself, so
+# audio"/"pause song", both still strict extensions of "pause" itself, so
 # the pause contribution stays 2 pairs, just with new right-hand sides. STOP
 # gains one new pair: STOP's v1 is now the bare word "stop" (was "stop
 # song"), and v2 "stop playing" is a strict extension of it. "time"/"timer
@@ -325,7 +325,7 @@ def test_all_129_distinct_and_normalization_stable():
 
 EXPECTED_STRICT_PREFIX_PAIRS = {
     ("pause", "pause audio"),
-    ("pause", "pause for now"),
+    ("pause", "pause song"),
     ("stop", "stop playing"),
     ("time", "timer 10 seconds"),
     ("time", "timer 30 seconds"),
