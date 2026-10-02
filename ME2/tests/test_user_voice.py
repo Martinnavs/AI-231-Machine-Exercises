@@ -25,7 +25,7 @@ def test_clip_id_is_slug_and_take():
 
 
 @pytest.mark.parametrize("text,label", [
-    ("Call", "CALL"), ("Place a call", "CALL"), ("Make a phone call", "CALL"), ("Set color to green", "COLOR"),
+    ("Call", "CALL"), ("Make a call", "CALL"), ("Make a phone call", "CALL"), ("Set color to green", "COLOR"),
     ("Switch color to red", "COLOR"), ("Send my message", "MESSAGE"), ("Show my reminders", "LIST_REMINDERS"),
     ("Shut off the lights", "LIGHT_OFF"), ("What time is it", "TIME"),
 ])

@@ -18,6 +18,7 @@ import re
 from me2_voicegen.vcm.optionb.numbers import spell_integer
 
 _DIGIT_RUN = re.compile(r"\d+")
+_ON_THE_HOUR = re.compile(r"(\d):00\b")
 
 
 def prepare_ctc_transcript(text: str) -> str:
@@ -25,4 +26,5 @@ def prepare_ctc_transcript(text: str) -> str:
     words (via `vcm.optionb.numbers.spell_integer`). Raises `ValueError` if a
     digit run falls outside `spell_integer`'s 0-100 range, rather than
     silently mis-spelling an unexpected number."""
+    text = _ON_THE_HOUR.sub(r"\1", text)  # "6:00 AM" is the same spoken time as "6 AM"
     return _DIGIT_RUN.sub(lambda m: spell_integer(int(m.group())), text)

@@ -110,7 +110,7 @@ def test_optionb_grammar_carries_derived_incomplete_prefixes():
     assert "time" not in incomplete
     assert "pause" not in incomplete
     assert "color red" not in incomplete
-    assert len(incomplete) == 171
+    assert len(incomplete) == 168
 
     # Cross-invariant: the experimental view and the production field agree.
     assert (

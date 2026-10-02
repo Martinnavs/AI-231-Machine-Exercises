@@ -66,7 +66,7 @@ and "Slot values" tables directly.
 | Music control | `VOLUME_UP` | Volume up | Increase the volume | Turn the volume up |
 | Music control | `VOLUME_DOWN` | Volume down | Lower the volume | Turn the volume down |
 | Music control | `NEXT` | Next song | Skip song | Play next song |
-| Music control | `PAUSE` | Pause | Pause audio | Pause for now |
+| Music control | `PAUSE` | Pause | Pause audio | Pause song |
 | Music control | `STOP` | Stop | Stop playing | End playback |
 | Lighting | `LIGHT_ON` | Lights on | Power on the lights | Turn on the lights |
 | Lighting | `LIGHT_OFF` | Lights out | Kill the lights | Shut off the lights |
@@ -77,7 +77,7 @@ and "Slot values" tables directly.
 | Information | `TIME` | Time | What time is it? | Tell me the time |
 | Timers and alarms | `TIMER` | Timer {duration} | Countdown for {duration} | Start a timer for {duration} |
 | Timers and alarms | `ALARM` | Alarm {time} | Wake me up at {time} | Set an alarm for {time} |
-| Communication | `CALL` | Call | Place a call | Make a phone call |
+| Communication | `CALL` | Call | Make a call | Make a phone call |
 | Communication | `MESSAGE` | Message | Send a message | Send my message |
 | Reminders | `CREATE_REMINDER` | Reminder {task} | Remind me to {task} | Create a reminder to {task} |
 | Reminders | `LIST_REMINDERS` | Reminders | Show my reminders | List my reminders |
@@ -169,5 +169,5 @@ Resolve manifest paths relative to this directory. Metadata records the split as
 | `CREATE_REMINDER` task slot | `call home` | `exercise` | Reduce confusion with the `CALL` intent. |
 | `VOLUME_DOWN` variation 2 | Decrease the volume | Lower the volume | Reduce confusion between the similar-sounding words increase and decrease. |
 | `NEXT` phrases | Skip song; Next song; Play next song | Next song; Skip song; Play next song | Use explicit song-navigation phrases. |
-| `PAUSE` phrases | Pause; Pause the music; Pause this song | Pause; Pause audio; Pause for now | Use shorter pause phrases and avoid music-specific wording. |
+| `PAUSE` phrases | Pause; Pause the music; Pause this song | Pause; Pause audio; Pause song | Use shorter pause phrases and avoid music-specific wording. |
 | `STOP` phrases | Stop song; Stop music; Stop playing music | Stop; Stop playing; End playback | Use direct playback-stop phrases and avoid song or music wording. |

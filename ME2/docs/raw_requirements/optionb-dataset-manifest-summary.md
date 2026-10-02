@@ -36,7 +36,7 @@ same table-extraction logic in `tests/test_optionb_grammar.py`).
 | - | `VOLUME_UP` | Volume up | Increase the volume | Turn the volume up |
 | - | `VOLUME_DOWN` | Volume down | Lower the volume | Turn the volume down |
 | - | `NEXT` | Next song | Skip song | Play next song |
-| - | `PAUSE` | Pause | Pause audio | Pause for now |
+| - | `PAUSE` | Pause | Pause audio | Pause song |
 | - | `STOP` | Stop | Stop playing | End playback |
 | - | `LIGHT_ON` | Lights on | Power on the lights | Turn on the lights |
 | - | `LIGHT_OFF` | Lights out | Kill the lights | Shut off the lights |
@@ -47,7 +47,7 @@ same table-extraction logic in `tests/test_optionb_grammar.py`).
 | - | `TIME` | Time | What time is it? | Tell me the time |
 | - | `TIMER` | Timer {duration} | Countdown for {duration} | Start a timer for {duration} |
 | - | `ALARM` | Alarm {time} | Wake me up at {time} | Set an alarm for {time} |
-| - | `CALL` | Call | Place a call | Make a phone call |
+| - | `CALL` | Call | Make a call | Make a phone call |
 | - | `MESSAGE` | Message | Send a message | Send my message |
 | - | `CREATE_REMINDER` | Reminder {task} | Remind me to {task} | Create a reminder to {task} |
 | - | `LIST_REMINDERS` | Reminders | Show my reminders | List my reminders |

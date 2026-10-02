@@ -18,7 +18,7 @@ from me2_voicegen.vcm.text import CONVERSIONS_V2_DIR, normalize_text, resolve_tr
 # (which is deliberately left un-refetched/unchanged as a reproducible
 # snapshot -- its 7 changed intents' old transcripts are no longer grammar
 # -accepted under the refreshed grammar, by design).
-REAL_OPTIONB_MANIFEST = CONVERSIONS_V2_DIR / "optionb-v3" / "manifest.csv"
+REAL_OPTIONB_MANIFEST = CONVERSIONS_V2_DIR / "ai231-me2-voice-commands" / "manifest.csv"
 
 
 def test_spells_out_a_single_digit_run():
@@ -120,22 +120,21 @@ def test_import_vcm_text_has_no_import_cycle():
 
 
 @pytest.mark.skipif(
-    not REAL_OPTIONB_MANIFEST.exists(), reason="real optionb manifest not fetched locally"
+    not REAL_OPTIONB_MANIFEST.exists(), reason="ai231 dataset not converted locally"
 )
-def test_all_93_real_transcripts_are_digit_safe_and_grammar_accepted():
+def test_exact_real_transcripts_are_grammar_accepted_and_cover_all_93():
+    """`exact` rows of the converted ai231 dataset: every one of the 93 phrases appears and is accepted
+    with the right intent; raw typos ("9PM", "what is the weather") stay under 0.1%."""
     with REAL_OPTIONB_MANIFEST.open(newline="", encoding="utf-8") as f:
-        rows = list(csv.DictReader(f))
+        rows = [r for r in csv.DictReader(f) if r["bucket"] == "target_commands" and r["variation_match"] == "exact"]
 
-    distinct = {
-        r["transcript"] for r in rows if r["bucket"] == "target_commands"
-    }
-    assert len(distinct) == 93
+    accepted, rejected = set(), 0
+    for r in rows:
+        result = OPTIONB_GRAMMAR.accepts(normalize_text(prepare_ctc_transcript(r["transcript"])))
+        if result is None or result[0][0] != r["label"]:
+            rejected += 1
+        else:
+            accepted.add((r["label"], r["variation"], r["slot_value"]))
 
-    failures = []
-    for transcript in distinct:
-        normalized = normalize_text(prepare_ctc_transcript(transcript))
-        if OPTIONB_GRAMMAR.accepts(normalized) is None:
-            failures.append((transcript, normalized))
-
-    assert failures == []
-    assert len(distinct) - len(failures) == 93
+    assert len(accepted) == 93
+    assert rejected <= len(rows) * 0.001

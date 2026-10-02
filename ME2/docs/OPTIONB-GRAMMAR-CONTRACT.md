@@ -22,7 +22,7 @@ divergences remain** -- `vcm.optionb.grammar.KNOWN_README_DIVERGENCES == []`
 | `$CMD_VOLUME_UP` | Volume up | Increase the volume | Turn the volume up |
 | `$CMD_VOLUME_DOWN` | Volume down | Lower the volume | Turn the volume down |
 | `$CMD_NEXT` | Next song | Skip song | Play next song |
-| `$CMD_PAUSE` | Pause | Pause audio | Pause for now |
+| `$CMD_PAUSE` | Pause | Pause audio | Pause song |
 | `$CMD_STOP` | Stop | Stop playing | End playback |
 | `$CMD_LIGHT_ON` | Lights on | Power on the lights | Turn on the lights |
 | `$CMD_LIGHT_OFF` | Lights out | Kill the lights | Shut off the lights (weak)| 
@@ -33,7 +33,7 @@ divergences remain** -- `vcm.optionb.grammar.KNOWN_README_DIVERGENCES == []`
 | `$CMD_TIME` | Time | What time is it? (weak) | Tell me the time |
 | `$CMD_TIMER` | Timer {duration} | Countdown for {duration} | Start a timer for {duration} |
 | `$CMD_ALARM` | Alarm {time} | Wake me up at {time} | Set an alarm for {time} |
-| `$CMD_CALL` | Call (weak) | Place a call | Make a phone call |
+| `$CMD_CALL` | Call (weak) | Make a call | Make a phone call |
 | `$CMD_MESSAGE` | Message | Send a message | Send my message (weak) |
 | `$CMD_CREATE_REMINDER` | Reminder {task} | Remind me to {task} | Create a reminder to {task} |
 | `$CMD_LIST_REMINDERS` | Reminders | Show my reminders (weak) | List my reminders |
@@ -138,7 +138,7 @@ never more, so the grammar never accepts a phrase absent from the
 (never carried over unchanged from a prior grammar):** among the canonical
 93, **6 strict character-level prefix pairs** exist (one phrase's text is a
 character-for-character prefix of another's) -- `"pause"` is a prefix of
-`"pause audio"` and `"pause for now"`; `"stop"` is a prefix of `"stop
+`"pause audio"` and `"pause song"`; `"stop"` is a prefix of `"stop
 playing"` (STOP's v1 is now the bare word "stop"); `"time"` is a prefix of
 `"timer 10 seconds"`, `"timer 30 seconds"`, and `"timer 1 minute"` (because
 "Timer" itself starts with "Time"). Adding the 36 word-form phrases
