@@ -177,3 +177,22 @@ make app-pipeline APP_PIPELINE_MODEL=out/vcm/quartznet5x3-s2-fil50-ambient-rir-1
 Switching the served model from `optiond` to this checkpoint is this one Make
 target plus these two values; the streaming CLI, INT8 export, and
 `resolve_threshold()` contract are unchanged (ticket 01).
+
+## Margin check on the ai231 dataset (2026-10-02)
+
+Whole-clip decoding, threshold -0.1, beam 50, no retraining, `exact` rows of the converted
+`ai231-me2-voice-commands` test split (3,601 clips; 0 of 47 out-of-scope false accepts at every margin).
+Incomplete-prefix false accepts use the existing 10,688 QuartzNet test probes (built from the older test set's
+clips), at the same threshold.
+
+| Margin | Complete clips, intent / intent+slot | Probe false accepts, room-tone only | All probes |
+|---|---|---|---|
+| gate off | 97.3% / 97.2% | 229/3,248 (7.1%) | 1,792 (16.8%) |
+| 4.0 | 97.1% / 97.0% | 105/3,248 (3.2%) | 935 (8.8%) |
+| 20.0 | 94.9% / 94.8% | 26/3,248 (0.8%) | 328 (3.1%) |
+
+Decision: margins unchanged. The streaming mode (`app-pipeline-live`) keeps 4.0: it keeps almost all
+complete-clip accuracy and halves unfinished-phrase false accepts, and its end-of-speech check already guards
+against cut-offs. The 3 s mode (`app-pipeline-quartznet`) keeps 20.0. The ai231 clips are all complete, so
+they show only the gate's cost; the probes show what it protects, which is why neither set alone was used to
+pick a margin. Holdout (167 `exact` clips, indicative only): 86.2% / 91.0% / 94.6% at 20.0 / 4.0 / off.
