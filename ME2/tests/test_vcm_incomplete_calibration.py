@@ -15,17 +15,80 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+import torch
 
 from me2_voicegen.vcm import alphabet as vcm_alphabet
 from me2_voicegen.vcm import decoder as dec
-from me2_voicegen.vcm.evaluate import RowResult
+from me2_voicegen.common.features import HOP_LENGTH, LogMelFeatureExtractor
+from me2_voicegen.vcm.evaluate import RowResult, TARGET_BUCKET
 from me2_voicegen.vcm.optiona.grammar import TOY_GRAMMAR
 from me2_voicegen.vcm.optionb.grammar import OPTIONB_GRAMMAR
 from me2_voicegen.vcm.optionb import incomplete_probes as ip
+from me2_voicegen.vcm.optionb.text import normalize_text as optionb_normalize_text
+from me2_voicegen.vcm.optionb.transcript import prepare_ctc_transcript
 
 import me2_voicegen.vcm.incomplete_calibration as ic
 
 NEGINF = float("-inf")
+
+
+class _TrailingSilenceStub(torch.nn.Module):
+    """Scripted near-one-hot model for `decode_dataset_rows` (quartznet-
+    promotion ticket 01): emits the CTC token path of `text` on frames
+    `[0, len(path))` and BLANK peaks on every later frame, so `force_align`
+    anchors the characters at frames `0..len(path)-1` and every later frame
+    is natural trailing silence. It *advertises* `total_stride` (like
+    `QuartzNetCTC`) but never subsamples time -- this is a conversion probe,
+    not a strided network. `total_stride=None` leaves the attribute unset,
+    mirroring `MatchboxNetCTC`."""
+
+    def __init__(self, text: str, total_stride: int | None = None, peak: float = 20.0) -> None:
+        super().__init__()
+        ids: list[int] = []
+        prev: int | None = None
+        for ch in text:
+            cid = vcm_alphabet.CHAR_TO_ID[ch]
+            if cid == prev:
+                ids.append(vcm_alphabet.BLANK_ID)
+                prev = None
+            ids.append(cid)
+            prev = cid
+        self.forced_ids = ids
+        self.peak = peak
+        if total_stride is not None:
+            self.total_stride = total_stride
+
+    def forward(self, features: torch.Tensor) -> torch.Tensor:
+        batch, _, frames = features.shape
+        logits = torch.full((batch, frames, vcm_alphabet.ALPHABET_SIZE), -self.peak)
+        for t, cid in enumerate(self.forced_ids):
+            if t >= frames:
+                break
+            logits[:, t, cid] = self.peak
+        for t in range(len(self.forced_ids), frames):
+            logits[:, t, vcm_alphabet.BLANK_ID] = self.peak
+        return logits
+
+
+class _MiniDataset:
+    """Minimal stand-in for `VCMDataset` exposing exactly what
+    `decode_dataset_rows` touches: `.rows` dicts and `__getitem__`
+    returning an example with `.waveform`."""
+
+    def __init__(self, rows: list[dict], waveforms: list[torch.Tensor]) -> None:
+        self.rows = rows
+        self._waveforms = waveforms
+
+    def __len__(self) -> int:
+        return len(self.rows)
+
+    def __getitem__(self, i: int):
+        return _MiniExample(self._waveforms[i])
+
+
+class _MiniExample:
+    def __init__(self, waveform: torch.Tensor) -> None:
+        self.waveform = waveform
 
 
 # ---------------------------------------------------------------------------
@@ -1210,3 +1273,55 @@ def test_select_cli_regression_budget_accepts_override():
         ["select", "--probe-manifest", "probes/val/manifest.csv", "--regression-budget", "2.5"]
     )
     assert args.regression_budget == 2.5
+
+
+# ---------------------------------------------------------------------------
+# decode_dataset_rows: stride-aware trailing silence (quartznet-promotion
+# ticket 01). The forced-alignment frame indices are posterior frames, so the
+# seconds conversion must scale by the model's total stride: 2x for a
+# stride-2 model at the same frame index, and bit-identical to the old
+# stride-1 arithmetic when the model has no total_stride attribute.
+# ---------------------------------------------------------------------------
+
+
+def _decode_trailing_silence(total_stride: int | None):
+    transcript_raw = "call"
+    text = optionb_normalize_text(prepare_ctc_transcript(transcript_raw))
+    fe = LogMelFeatureExtractor()
+    waveform = torch.zeros(16000)
+    model = _TrailingSilenceStub(text, total_stride=total_stride)
+    row = {
+        "bucket": TARGET_BUCKET,
+        "label": "CALL",
+        "source_dataset": "optionb",
+        "group_id": "",
+        "transcript": transcript_raw,
+    }
+    dataset = _MiniDataset([row], [waveform])
+    results, silences, _benchmark_logp = ic.decode_dataset_rows(
+        model, fe, dataset, OPTIONB_GRAMMAR, beam_width=25, device="cpu"
+    )
+    return results, silences
+
+
+def test_decode_dataset_rows_trailing_silence_stride1_is_unchanged_golden():
+    results, silences = _decode_trailing_silence(total_stride=None)
+    assert len(results) == 1
+    fe = LogMelFeatureExtractor()
+    t_frames = fe(torch.zeros(16000)).shape[-1]
+    # "call" -> CTC path [c, a, l, blank, l] occupies frames 0..4, so the
+    # natural trailing silence is the remaining t_frames - 5 posterior frames.
+    # The division is innermost, matching the pre-ticket-01
+    # `trailing_frames * FRAME_DURATION_S` arithmetic bit-for-bit.
+    expected = (t_frames - 5) * (HOP_LENGTH / 16000)
+    assert silences[0] == expected
+
+
+def test_decode_dataset_rows_trailing_silence_stride2_is_2x_stride1():
+    results_s1, silences_s1 = _decode_trailing_silence(total_stride=None)
+    results_s2, silences_s2 = _decode_trailing_silence(total_stride=2)
+    assert len(results_s2) == 1
+    # Same frame index (the stub never subsamples), stride-2 hop: exactly 2x
+    # the stride-1 seconds, bit-for-bit.
+    assert silences_s2[0] == 2 * silences_s1[0]
+    assert silences_s2[0] > 0.0

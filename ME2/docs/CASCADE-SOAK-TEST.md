@@ -122,3 +122,55 @@ noisy-gate FARs (see "Why this exists" above) -- if the measured rate comes out 
 higher, the two stages' failures are correlated rather than independent, and that
 independence assumption should be dropped from future promotion write-ups rather than
 reused.
+
+## QuartzNet-5x3-tiny stride-2 (quartznet-promotion ticket 03)
+
+Same 4 ambient files (3.296 h total), same CLI and INT8 ONNX path, but with
+`--model out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m` at the ticket-02
+operating point (mean_frame, threshold -0.1, margin 20.0). One deliberate
+difference from the optiond commands above: `--required-command-margin 20.0`
+is **included**, because it is the calibrated gate for this checkpoint
+(docs/QUARTZNET-OPERATING-POINT.md section 2); the optiond runs above omitted
+it on purpose. The optiond P3b baseline (303) was measured at margin 4.0, so
+the margin settings differ between the two columns -- stated, not hidden.
+
+Runner: `scripts/quartznet_soak_gates.py` (stages `p3` / `p3b` / `p4`,
+`summary`), per-file JSONL/stderr under
+`out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/soak/{p3,p3b,p4}/`, summaries
+in `out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/soak/summary.json`. The
+P4 clips are the same 821 composed test clips the optiond dense pilot used
+(`out/vcm/option-d-fil50-ambient-rir-135m/dense_pilot/cascade_stream/clips/`).
+
+```bash
+# P3 cascade (wakeword gate), P3b VCM-only, P4 recall replay -- one stage at a time:
+PYTHONPATH=$PWD/src uv run python scripts/quartznet_soak_gates.py p3
+PYTHONPATH=$PWD/src uv run python scripts/quartznet_soak_gates.py p3b
+PYTHONPATH=$PWD/src uv run python scripts/quartznet_soak_gates.py p4
+PYTHONPATH=$PWD/src uv run python scripts/quartznet_soak_gates.py summary
+```
+
+| stage (3.296 h unless noted) | optiond baseline | QuartzNet |
+|---|---|---|
+| P3 cascade wakeword periods opened | 0 (vacuous) | 0 (vacuous) |
+| P3 cascade `period: ACCEPT` | 0 | 0 |
+| P3b VCM-only `trigger` count | 303 (B: -0.1, margin 4.0) | **101** (3 / 48 / 43 / 7 per file; intents CALL, NEXT, PAUSE, STOP, TIME) |
+| P4 correct-on-first-trigger / 821 | 720 (87.7%) | **749 (91.2%)** |
+| P4 wrong-intent triggers | 111 | **49** |
+| P4 per-focus PAUSE / STOP / TIME | 87/100, 129/134, 86/107 | 99/100, 129/134, **77/107** |
+| `dropped` windows (2.5 s / 0.25 s) | 0 | 0 (P3, P3b, all 821 P4 clips) |
+
+Promotion bar (set in the ticket before any number existed): P3b triggers <=
+303, zero compound false actions in the cascade, P4 recall within 1 pp of
+720/821, `dropped == 0`. **Result: all four hold** (101 <= 303; 0 accepts;
+749/821 = 91.2% >= 86.7%; dropped 0). One disclosed shortfall outside the bar:
+streaming recall on TIME clips is 77/107 (72.0%) vs optiond's 86/107
+(80.4%), -8.4 pp per-focus, while overall recall is +3.5 pp -- reported per
+the ticket's "do not tune to pass" rule, not masked by the aggregate.
+
+Small-n caveat, stated plainly as for the optiond runs: the P3 cascade result
+is 0 on a small exposure (the wakeword stage never opened a period on this
+audio for either model, and the 8-hour hardware soak's baseline was n=10
+wakeword false triggers -- an n=10 baseline gives only a ~25-30% CI upper
+bound, and n=0 gives none at all). P3 is therefore a no-regression check,
+not a measurement of the compound false-action rate; P3b is the stage with
+real power.

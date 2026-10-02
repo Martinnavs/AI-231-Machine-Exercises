@@ -6,20 +6,25 @@ default test run.
 
 from __future__ import annotations
 
+import dataclasses
+
 import pytest
 import torch
 
 from me2_voicegen.vcm import alphabet
 from me2_voicegen.vcm.decoder import decode
-from me2_voicegen.common.features import LogMelFeatureExtractor
+from me2_voicegen.common.features import HOP_LENGTH, LogMelFeatureExtractor
+from me2_voicegen.vcm.model import MatchboxNetCTC
 from me2_voicegen.vcm.optiona.grammar import SPEC_GRAMMAR, TOY_GRAMMAR
 from me2_voicegen.vcm.pipeline import (
     SlidingWindowPipeline,
     STRIDE_SAMPLES,
     WINDOW_SAMPLES,
+    frame_hop_samples,
     infer_waveform,
     logp_for_waveform,
 )
+from me2_voicegen.vcm.quartznet import QUARTZNET5X3_CONFIG, QuartzNetCTC
 
 SAMPLE_RATE = 16000
 
@@ -357,3 +362,38 @@ def test_sliding_window_pipeline_threads_score_mode(vcm_stub_model_factory):
     assert pipe.score_mode == "per_char"
     assert SlidingWindowPipeline(model, LogMelFeatureExtractor(), TOY_GRAMMAR,
                                  threshold=-50.0).score_mode == "mean_frame"
+
+
+# ---------------------------------------------------------------------------
+# frame_hop_samples: waveform samples per posterior frame, stride-aware.
+# ---------------------------------------------------------------------------
+
+
+def test_frame_hop_samples_stride1_stub_equals_hop_length(vcm_stub_model_factory):
+    model = vcm_stub_model_factory(forced_ids=CALL_IDS)
+    # No total_stride attribute -> treated as stride 1 (MatchboxNet).
+    assert not hasattr(model, "total_stride")
+    assert frame_hop_samples(model) == HOP_LENGTH
+
+
+def test_frame_hop_samples_stride2_stub_is_2x_hop_length(vcm_stub_model_factory):
+    model = vcm_stub_model_factory(forced_ids=CALL_IDS, total_stride=2)
+    assert frame_hop_samples(model) == 2 * HOP_LENGTH
+
+
+def test_frame_hop_samples_stride4_stub_is_4x_hop_length(vcm_stub_model_factory):
+    model = vcm_stub_model_factory(forced_ids=CALL_IDS, total_stride=4)
+    assert frame_hop_samples(model) == 4 * HOP_LENGTH
+
+
+def test_frame_hop_samples_real_matchboxnet_is_stride1():
+    assert frame_hop_samples(MatchboxNetCTC()) == HOP_LENGTH
+
+
+def test_frame_hop_samples_real_quartznet_defaults_stride2():
+    assert frame_hop_samples(QuartzNetCTC(QUARTZNET5X3_CONFIG)) == 2 * HOP_LENGTH
+
+
+def test_frame_hop_samples_real_quartznet_s1_ablation_is_stride1():
+    s1 = dataclasses.replace(QUARTZNET5X3_CONFIG, time_stride=1)
+    assert frame_hop_samples(QuartzNetCTC(s1)) == HOP_LENGTH
