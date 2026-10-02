@@ -7,7 +7,7 @@ from __future__ import annotations
 import torch
 
 from me2_voicegen.common.augment import Augmenter
-from me2_voicegen.vcm.dataset import VCMDataset, collate_fn
+from me2_voicegen.vcm.dataset import VCMDataset, VCMExample, collate_fn
 
 
 def _target_command_specs(n: int = 3, split: str = "train") -> list[dict]:
@@ -333,3 +333,86 @@ def test_collate_fn_excludes_nothing_itself_caller_must_filter(vcm_fake_manifest
     loss_bearing_batch = [dataset[i] for i in dataset.loss_bearing_indices]
     out = collate_fn(loss_bearing_batch)
     assert out["features"].shape[0] == 1
+
+
+def test_timestretch_never_applied_outside_train_split(vcm_fake_manifest_factory):
+    # The train-only rule is enforced in the dataset itself (the
+    # `split == "train"` gate around `augment_waveform`), not just by the
+    # CLI: a val-split sample must come out byte-identical to the plain
+    # load even at p_timestretch=1.0.
+    specs = _target_command_specs(1, split="val") + _target_command_specs(1, split="train")
+    manifest_path = vcm_fake_manifest_factory(specs)
+    augmenter = Augmenter(p_timestretch=1.0, seed=11)
+
+    plain_val = VCMDataset(manifest_path, split="val", augmenter=None)
+    aug_val = VCMDataset(manifest_path, split="val", augmenter=augmenter)
+    plain_wave, _, _ = plain_val[0]
+    aug_wave, _, _ = aug_val[0]
+    assert torch.equal(plain_wave, aug_wave)
+
+    # Positive control: the same augmenter on the train split MUST stretch.
+    plain_train = VCMDataset(manifest_path, split="train", augmenter=None)
+    aug_train = VCMDataset(manifest_path, split="train", augmenter=augmenter)
+    plain_train_wave, _, _ = plain_train[0]
+    aug_train_wave, _, _ = aug_train[0]
+    assert not torch.equal(plain_train_wave, aug_train_wave)
+
+
+def test_timestretch_end_to_end_changes_features_with_valid_shape_contract(vcm_fake_manifest_factory):
+    # Full load path: ~1.5s 16kHz mono fixture wav -> __getitem__ ->
+    # stretched waveform -> log-mel (30ms window / 10ms hop) -> collate,
+    # proving the stretched (variable-length) output passes cleanly
+    # through the per-sample `input_lengths` the CTC path carries.
+    specs = [
+        {
+            "bucket": "target_commands",
+            "source_dataset": "sanitized_clean",
+            "label": "ALARM",
+            "split": "train",
+            "duration_s": 1.5,
+        }
+    ]
+    manifest_path = vcm_fake_manifest_factory(specs)
+    plain_ds = VCMDataset(manifest_path, split="train", augmenter=None)
+    aug_ds = VCMDataset(manifest_path, split="train", augmenter=Augmenter(p_timestretch=1.0, seed=21))
+
+    # Each __getitem__ on aug_ds draws a fresh factor (p=1.0), so the
+    # stretched waveform below is the one every assertion uses -- exactly
+    # what the real train path does (collate_fn computes mels from the
+    # per-example waveform it was handed).
+    plain_wave, plain_ids, plain_len = plain_ds[0]
+    aug_wave, aug_ids, aug_len = aug_ds[0]
+    # Targets are untouched by a waveform augmentation.
+    assert aug_ids.equal(plain_ids)
+    assert aug_len == plain_len
+    assert plain_wave.shape[-1] == int(round(1.5 * 16000))
+
+    from me2_voicegen.common.features import LogMelFeatureExtractor
+
+    extractor = LogMelFeatureExtractor()
+    plain_feats = extractor(plain_wave)
+    aug_feats = extractor(aug_wave)
+    assert plain_feats.shape[0] == 40
+    assert aug_feats.shape[0] == 40
+    assert torch.isfinite(aug_feats).all()
+    assert not torch.equal(aug_feats, plain_feats)
+
+    # Stretched length inside the 0.85x-1.15x band (±1 sample).
+    n = plain_wave.shape[-1]
+    assert int(round(n * 0.85)) - 1 <= aug_wave.shape[-1] <= int(round(n * 1.15)) + 1
+
+    # Mixed-length batch through the real collate, built from the exact
+    # stretched/unstretched samples fetched above: input_lengths must
+    # track each example's own feature width (the per-sample lengths the
+    # CTC path carries, which is what makes variable lengths safe).
+    out = collate_fn(
+        [
+            VCMExample(waveform=aug_wave, target_ids=aug_ids, target_len=aug_len),
+            VCMExample(waveform=plain_wave, target_ids=plain_ids, target_len=plain_len),
+        ],
+        extractor,
+    )
+    assert out["features"].shape == (2, 40, int(out["input_lengths"].max()))
+    assert out["input_lengths"][0] == aug_feats.shape[-1]
+    assert out["input_lengths"][1] == plain_feats.shape[-1]
+    assert out["target_len"].tolist() == [plain_len, plain_len]

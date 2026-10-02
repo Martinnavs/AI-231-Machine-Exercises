@@ -160,6 +160,18 @@ samples per posterior frame = `HOP_LENGTH * total_stride`, MatchboxNet treated
 as stride 1) rather than open-coding the factor. The ONNX I/O names stay
 `features` -> `logits`; a strided model's output time axis is named `time_out`.
 
+**Optional semantic heads (feature `ctc-attention`).** `QuartzNetConfig(heads=True)`
+(preset `quartznet5x3-heads`; default off, so every existing checkpoint and
+config dict is unchanged) adds an attention-pooled intent head (21 classes: the
+19 grammar intents + `unknown` + `silence`) and one 3-way slot head per slotted
+intent on the same encoder output. `forward(features)` still returns only the
+CTC logits; `forward_heads(features, input_lengths=None)` returns `HeadsOutput`
+(`ctc_logits`, `intent_logits`, `slot_logits`, `attention`), pooling over the
+frames valid per `output_lengths`. Label tables are derived from
+`OPTIONB_GRAMMAR` in `vcm/semantic_labels.py`. The heads are not part of the
+ONNX export yet, and a plain-CTC checkpoint loads into a heads model only with
+`strict=False` (the head weights are then freshly initialised).
+
 ## 7. Decoder input/output contract (source of truth: `vcm/decoder.py`)
 
 - **Input:** a CTC posterior/log-prob array over the 29-token alphabet

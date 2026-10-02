@@ -107,8 +107,8 @@ def resolve_transcript(manifest_row: Mapping[str, str]) -> str | None:
     if source_dataset == "sanitized_clean":
         return _OPTIONA_INTENT_PHRASES[manifest_row["label"]]
 
-    if source_dataset == "background_noise":
-        return ""
+    if source_dataset == "background_noise" or source_dataset.startswith("negative_"):
+        return ""  # noise and the ai231 synthetic negatives (import_ai231) carry no words
 
     if source_dataset == "filipino_speech_corpus":
         return None

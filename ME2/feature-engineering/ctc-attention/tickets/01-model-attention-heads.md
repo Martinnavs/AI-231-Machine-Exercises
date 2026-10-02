@@ -37,3 +37,15 @@ model-seam note.
 Training code, loss, ONNX export of heads, any streaming change.
 
 ## Execution Log
+
+### 2026-10-02 — implemented (Claude, worktree `me2-ctc-attention`, detached at `d931906`; nothing committed)
+- Added `vcm/semantic_labels.py`; `HeadsOutput`, `AttentivePool`, `heads`/`head_dim`/`pooling` config fields,
+  `_encode`/`forward_heads` in `vcm/quartznet.py`; preset `quartznet5x3-heads` in `vcm/model.py`;
+  `tests/test_vcm_quartznet_heads.py` (17 tests); model-seam note in `docs/VCM-CONTRACT.md`.
+- Added params: 43,048 (pool 33,025 + intent 5,397 + 6 slot heads x 771) = 4.7% of the 911,189 model. The ticket's
+  "< 2% (about 60k)" is self-inconsistent; 43k is under the 60k figure, not under 2%. Needs a human call.
+- Whole-model "padded batch == unpadded clip" is not true for a conv encoder (receptive field sees padding near the
+  clip end); tested instead at pool level (exact) and that garbage past `output_lengths` cannot reach the logits.
+- Pytest: 247 passed (quartznet, model, train, export, e2e_benchmark, streaming_backends, optionb_grammar, heads).
+  Old checkpoints (`quartznet5x3-s2-...-135m`, `optiond-seed1-...-135m`): CTC logits bit-identical, old code vs new.
+- Added a streaming-shaped test (batch 1, `lengths=None`, windows 0.3-6 s): finite outputs, attention sums to 1, >=15 output frames at 0.3 s. Streaming never pads, so only training batches use the mask.

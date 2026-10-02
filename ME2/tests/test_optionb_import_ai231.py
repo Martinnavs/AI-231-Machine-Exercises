@@ -25,3 +25,14 @@ def test_off_schema_slot_skipped_and_oos_mapped():
 
 def test_val_speakers_are_deterministic_subset():
     assert is_val_speaker("s10") == is_val_speaker("s10")
+
+
+def test_negatives_map_to_pools_with_empty_transcripts():
+    from me2_voicegen.vcm.optionb.import_ai231 import NEGATIVE_KINDS, convert_negative
+
+    out = {k: convert_negative({"neg_kind": k, "transcript": f"<{k}>"}) for k in NEGATIVE_KINDS}
+    assert all(o["transcript"] == "" for o in out.values())
+    assert out["noise_only"]["source_dataset"] == "background_noise" and out["noise_only"]["label"] == "silence"
+    assert out["babble"]["source_dataset"] == "negative_babble" and out["babble"]["label"] == "unknown"
+    for k in ("near_silence", "reversed", "truncated"):
+        assert out[k]["source_dataset"] == f"negative_{k}"

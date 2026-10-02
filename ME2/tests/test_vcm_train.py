@@ -324,3 +324,11 @@ def test_matchbox_checkpoint_keeps_config_keys(vcm_fake_manifest_factory, tmp_pa
     ckpt = torch.load(tmp_path / "m" / "checkpoints" / "checkpoint.pt", weights_only=True)
     assert set(ckpt["config"]) == set(asdict(MatchboxNetConfig()))
     assert ckpt["model_type"] == "matchboxnet"
+
+
+def test_p_timestretch_flag_defaults_off_and_accepts_value():
+    args = build_arg_parser().parse_args([])
+    assert args.p_timestretch == 0.0
+
+    args_explicit = build_arg_parser().parse_args(["--p-timestretch", "0.5"])
+    assert args_explicit.p_timestretch == 0.5

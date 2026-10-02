@@ -140,6 +140,8 @@ PRESETS: dict[str, MatchboxNetConfig | QuartzNetConfig] = {
     "quartznet5x3": QUARTZNET5X3_CONFIG,
     "optiond-wide": OPTIOND_WIDE_CONFIG,
     "quartznet5x3-s1": dataclasses.replace(QUARTZNET5X3_CONFIG, time_stride=1),
+    # Same encoder + attention-pooled intent/slot heads (feature ctc-attention).
+    "quartznet5x3-heads": dataclasses.replace(QUARTZNET5X3_CONFIG, heads=True),
 }
 
 

@@ -12,16 +12,22 @@ padding): prologue depthwise(k, stride 2) + pointwise + BN + ReLU; 5 residual
 blocks of `repeats` (3) depthwise/pointwise/BN sub-modules (ReLU + dropout
 between them, residual 1x1 + BN added before the block's last ReLU); an
 epilogue depthwise + pointwise + 1x1; then a linear head.
+
+With `config.heads` the same encoder output also feeds an attention-pooled
+intent head and one slot head per slotted intent (`forward_heads`); `forward`
+is unchanged, so CTC callers and ONNX export see the same graph.
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from typing import Literal, NamedTuple
 
 import torch
 from torch import nn
 
 from me2_voicegen.vcm.alphabet import ALPHABET_SIZE
+from me2_voicegen.vcm.semantic_labels import INTENT_CLASSES, N_SLOT_VALUES, SLOTS, slot_head_name
 
 
 @dataclass
@@ -37,6 +43,11 @@ class QuartzNetConfig:
     time_stride: int = 2  # 1 (ablation: no subsampling), 2 (default) or 4
     dropout: float = 0.0
     alphabet_size: int = ALPHABET_SIZE
+    # Optional semantic heads (docs/VCM-CONTRACT.md model-seam note). Off by
+    # default so every existing config dict / checkpoint loads unchanged.
+    heads: bool = False
+    head_dim: int = 128
+    pooling: Literal["attention", "mean"] = "attention"
 
     def __post_init__(self) -> None:
         if self.time_stride not in (1, 2, 4):
@@ -56,6 +67,10 @@ class QuartzNetConfig:
             raise ValueError(f"dropout must be in [0, 1), got {self.dropout}")
         if self.repeats < 1 or self.n_blocks < 1:
             raise ValueError("repeats and n_blocks must be >= 1")
+        if self.pooling not in ("attention", "mean"):
+            raise ValueError(f"pooling must be 'attention' or 'mean', got {self.pooling!r}")
+        if self.head_dim < 1:
+            raise ValueError(f"head_dim must be >= 1, got {self.head_dim}")
 
 
 QUARTZNET5X3_CONFIG = QuartzNetConfig()
@@ -100,6 +115,33 @@ class _QuartzBlock(nn.Module):
         return self.drop(self.act(out + self.residual(x)))
 
 
+class HeadsOutput(NamedTuple):
+    ctc_logits: torch.Tensor  # (B, T', alphabet)
+    intent_logits: torch.Tensor  # (B, len(INTENT_CLASSES))
+    slot_logits: dict[str, torch.Tensor]  # slot_head_name(intent) -> (B, 3)
+    attention: torch.Tensor  # (B, T'); 0 on padded frames, rows sum to 1
+
+
+class AttentivePool(nn.Module):
+    """Pool `(B, T', C)` over valid frames with learned attention (or a plain
+    masked mean when `attention=False`, the ablation control)."""
+
+    def __init__(self, dim: int, hidden: int, attention: bool = True) -> None:
+        super().__init__()
+        self.score = nn.Sequential(nn.Linear(dim, hidden), nn.Tanh(), nn.Linear(hidden, 1)) if attention else None
+
+    def forward(
+        self, x: torch.Tensor, lengths: torch.Tensor | None = None
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        b, t, _ = x.shape
+        if lengths is None:
+            lengths = torch.full((b,), t, dtype=torch.long, device=x.device)
+        valid = torch.arange(t, device=x.device)[None, :] < lengths.to(x.device)[:, None]
+        scores = self.score(x).squeeze(-1) if self.score is not None else torch.zeros(b, t, device=x.device, dtype=x.dtype)
+        weights = torch.softmax(scores.masked_fill(~valid, float("-inf")), dim=-1)
+        return (weights.unsqueeze(-1) * x).sum(dim=1), weights
+
+
 class QuartzNetCTC(nn.Module):
     """`(B, n_mels, T)` -> `(B, T', alphabet_size)` logits, T' = ceil(T / total_stride)."""
 
@@ -134,6 +176,13 @@ class QuartzNetCTC(nn.Module):
         )
         self.classifier = nn.Linear(c.epilogue_channels, c.alphabet_size)
 
+        if c.heads:
+            self.pool = AttentivePool(c.epilogue_channels, c.head_dim, attention=c.pooling == "attention")
+            self.intent_head = nn.Linear(c.epilogue_channels, len(INTENT_CLASSES))
+            self.slot_heads = nn.ModuleDict(
+                {slot_head_name(i): nn.Linear(c.epilogue_channels, N_SLOT_VALUES) for i in SLOTS}
+            )
+
         # (kernel, stride, padding, dilation) of every length-changing conv on
         # the main path, in order; output_lengths() applies the conv formula.
         self._length_convs: list[tuple[int, int, int, int]] = [
@@ -142,11 +191,33 @@ class QuartzNetCTC(nn.Module):
         if block1_stride != 1:
             self._length_convs.append((c.kernel_sizes[0], block1_stride, c.kernel_sizes[0] // 2, 1))
 
-    def forward(self, features: torch.Tensor) -> torch.Tensor:
+    def _encode(self, features: torch.Tensor) -> torch.Tensor:
+        """`(B, n_mels, T)` -> encoder output `(B, T', epilogue_channels)`."""
         x = self.prologue(features)
         x = self.blocks(x)
         x = self.epilogue(x)
-        return self.classifier(x.transpose(1, 2))
+        return x.transpose(1, 2)
+
+    def forward(self, features: torch.Tensor) -> torch.Tensor:
+        return self.classifier(self._encode(features))
+
+    def forward_heads(
+        self, features: torch.Tensor, input_lengths: torch.Tensor | None = None
+    ) -> HeadsOutput:
+        """CTC logits plus the pooled intent/slot logits. `input_lengths` are
+        *feature* lengths (mapped through `output_lengths`); `None` = all
+        frames valid. Padded frames get exactly zero attention."""
+        if not self.config.heads:
+            raise RuntimeError("model was built with heads=False; use the quartznet5x3-heads preset or heads=True")
+        enc = self._encode(features)
+        out_lengths = None if input_lengths is None else self.output_lengths(input_lengths)
+        pooled, attention = self.pool(enc, out_lengths)
+        return HeadsOutput(
+            ctc_logits=self.classifier(enc),
+            intent_logits=self.intent_head(pooled),
+            slot_logits={name: head(pooled) for name, head in self.slot_heads.items()},
+            attention=attention,
+        )
 
     def output_lengths(self, input_lengths: torch.Tensor) -> torch.Tensor:
         lengths = input_lengths.to(torch.long)

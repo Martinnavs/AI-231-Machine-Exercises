@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import math
 
+import pytest
 import torch
 
 from me2_voicegen.common.augment import (
@@ -183,3 +184,134 @@ def test_different_seeds_diverge():
     out_a = a.augment_waveform(waveform, noise_pool=noise_pool)
     out_b = b.augment_waveform(waveform, noise_pool=noise_pool)
     assert not torch.equal(out_a, out_b)
+
+
+# ---------------------------------------------------------------------------
+# Time-stretch (stochastic 0.85x-1.15x resample of the raw waveform,
+# applied pre-mel).
+# ---------------------------------------------------------------------------
+
+
+def test_timestretch_default_is_off():
+    augmenter = Augmenter()
+    assert augmenter.p_timestretch == 0.0
+
+
+def test_timestretch_p0_is_byte_identical_noop():
+    # Safety invariant: with p=0 the output waveform must be byte-identical
+    # to today's (un-augmented) output -- same values, same shape, no extra
+    # RNG draws.
+    waveform = _sine(duration_s=1.0)
+    for seed in (0, 7, 42):
+        augmenter = Augmenter(p_timestretch=0.0, seed=seed)
+        out = augmenter.augment_waveform(waveform, noise_pool=[_white_noise(seed=1)])
+        assert out.shape == waveform.shape
+        assert torch.equal(out, waveform)
+
+
+def test_timestretch_p0_preserves_length_with_other_augmentations_on():
+    # With RIR+noise active but p_timestretch=0, the length must still be
+    # unchanged: RIR/noise preserve duration by construction, and the
+    # stretch is the only step allowed to change it.
+    waveform = _sine(duration_s=0.7)
+    noise_pool = [_white_noise(duration_s=0.7, seed=3)]
+    for seed in (1, 2, 3):
+        augmenter = Augmenter(
+            p_rir=1.0, p_noise=1.0, p_timestretch=0.0, seed=seed, rir_pool_size=5
+        )
+        out = augmenter.augment_waveform(waveform, noise_pool=noise_pool)
+        assert out.shape == waveform.shape
+
+
+def test_timestretch_deterministic_under_fixed_seed():
+    waveform = _sine(duration_s=0.8)
+
+    a = Augmenter(p_timestretch=1.0, seed=2025)
+    b = Augmenter(p_timestretch=1.0, seed=2025)
+
+    out_a = a.augment_waveform(waveform)
+    out_b = b.augment_waveform(waveform)
+    assert torch.equal(out_a, out_b)
+
+
+def test_timestretch_different_seeds_diverge():
+    waveform = _sine(duration_s=0.8)
+
+    a = Augmenter(p_timestretch=1.0, seed=1)
+    b = Augmenter(p_timestretch=1.0, seed=2)
+
+    assert not torch.equal(a.augment_waveform(waveform), b.augment_waveform(waveform))
+
+
+def test_timestretch_output_length_exact_at_bound_factors():
+    from me2_voicegen.common.augment import TSTRETCH_FACTOR_MIN, TSTRETCH_FACTOR_MAX, apply_timestretch
+
+    waveform = _sine(duration_s=1.5)
+    n = waveform.shape[-1]
+    for factor in (TSTRETCH_FACTOR_MIN, 1.0, TSTRETCH_FACTOR_MAX):
+        out = apply_timestretch(waveform, factor, sample_rate=16000)
+        assert out.shape[-1] == int(round(n * factor))
+        assert torch.isfinite(out).all()
+
+
+def test_timestretch_output_length_within_one_sample_inside_bounds():
+    from me2_voicegen.common.augment import apply_timestretch
+
+    waveform = _sine(duration_s=1.5)
+    n = waveform.shape[-1]
+    for factor in (0.90, 0.95, 1.05, 1.10):
+        out = apply_timestretch(waveform, factor, sample_rate=16000)
+        assert abs(out.shape[-1] - int(round(n * factor))) <= 1
+
+
+def test_timestretch_drawn_factors_stay_within_bounds():
+    # Statistical check through the public API: over many seeds the
+    # stretched length must land inside the 0.85x-1.15x band (±1 sample).
+    waveform = _sine(duration_s=1.0)
+    n = waveform.shape[-1]
+    lo = int(round(n * 0.85)) - 1
+    hi = int(round(n * 1.15)) + 1
+    for seed in range(8):
+        augmenter = Augmenter(p_timestretch=1.0, seed=seed)
+        out = augmenter.augment_waveform(waveform)
+        assert lo <= out.shape[-1] <= hi, (
+            f"seed {seed}: stretched length {out.shape[-1]} outside "
+            f"[{lo}, {hi}] for N={n}"
+        )
+
+
+# --- apply_timestretch regressions found when wiring it into training (ctc-attention ticket 02) ---
+
+@pytest.mark.parametrize("shape", [(32000,), (1, 32000)])
+def test_timestretch_pad_branch_handles_1d_and_2d(monkeypatch, shape):
+    """The dataset passes 1-D waveforms; the edge-pad branch used `expand(-1, n)`, which only worked for 2-D."""
+    from me2_voicegen.common import augment
+
+    real = augment.AF.resample
+    monkeypatch.setattr(augment.AF, "resample", lambda w, o, n: real(w, o, n)[..., :-5])  # force "too short"
+    out = augment.apply_timestretch(torch.randn(*shape), 1.1)
+    assert out.shape[-1] == round(32000 * 1.1) and out.shape[:-1] == shape[:-1]
+    assert torch.isfinite(out).all()
+
+
+def test_timestretch_awkward_factors_are_fast_and_exact_length():
+    """round(16000*factor) Hz is almost always coprime with 16000 -> a 16000-phase filter (5 s per clip at 1.1507)."""
+    import random
+    import time
+
+    from me2_voicegen.common.augment import apply_timestretch
+
+    rng = random.Random(0)
+    start = time.perf_counter()
+    for factor in [1.1507, 0.8731, 1.0617] + [rng.uniform(0.85, 1.15) for _ in range(30)]:
+        n = rng.randint(6400, 48000)
+        assert apply_timestretch(torch.randn(n), factor).shape[-1] == round(n * factor)
+    assert time.perf_counter() - start < 5.0
+
+
+def test_apply_noise_with_silent_noise_window_is_finite_and_unchanged():
+    wave = torch.randn(1600) * 0.1
+    silent_head = torch.cat([torch.zeros(4000), torch.randn(4000)])  # first 1600 samples are digital zero
+    out = apply_noise(wave, silent_head, 12.0)
+    assert torch.isfinite(out).all() and torch.equal(out, wave)
+    assert torch.isfinite(apply_noise(torch.zeros(1600), torch.randn(1600), 12.0)).all()

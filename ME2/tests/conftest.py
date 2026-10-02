@@ -163,6 +163,9 @@ def vcm_fake_manifest_factory(tmp_path, monkeypatch, vcm_wav_factory):
                     # manifest row (no source-manifest join, D7); harmless
                     # unused column for the other four source_datasets.
                     "transcript": spec.get("transcript", "") if source_dataset == "optionb" else "",
+                    # Optional canonical slot column (ai231-style manifests); only written
+                    # when some spec asks for it so other tests' fake manifests are unchanged.
+                    **({"slot_value": spec.get("slot_value", "")} if any("slot_value" in sp for sp in specs) else {}),
                 }
             )
 
