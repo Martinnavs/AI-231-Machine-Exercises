@@ -317,6 +317,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--lr", type=float, default=1e-4)
     parser.add_argument("--weight-decay", type=float, default=1e-2)
     parser.add_argument("--patience", type=int, default=10, help="epochs without val-loss improvement before early stop")
+    parser.add_argument("--license-note", default=None,
+                        help="override the checkpoint licence note (default: the ESC-50 note below, written for the old test_set manifest)")
     parser.add_argument("--amp", action="store_true", default=None, help="default: on for cuda, off for cpu")
     parser.add_argument("--no-amp", dest="amp", action="store_false")
     parser.add_argument("--p-rir", type=float, default=0.3)
@@ -343,6 +345,18 @@ def build_arg_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="with --perturbation-plan table: write each epoch's recipes (gzipped CSV) and a per-class summary "
         "under <out-dir>/metadata/perturbation_plan/",
+    )
+    parser.add_argument(
+        "--skip-prenoised",
+        action="store_true",
+        help="with --perturbation-plan table: no added noise or babble on clips that already carry noise "
+        "(ai231 `*_noisy.wav`, `*_ambient` rows); the noise / babble quotas are over the clean clips",
+    )
+    parser.add_argument(
+        "--noise-random-offset",
+        action="store_true",
+        help="with --perturbation-plan table: start each noise / babble mix at a seeded random point in the clip "
+        "instead of its beginning",
     )
     parser.add_argument(
         "--p-babble",
@@ -421,7 +435,11 @@ def main(argv: list[str] | None = None) -> None:
     )
     if table:
         train_dataset.enable_perturbation_plan(
-            train_dataset.plan_config(args.p_timestretch, args.p_rir, args.p_noise, args.p_babble), seed=args.seed
+            train_dataset.plan_config(
+                args.p_timestretch, args.p_rir, args.p_noise, args.p_babble,
+                skip_prenoised=args.skip_prenoised, random_offsets=args.noise_random_offset,
+            ),
+            seed=args.seed,
         )
         plan_dir = args.out_dir / "metadata" / "perturbation_plan"
         if args.dump_plan:
@@ -645,7 +663,7 @@ def main(argv: list[str] | None = None) -> None:
                     "seed": args.seed,
                     "epoch": epoch,
                     "val_loss": val_loss,
-                    "license": LICENSE_NOTE,
+                    "license": args.license_note or LICENSE_NOTE,
                 },
                 checkpoints_dir / "checkpoint.pt",
             )
@@ -658,7 +676,7 @@ def main(argv: list[str] | None = None) -> None:
 
     total_wall_s = time.monotonic() - start_time
     loss_history = {
-        "license": LICENSE_NOTE,
+        "license": args.license_note or LICENSE_NOTE,
         "seed": args.seed,
         "preset": args.preset,
         "model_type": model_type,
@@ -672,7 +690,8 @@ def main(argv: list[str] | None = None) -> None:
         "deadline_hit": deadline_hit,
         "nan_or_inf_seen": nan_or_inf_seen,
         "best_val_loss": best_val_loss,
-        **({"perturbation_plan": "table"} if table else {}),
+        **({"perturbation_plan": "table", "skip_prenoised": args.skip_prenoised,
+            "noise_random_offset": args.noise_random_offset} if table else {}),
         **(
             {"noise_source": args.noise_source, "p_babble": args.p_babble}
             if args.noise_source != "manifest" or args.p_babble > 0

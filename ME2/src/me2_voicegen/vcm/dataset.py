@@ -187,7 +187,10 @@ class VCMDataset(Dataset):
                 self._noise_pool_cache += synthetic_noise_pool()
         return self._noise_pool_cache
 
-    def plan_config(self, p_stretch: float, p_rir: float, p_noise: float, p_babble: float, rir_pool_size: int = 200) -> PlanConfig:
+    def plan_config(
+        self, p_stretch: float, p_rir: float, p_noise: float, p_babble: float, rir_pool_size: int = 200,
+        skip_prenoised: bool = False, random_offsets: bool = False,
+    ) -> PlanConfig:
         """A `PlanConfig` sized to this dataset's own pools. An empty pool with a nonzero probability raises
         (the legacy path would silently skip the step)."""
         return PlanConfig(
@@ -195,6 +198,7 @@ class VCMDataset(Dataset):
             n_rir=rir_pool_size if p_rir > 0 else 0,
             n_noise=len(self._noise_pool()) if p_noise > 0 else 0,
             n_babble=len(self._babble_pool()) if p_babble > 0 else 0,
+            skip_prenoised=skip_prenoised, random_offsets=random_offsets,
         )
 
     def enable_perturbation_plan(self, cfg: PlanConfig, seed: int) -> None:

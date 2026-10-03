@@ -161,3 +161,88 @@ def test_train_cli_table_mode_dumps_a_reproducible_plan(plan_dataset, tmp_path):
     for name in ("epoch_001.csv.gz", "epoch_002.csv.gz"):
         assert gzip.open(d1 / name, "rt").read() == gzip.open(d2 / name, "rt").read()   # same seed, any worker count
     assert gzip.open(d1 / "epoch_001.csv.gz", "rt").read() != gzip.open(d1 / "epoch_002.csv.gz", "rt").read().replace("2,", "1,")
+
+
+def test_class_key_adds_variation_and_source_only_when_the_manifest_has_variations():
+    old = {"label": "ALARM", "slot_value": "6 AM"}
+    new = {**old, "variation": "Alarm 6 AM", "source_dataset": "optionb"}
+    assert class_key(old) == "ALARM|6 am"  # old manifests keep the intent+slot key
+    assert class_key(new) == "ALARM|6 am|Alarm 6 AM|optionb"
+    assert class_key({**new, "source_dataset": "fil50_persona"}) != class_key(new)
+    assert class_key({"label": "unknown", "variation": "", "source_dataset": "optionb"}) == "unknown||" + "|optionb"
+
+
+def test_93_variations_two_sources_get_the_same_shares_real_and_persona():
+    rng = random.Random(0)
+    rows = []
+    for v in range(93):
+        for source, n in (("optionb", rng.randint(60, 140)), ("fil50_persona", rng.randint(30, 50))):
+            rows += [
+                {"label": f"L{v // 5}", "slot_value": "", "variation": f"V{v}", "source_dataset": source, "filename": f"{v}-{source}-{i}.wav"}
+                for i in range(n)
+            ]
+    plan = build_epoch_plan(rows, list(range(len(rows))), CFG, seed=0, epoch=1)
+    by_var, by_src = {}, {}
+    for i, rec in enumerate(rows):
+        r = plan[i]
+        flags = (r.stretch is not None, r.rir is not None, r.noise is not None, r.babble is not None)
+        for table, key in ((by_var, rec["variation"]), (by_src, rec["source_dataset"])):
+            acc = table.setdefault(key, [0, 0, 0, 0, 0])
+            acc[0] += 1
+            for j, f in enumerate(flags):
+                acc[1 + j] += f
+    ps = (0.25, 0.7, 0.5, 0.15)
+    for key, (n, *hits) in by_var.items():
+        for name, h, p in zip(("stretch", "rir", "noise", "babble"), hits, ps):
+            assert abs(h / n - p) <= 0.02, (key, name, h / n)
+    rates = {s: [h / acc[0] for h in acc[1:]] for s, acc in by_src.items()}
+    for j in range(4):
+        assert abs(rates["optionb"][j] - rates["fil50_persona"][j]) <= 0.02, (j, rates)
+
+
+def _rows_with_noisy(n_per: int = 60) -> list[dict]:
+    rows = []
+    for v in range(6):
+        for k in range(n_per):
+            tag = "noisy" if k % 2 else "clean"
+            rows.append({"label": f"L{v}", "slot_value": "", "variation": f"V{v}", "source_dataset": "optionb",
+                         "source_relpath": f"train/audio/train_{v}_{k}_group_synthetic_x_{tag}.wav", "filename": f"{v}-{k}.wav"})
+    return rows
+
+
+def test_skip_prenoised_keeps_noise_and_babble_off_noisy_clips_and_is_a_noop_when_off():
+    from dataclasses import replace
+
+    from me2_voicegen.vcm.perturbation_plan import is_prenoised
+
+    rows = _rows_with_noisy()
+    idx = list(range(len(rows)))
+    on = build_epoch_plan(rows, idx, replace(CFG, skip_prenoised=True), seed=0, epoch=1)
+    clean = [i for i in idx if not is_prenoised(rows[i])]
+    assert all(on[i].noise is None and on[i].babble is None for i in idx if is_prenoised(rows[i]))
+    assert abs(sum(on[i].noise is not None for i in clean) / len(clean) - 0.5) <= 0.02
+    assert abs(sum(on[i].rir is not None for i in idx) / len(idx) - 0.7) <= 0.02  # reverb still on every clip type
+    # rows with no `_noisy` marker: the flag changes nothing
+    plain = [{**r, "source_relpath": r["source_relpath"].replace("_noisy", "_clean")} for r in rows]
+    assert build_epoch_plan(plain, idx, replace(CFG, skip_prenoised=True), seed=0, epoch=1) == build_epoch_plan(plain, idx, CFG, seed=0, epoch=1)
+
+
+def test_random_offsets_only_add_offsets_and_apply_noise_uses_them():
+    from dataclasses import replace
+
+    from me2_voicegen.common.augment import apply_noise
+
+    rows = _rows_with_noisy()
+    idx = list(range(len(rows)))
+    base = build_epoch_plan(rows, idx, CFG, seed=0, epoch=1)
+    off = build_epoch_plan(rows, idx, replace(CFG, random_offsets=True), seed=0, epoch=1)
+    for i in idx:
+        assert replace(off[i], noise_offset=None, babble_offset=None) == base[i]
+        assert (off[i].noise_offset is not None) == (off[i].noise is not None)
+        assert off[i].noise_offset is None or 0.0 <= off[i].noise_offset < 1.0
+    assert off == build_epoch_plan(rows, idx, replace(CFG, random_offsets=True), seed=0, epoch=1)
+    wave = torch.randn(1600) * 0.1
+    noise = torch.randn(16000)
+    a, b = apply_noise(wave, noise, 10.0, 0.0), apply_noise(wave, noise, 10.0, 0.9)
+    assert torch.allclose(a, apply_noise(wave, noise, 10.0)) and not torch.allclose(a, b)
+    assert torch.isfinite(apply_noise(wave, torch.randn(800), 10.0, 0.5)).all()  # short clip: rotate, then loop

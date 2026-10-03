@@ -5,7 +5,7 @@ two runs with the same seed do not perturb the same clips the same way. Here the
 clip in every epoch is instead a row of a table, a pure function of `(seed, epoch, class)`: independent of workers,
 shuffle order and thread count, and dumpable as a CSV to audit exactly what each clip saw.
 
-Stratification: clips are grouped by intent+slot class (`class_key`). Inside a class each perturbation type gets an
+Stratification: clips are grouped by `class_key` (intent+slot, plus variation and source for ai231-style manifests). Inside a class each perturbation type gets an
 exact quota (`p * n`, randomised rounding so the expectation is `p`) assigned to a random subset of the class, so every
 class receives the intended share of reverb / noise / babble / stretch instead of a share left to chance. Continuous
 parameters (stretch factor, SNRs) are Latin-hypercube spread across the clips that received them, and pool indices
@@ -27,7 +27,7 @@ import numpy as np
 from me2_voicegen.common.augment import BABBLE_SNR_MAX_DB, BABBLE_SNR_MIN_DB, SNR_MAX_DB, SNR_MIN_DB, Recipe
 from me2_voicegen.common.augment import TSTRETCH_FACTOR_MAX, TSTRETCH_FACTOR_MIN
 
-PLAN_FIELDS = ["epoch", "row", "filename", "class", "stretch", "rir", "noise", "noise_snr_db", "babble", "babble_snr_db"]
+PLAN_FIELDS = ["epoch", "row", "filename", "class", "stretch", "rir", "noise", "noise_snr_db", "babble", "babble_snr_db", "noise_offset", "babble_offset"]
 
 
 @dataclass(frozen=True)
@@ -42,6 +42,8 @@ class PlanConfig:
     stretch_range: tuple[float, float] = (TSTRETCH_FACTOR_MIN, TSTRETCH_FACTOR_MAX)
     noise_snr_range: tuple[float, float] = (SNR_MIN_DB, SNR_MAX_DB)
     babble_snr_range: tuple[float, float] = (BABBLE_SNR_MIN_DB, BABBLE_SNR_MAX_DB)
+    skip_prenoised: bool = False  # no added noise / babble on clips that already carry noise (`is_prenoised`)
+    random_offsets: bool = False  # seeded start offset into each noise / babble clip (separate RNG stream)
 
     def __post_init__(self) -> None:
         for name, p, n in (("rir", self.p_rir, self.n_rir), ("noise", self.p_noise, self.n_noise), ("babble", self.p_babble, self.n_babble)):
@@ -50,9 +52,22 @@ class PlanConfig:
 
 
 def class_key(row: Mapping[str, str]) -> str:
-    """Intent+slot class of a manifest row, e.g. `ALARM|6 am`, `STOP|`, `unknown|`. Rows from manifests without a
-    `slot_value` column fall into their intent's single class."""
-    return f"{row['label']}|{(row.get('slot_value') or '').lower()}"
+    """Stratum of a manifest row. Manifests with a `variation` column (ai231 and later) group by
+    `label | slot_value | variation | source_dataset`, e.g. `TIMER|10 seconds|Timer 10 seconds|optionb`, so every one of the
+    93 variations, and real vs persona clips within it, get the same perturbation shares; out-of-scope rows have an empty
+    variation and fall into one stratum per source. Older manifests (no `variation` column) keep the intent+slot class,
+    e.g. `ALARM|6 am`, so runs on them reproduce as before."""
+    base = f"{row['label']}|{(row.get('slot_value') or '').lower()}"
+    if "variation" not in row:
+        return base
+    return f"{base}|{row.get('variation') or ''}|{row.get('source_dataset') or ''}"
+
+
+def is_prenoised(row: Mapping[str, str]) -> bool:
+    """Clips that already contain noise: ai231 group-synthetic `*_noisy.wav` (named in `source_relpath`) and rows mixed
+    offline by the ambient overlay (`*_ambient` sources)."""
+    name = f"{row.get('source_relpath', '')} {row.get('filename', '')}"
+    return "_noisy" in name or (row.get("source_dataset") or "").endswith("_ambient")
 
 
 def _quota(rng: np.random.Generator, n: int, p: float) -> int:
@@ -94,8 +109,12 @@ def build_epoch_plan(
         n = len(members)
         fields: dict[int, dict] = {i: {} for i in members}
 
-        def pick(p: float) -> list[int]:
-            return [members[j] for j in rng.permutation(n)[: _quota(rng, n, p)]]
+        def pick(p: float, pool: Sequence[int] = members) -> list[int]:
+            return [pool[j] for j in rng.permutation(len(pool))[: _quota(rng, len(pool), p)]]
+
+        # with skip_prenoised the noise / babble quotas are over the clean clips only; otherwise `eligible` is `members`
+        # itself and the RNG stream (so every recipe) is identical to the plain table
+        eligible = [i for i in members if not is_prenoised(rows[i])] if cfg.skip_prenoised else members
 
         chosen = pick(cfg.p_stretch)
         for i, f in zip(chosen, _spread(rng, len(chosen), *cfg.stretch_range)):
@@ -103,12 +122,19 @@ def build_epoch_plan(
         chosen = pick(cfg.p_rir)
         for i, r in zip(chosen, _deal(rng, len(chosen), cfg.n_rir)):
             fields[i]["rir"] = r
-        chosen = pick(cfg.p_noise)
+        chosen = pick(cfg.p_noise, eligible)
         for i, j, snr in zip(chosen, _deal(rng, len(chosen), cfg.n_noise), _spread(rng, len(chosen), *cfg.noise_snr_range)):
             fields[i].update(noise=j, noise_snr_db=float(snr))
-        chosen = pick(cfg.p_babble)
+        chosen = pick(cfg.p_babble, eligible)
         for i, j, snr in zip(chosen, _deal(rng, len(chosen), cfg.n_babble), _spread(rng, len(chosen), *cfg.babble_snr_range)):
             fields[i].update(babble=j, babble_snr_db=float(snr))
+        if cfg.random_offsets:  # own stream, so all other fields stay as without offsets
+            orng = np.random.default_rng(zlib.crc32(f"{seed}:{epoch}:{key}:offsets".encode("utf-8")))
+            for i in members:
+                if "noise" in fields[i]:
+                    fields[i]["noise_offset"] = float(orng.random())
+                if "babble" in fields[i]:
+                    fields[i]["babble_offset"] = float(orng.random())
         for i in members:
             plan[i] = Recipe(**fields[i])
     return plan
@@ -120,6 +146,7 @@ def plan_rows(plan: Mapping[int, Recipe], rows: Sequence[Mapping[str, str]], epo
             "epoch": epoch, "row": i, "filename": rows[i].get("filename", ""), "class": class_key(rows[i]),
             "stretch": r.stretch, "rir": r.rir, "noise": r.noise, "noise_snr_db": r.noise_snr_db,
             "babble": r.babble, "babble_snr_db": r.babble_snr_db,
+            "noise_offset": r.noise_offset, "babble_offset": r.babble_offset,
         }
         for i, r in sorted(plan.items())
     ]

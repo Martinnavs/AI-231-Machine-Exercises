@@ -134,10 +134,18 @@ def apply_rir(waveform: torch.Tensor, rir: torch.Tensor) -> torch.Tensor:
     return wet[:orig_len]
 
 
-def apply_noise(waveform: torch.Tensor, noise: torch.Tensor, snr_db: float) -> torch.Tensor:
+def apply_noise(waveform: torch.Tensor, noise: torch.Tensor, snr_db: float, offset: float | None = None) -> torch.Tensor:
     """Mix `noise` into `waveform` at `snr_db` dB SNR, looping/trimming
-    `noise` to match `waveform`'s length first."""
+    `noise` to match `waveform`'s length first. `offset` in [0, 1) picks where in the noise clip the window starts
+    (None = its beginning, the original behaviour): a clip longer than the waveform is cut at that fraction of its
+    spare length, a shorter one is rotated by that fraction before looping."""
     target_len = waveform.shape[-1]
+    if offset is not None:
+        if noise.shape[-1] > target_len:
+            start = int(offset * (noise.shape[-1] - target_len))
+            noise = noise[start : start + target_len]
+        else:
+            noise = torch.roll(noise, -int(offset * noise.shape[-1]), dims=-1)
     if noise.shape[-1] < target_len:
         repeats = math.ceil(target_len / noise.shape[-1])
         noise = noise.repeat(repeats)
@@ -189,6 +197,8 @@ class Recipe:
     noise_snr_db: float | None = None
     babble: int | None = None
     babble_snr_db: float | None = None
+    noise_offset: float | None = None  # where in the noise / babble clip the mixed window starts (see apply_noise)
+    babble_offset: float | None = None
 
 
 def apply_recipe(
@@ -205,9 +215,9 @@ def apply_recipe(
     if recipe.rir is not None:
         waveform = apply_rir(waveform, rir_pool[recipe.rir])
     if recipe.noise is not None:
-        waveform = apply_noise(waveform, noise_pool[recipe.noise], recipe.noise_snr_db)
+        waveform = apply_noise(waveform, noise_pool[recipe.noise], recipe.noise_snr_db, recipe.noise_offset)
     if recipe.babble is not None:
-        waveform = apply_noise(waveform, babble_pool[recipe.babble], recipe.babble_snr_db)
+        waveform = apply_noise(waveform, babble_pool[recipe.babble], recipe.babble_snr_db, recipe.babble_offset)
     return waveform
 
 
