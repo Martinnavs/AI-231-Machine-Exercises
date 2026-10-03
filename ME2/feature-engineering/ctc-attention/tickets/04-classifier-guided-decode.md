@@ -33,3 +33,5 @@ CTC still decides acceptance, slots and rejection.
 Replacing CTC acceptance with classifier acceptance; making the classifier the endpoint detector.
 
 ## Execution Log
+
+- 2026-10-03: not started. Its deferral condition (Pi window time above the stride) is now met: Pi decode 443 / 764 ms mean / p95 against a 250 ms stride, RTF 3.21. The "about 60%" in the Idea above is stale: measured at the shipped settings the beam search is about 86% of encoder + beam search time. See `docs/BEAM-SEARCH.md` section 6 for why exact speed-ups and a probability prune come first, and for the top-k recall risk (93.5% at k=3 on the holdout).

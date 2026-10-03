@@ -22,6 +22,7 @@ Then [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) for what can and cannot be rep
 |---|---|
 | [`VCM-CONTRACT.md`](VCM-CONTRACT.md) | The VCM interface contract (features, decoder I/O, licence provenance) |
 | [`OPTIONB-GRAMMAR-CONTRACT.md`](OPTIONB-GRAMMAR-CONTRACT.md) | The 19-intent, 93-wording grammar |
+| [`BEAM-SEARCH.md`](BEAM-SEARCH.md) | The grammar beam search: algorithm, measured cost per window, why it is slow (and why the Pi does not keep up live), ranked fixes |
 | [`INCOMPLETE-GRAMMAR-REJECTION.md`](INCOMPLETE-GRAMMAR-REJECTION.md) | The incomplete-prefix margin gate and its calibration |
 | [`VCM-DATASET-COMPATIBILITY.md`](VCM-DATASET-COMPATIBILITY.md) | Dataset schema compatibility |
 
