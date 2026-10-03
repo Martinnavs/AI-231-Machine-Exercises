@@ -2,7 +2,7 @@
 
 **BLUF.** A wake word ("sesame") followed by one of 19 spoken commands, decoded on-device by a 14.3 MB INT8 model trained on public data only.
 On the speaker-disjoint test split it gets **98.8% command + slot accuracy** (human voices 91.8%). Behind a wake word with room reverb and noise it answers **81% of commands**
-with 0.38 s median latency after the end of speech. On a **Raspberry Pi 4 (one core)** the answers are the same but each 0.25 s window takes 0.48 s, so it does not keep up live yet.
+and the answer is ready **about 0.5 s after the end of speech** (median; 0.9 s p95) on a **Raspberry Pi 4 using one core**, which keeps up live (real-time factor 0.96). That is twice as fast as before the exact fast beam search (about 1.0 s median, and it could not keep up).
 Branch `optionb-ctc-attention`; not promoted (`make app-pipeline*` still runs the earlier model). Start at [`docs/CURRENT-MODEL.md`](docs/CURRENT-MODEL.md).
 
 ## Architecture
@@ -26,17 +26,26 @@ Whole clip, ai231 **test** split (3,823 in-scope clips, 76 out-of-scope), INT8 O
 | Out-of-scope false accept | 3.9% (3/76) | 0.0% |
 | In-scope false reject | 1.0% | 4.9% |
 
-Soak: 186 holdout commands + 16 out-of-scope clips behind a wake word, reverb and noise, 32.6 min, tuned settings, INT8 ONNX, one thread:
+Soak: 186 holdout commands + 16 out-of-scope clips behind a wake word, reverb and noise, 32.6 min, tuned settings (beam 50, wake word 0.8, slot gate 0.6), INT8 ONNX, one thread, stride 0.25 s.
+**Latency first.** The answers are identical on all three machines; only the speed differs:
 
-| | Raspberry Pi 4 | Server CPU |
-| --- | ---: | ---: |
-| Correct first trigger | 81.2% (151/186) | 81.2% (151/186) |
-| Wrong actions / out-of-scope triggered / gap triggers | 9 / 3 of 16 / 0 | 9 / 3 of 16 / 0 |
-| Latency after end of speech, median / p95 | 0.38 / 0.65 s | 0.38 / 0.65 s |
-| Decode per window, mean / p95 | **443 / 764 ms** | 70 / 126 ms |
-| Real-time factor, p95 (1 = live limit) | **3.21** | 0.53 |
+| | **Pi 4, fast beam search** | Pi 4, original beam search | Server CPU, original |
+| --- | ---: | ---: | ---: |
+| **Estimated live latency after end of speech**, median / p95 | **0.48 / 0.92 s** | 0.99 / 1.49 s (a lower bound: it falls behind) | not computed |
+| Replay latency after end of speech (compute not counted), median / p95 | 0.38 / 0.65 s | 0.38 / 0.65 s | 0.38 / 0.65 s |
+| Compute per 0.25 s window (wake word + decode), mean / p95 / max | **100 / 239 / 305 ms** | 481 / 802 / 1,654 ms | 76 / 132 / n/a ms |
+| Real-time factor, p95 (1 = live limit) | **0.96** | 3.21 | 0.53 |
+| Whole 32.6 min replay | 7 min 30 s | 20 min 47 s | n/a |
+| Correct first trigger | 81.2% (151/186) | 81.2% (151/186) | 81.2% (151/186) |
+| Wrong actions / out-of-scope triggered / gap triggers | 9 / 3 of 16 / 0 | 9 / 3 of 16 / 0 | 9 / 3 of 16 / 0 |
 
-What the soak table means in plain terms (the answers are identical on the Pi and the server, only the speed differs; counts from `soak/holdout-wake-gap-v1/results/rpi4.md`):
+How to read the latency rows: the replay latency is the time from the end of speech to the answer on the audio clock; it does not include the time to compute. The estimated live latency adds the answering window's own
+wake word + decode time (measured on the Pi, `soak/holdout-wake-gap-v1/results/`). The Pi now answers in about half a second, but with little spare time: the slowest 5% of windows take 239 ms or more of the 250 ms stride,
+so a live microphone keeps up on average and falls briefly behind on the slowest windows. The original search is shown for comparison; at a real-time factor of 3.2 it queues, so its true delay would be longer than 0.99 s.
+What changed: the exact numba beam search (`optionb-ctc-attention-fast-beam`, bit-identical answers, `docs/BEAM-SEARCH.md`). The fast Pi run had the fan on (64-66 C, 1.5 GHz for the whole run); the original-search run was
+throttled and under-volted, so a clean original would be somewhat faster than shown. Keep one thread: four threads slow the tiny wake-word network (38 to 131 ms), and a narrower beam (10) gains nothing once the search is fast.
+
+What the soak accuracy means in plain terms (the same on the Pi and the server; counts from `soak/holdout-wake-gap-v1/results/rpi4.md`):
 
 **Commands: detected correctly or not** (186 spoken commands, each after "sesame"):
 
@@ -121,7 +130,7 @@ make hybrid-test                                              # hybrid decoder, 
 make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=run SOAK_ARGS="--backend onnx --threads 1"   # the soak (the 63 MB recording is in the repo)
 ```
 
-On a Pi `make soak-run` fails (`uv run` tries to install the x86 CUDA torch): call `.venv/bin/python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1`.
+On a Pi `make soak-run` fails (`uv run` tries to install the x86 CUDA torch): call `.venv/bin/python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1` (needs numba, in `requirements-pi.txt`; keep the Pi cool: `vcgencmd get_throttled` should read `0x0`).
 Whole-clip scoring and replays: [`docs/CURRENT-MODEL.md`](docs/CURRENT-MODEL.md) ("Evaluating"). Method: [`docs/SOAK-TEST.md`](docs/SOAK-TEST.md).
 
 ## Train

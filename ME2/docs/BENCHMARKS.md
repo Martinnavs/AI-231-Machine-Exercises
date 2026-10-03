@@ -67,25 +67,42 @@ So the accuracy numbers are speaker-disjoint and clip-disjoint on wordings the m
 the holdout soak below adds reverb and a harder real-accent set, with the caveats above.
 
 **Soak test: the holdout behind a wake word, with reverb and noise** (186 commands + 16 out-of-scope clips, 32.6 min, wake word then a 0-1 s gap then the command, 1-8 s of ambient noise between;
-tuned settings; [`SOAK-TEST.md`](SOAK-TEST.md); **Raspberry Pi 4 Model B, INT8 ONNX, one thread, 2026-10-03**, next to the same run on a server CPU core):
+tuned settings; [`SOAK-TEST.md`](SOAK-TEST.md); **Raspberry Pi 4 Model B, INT8 ONNX, stride 0.25 s, 2026-10-03**).
 
-| | Hybrid, Raspberry Pi 4 | Hybrid, server CPU (same settings) |
-| --- | ---: | ---: |
-| Correct first trigger (intent and slot) | 81.2% (151/186) | 81.2% (151/186) |
-| Wrong-action first triggers (wrong intent or slot) | 9 | 9 |
-| Wake word never opened a period | 5 | 5 |
-| Out-of-scope clips triggered | 3 of 16 | 3 of 16 |
-| Triggers in the ambient gaps | 0 | 0 |
-| Latency after end of speech, median / p95 (replay waits for each decode) | 0.38 / 0.65 s | 0.38 / 0.65 s |
-| Decode per window, mean / p95 / max | **443 / 764 / 1,575 ms** | 70 / 126 / 184 ms |
-| Wake-word gate per decoded window, mean | 38 ms | 5.6 ms |
-| Real-time factor, p95 (gate + decode over the 0.25 s stride) | **3.21** | 0.53 |
+**Latency.** Two numbers, because the replay runs in lockstep with the audio: the *replay latency* (end of speech to answer on the audio clock) does not include compute time, so it is the same on every
+machine (median 0.38 s, p95 0.65 s). The *estimated live latency* adds the answering window's own wake word + decode time, taken from the same run (correct first triggers only, n = 151):
 
-The Pi gives exactly the same answers as the server (same INT8 ONNX models) but is about 6 times slower per window: at the 0.25 s stride on one core it **does not keep up live**
-(p95 0.80 s of work per 0.25 s of audio; a live microphone would queue and drop windows, and the latency above would grow by the decode time). The whole 32.6-minute replay took 20 min 47 s
-because only windows inside a wake-word period are decoded. Not yet tried on the Pi: `--threads 4` and a longer stride (`--stride-s 0.5`). Result: `soak/holdout-wake-gap-v1/results/rpi4.md`.
+| Pi 4 run | Estimated live latency, median / p95 | Compute per window, mean / p95 / max | Real-time factor, p95 |
+| --- | ---: | ---: | ---: |
+| **Fast beam search, beam 50, 1 thread, fan on (64-66 C)** | **0.48 / 0.92 s** | **100 / 239 / 305 ms** | **0.96** |
+| Fast beam search, beam 50, 1 thread, no fan (78-83 C) | 0.49 / 0.93 s | 105 / 243 / 347 ms | 0.97 |
+| Fast beam search, beam 10, 1 thread (78-84 C) | 0.49 / 0.96 s | 105 / 276 ms | 1.10 |
+| Original beam search, beam 10, 4 threads (throttled) | 0.71 / 1.21 s | 339 / 555 / 1,228 ms | 2.22 |
+| Original beam search, beam 50, 1 thread (throttled, under-volted) | 0.99 / 1.49 s | 481 / 802 / 1,654 ms | 3.21 |
 
-<details><summary>Archived: the server-only soak table (before the Pi run)</summary>
+The two original-search rows are lower bounds: with a real-time factor above 1 a live microphone queues, so the real delay would be longer. The server CPU (original search) needs 76 ms per window on average (p95 132 ms, factor 0.53).
+Accuracy is the same in every row.
+
+- **What fixed the Pi:** the exact numba beam search (`optionb-ctc-attention-fast-beam`, `docs/BEAM-SEARCH.md`): decode per window 443 to 63 ms mean, 764 to 202 ms p95. Answers are bit-identical to the original search (every count matches).
+- **One thread is right.** Four threads sped the decode up (443 to 207 ms) but slowed the wake-word network from 38 to 131 ms (it runs five times per window), so the whole replay took longer (29 min against 21).
+- **Beam 10 buys nothing** once the search is fast: 65 against 66 ms per window, with the same accuracy.
+- **Heat matters a little:** with the fan the Pi held 1,500 MHz at 64-66 C; without it the clock averaged 1,456 MHz at 78-83 C. The original-search runs were taken while the Pi was throttled and, in the first, under-volted
+  (power supply since fixed), so a clean original would be somewhat faster than shown; the comparison is a rough 2x on latency, not an exact figure.
+- **Little spare time:** the slowest 5% of windows take 239 ms or more of the 250 ms stride (worst 305 ms). A live microphone keeps up on average and falls briefly behind on those windows. Not yet tried: a longer stride (`--stride-s 0.5`).
+
+Accuracy on the Pi (identical on the server and in every run above):
+
+| | Hybrid |
+| --- | ---: |
+| Correct first trigger (intent and slot) | 81.2% (151/186) |
+| Wrong-action first triggers (wrong intent or slot) | 9 |
+| Wake word never opened a period | 5 |
+| Out-of-scope clips triggered | 3 of 16 |
+| Triggers in the ambient gaps | 0 |
+
+Results: `soak/holdout-wake-gap-v1/results/rpi4.md` (original, beam 50), `rpi4-beam10-t4.md`, `rpi4-numba-beam10-t1.md`, `rpi4-numba-beam50-t1.md`, `rpi4-numba-beam50-t1-fan.md` (each with a `.json`).
+
+<details><summary>Archived: the server-only soak table (before the Pi runs)</summary>
 
 | | Hybrid, CPU INT8 | Hybrid, A100 | CTC only, CPU INT8 |
 | --- | ---: | ---: | ---: |
@@ -101,5 +118,5 @@ because only windows inside a wake-word period are decoded. Not yet tried on the
 </details>
 
 The soak audio is in `soak/holdout-wake-gap-v1/` (`continuous.wav` and the truth). On a Pi, `make soak-run` fails (`uv run` tries to install the x86 CUDA torch), so call the script with the Pi's venv:
-`python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1`,
+`python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1` (needs numba; keep the Pi cool),
 and compare with `soak/holdout-wake-gap-v1/results/`. Reverb, noise and the 16 out-of-scope clips come from public data only; wake-word false wakes from ordinary speech are not measured.
