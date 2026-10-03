@@ -30,5 +30,6 @@ Per clip it returns a trace (each component's intent and confidence, agreement, 
   clean unchanged at 98.8). Together about 14.3 MB INT8. Pi latency and memory are not measured (no Pi hardware on the node).
 - **Streaming:** `vcm.streaming --policy endpointed ... --cls-model cls-xl/export/vcm_heads.int8.onnx` (command in `docs/AI231-FIL50.md`).
   Wake word + command replay, 784 ai231 test sessions: 89.4% correct first trigger vs 88.3% CTC only (95.1% vs 93.9% where the wake word opened a period),
-  latency p50 0.38 s after speech end (`eval/streaming-replay-*.json`).
+  latency p50 0.38 s after speech end (`eval/streaming-replay-*.json`). With `--wakeword-poll-s 0.05` (finer wake-word polling)
+  the hybrid reaches 90.1% (706/784); the remaining 38 missed sessions are the wake-word model not firing.
 - **Status:** best hybrid so far for streaming tests, not promoted. Ticket 04 is deferred (see `docs/AI231-FIL50.md`).
