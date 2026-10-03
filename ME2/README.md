@@ -29,6 +29,16 @@ uv run python -m me2_voicegen.vcm.streaming \
   --log-periods --source mic            # or --source path/to/recording.wav; add --log-timing for per-window gate/decode milliseconds
 ```
 
+**On a Raspberry Pi** (aarch64: `uv sync` fails there because torch is pinned to the x86 CUDA index; use the lean install in [`docs/RASPBERRY-PI.md`](docs/RASPBERRY-PI.md)),
+add the microphone device to the same command. The capture must be 16 kHz signed 16-bit mono raw PCM:
+
+```bash
+uv venv --python 3.10 .venv-pi && uv pip install --python .venv-pi/bin/python -r requirements-pi.txt && export PYTHONPATH=src   # once
+.venv-pi/bin/python -m me2_voicegen.vcm.streaming ...same flags as above... \
+  --source mic --mic-command "arecord -D plughw:3,0 -f S16_LE -r 16000 -c 1 -t raw -"
+# or: make hybrid-stream HYBRID_MIC_COMMAND="arecord -D plughw:3,0 -f S16_LE -r 16000 -c 1 -t raw -"
+```
+
 Without `--cls-model` it is the plain CTC decode. On the holdout soak (186 commands behind a wake word, reverb and noise): 81% correct first trigger (hybrid) vs 74% (CTC only),
 0.38 s median latency after the end of speech, about 70 ms per decoded window on a server CPU core (Raspberry Pi 4 not measured yet).
 

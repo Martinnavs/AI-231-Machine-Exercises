@@ -8,7 +8,7 @@ Method, results and tuning: [`docs/SOAK-TEST.md`](../../docs/SOAK-TEST.md).
 **`continuous.wav` is committed** (63 MB, force-added: `*.wav` is git-ignored). The clips come from datasets with several non-commercial terms and wake-word voices of unconfirmed provenance:
 research and education use only, no commercial reuse. Check it with `sha256sum -c SHA256SUMS`; it can also be rebuilt from the seeds (commands in `docs/SOAK-TEST.md`).
 
-## Run it (CPU INT8 ONNX, the same on a Raspberry Pi)
+## Run it (CPU INT8 ONNX, the same on a Raspberry Pi; Pi install and microphone: [`docs/RASPBERRY-PI.md`](../../docs/RASPBERRY-PI.md))
 
 ```bash
 make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=rpi4 SOAK_ARGS="--backend onnx --threads 1"

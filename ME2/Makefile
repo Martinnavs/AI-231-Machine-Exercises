@@ -479,6 +479,7 @@ SOAK_NAME ?= run
 SOAK_ARGS ?=
 HYBRID_WAV ?=
 HYBRID_SOURCE ?= mic
+HYBRID_MIC_COMMAND ?=               # e.g. "arecord -D plughw:3,0 -f S16_LE -r 16000 -c 1 -t raw -" (Raspberry Pi, docs/RASPBERRY-PI.md)
 HYBRID_WAKEWORD ?= out/wakeword-sesame-ambient-rir-45m
 .PHONY: hybrid-decode hybrid-stream hybrid-test soak-run
 hybrid-decode: ## Decode HYBRID_WAV="a.wav b.wav" with the hybrid (JSON per clip + which model answered)
@@ -486,7 +487,7 @@ hybrid-decode: ## Decode HYBRID_WAV="a.wav b.wav" with the hybrid (JSON per clip
 	$(UV) run python scripts/hybrid_decode_file.py $(HYBRID_WAV) --ctc-checkpoint $(HYBRID_CTC) --cls-checkpoint $(HYBRID_CLS) --cls-threshold $(HYBRID_CLS_THRESHOLD)
 
 hybrid-stream: ## Hybrid streaming: wake word then command (HYBRID_SOURCE=mic or a wav path)
-	$(UV) run python -m me2_voicegen.vcm.streaming --model $(HYBRID_DIR)/ctc-wide --backend onnx --onnx-variant int8 --grammar optionb --threshold=-0.1 --required-command-margin 4.0 --beam-width 50 --gate wakeword --policy endpointed --gate-period 3 --hold-ms 200 --stable-strides 1 --wakeword-model $(HYBRID_WAKEWORD) --wakeword-backend onnx --wakeword-threshold $(HYBRID_WAKEWORD_THRESHOLD) --wakeword-poll-s 0.05 --log-periods --cls-model $(HYBRID_CLS) --cls-threshold $(HYBRID_CLS_THRESHOLD) --cls-slot-threshold $(HYBRID_CLS_SLOT_THRESHOLD) --source "$(HYBRID_SOURCE)"
+	$(UV) run python -m me2_voicegen.vcm.streaming --model $(HYBRID_DIR)/ctc-wide --backend onnx --onnx-variant int8 --grammar optionb --threshold=-0.1 --required-command-margin 4.0 --beam-width 50 --gate wakeword --policy endpointed --gate-period 3 --hold-ms 200 --stable-strides 1 --wakeword-model $(HYBRID_WAKEWORD) --wakeword-backend onnx --wakeword-threshold $(HYBRID_WAKEWORD_THRESHOLD) --wakeword-poll-s 0.05 --log-periods --cls-model $(HYBRID_CLS) --cls-threshold $(HYBRID_CLS_THRESHOLD) --cls-slot-threshold $(HYBRID_CLS_SLOT_THRESHOLD) --source "$(HYBRID_SOURCE)" $(if $(HYBRID_MIC_COMMAND),--mic-command "$(HYBRID_MIC_COMMAND)")
 
 soak-run: ## Stream SOAK_DIR/continuous.wav once and score it (SOAK_NAME=..., SOAK_ARGS="--backend torch --device cuda:0 --gpu 5"); results in SOAK_DIR/results/
 	$(UV) run python scripts/soak_run.py --sessions $(SOAK_DIR) --continuous --name $(SOAK_NAME) --wakeword-threshold $(HYBRID_WAKEWORD_THRESHOLD) --cls-slot-threshold $(HYBRID_CLS_SLOT_THRESHOLD) $(SOAK_ARGS)
