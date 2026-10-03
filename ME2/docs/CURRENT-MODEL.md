@@ -8,7 +8,7 @@ long, dated records instead of repeating them.
   It is **not promoted**: `make app-pipeline*` and the README's "production checkpoint" still name the older model
   (`option-d-fil50-ambient-rir-135m`, and `quartznet5x3-s2-fil50-ambient-rir-135m` for the live targets). Promotion is a separate decision.
 - **Reproducibility:** the task is to be reproducible from public data. Read [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) before
-  claiming a result: part of the training recipe cannot be rebuilt from the published datasets yet.
+  claiming a result: the training manifest rebuilds from the published datasets except 4 persona clips (28,854 of 28,858 rows); retraining on the rebuilt manifest was not re-run.
 - **Archived checkpoints:** the other models' binaries were untracked on 2026-10-03; see [`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md).
 - **Model card:** [`out/vcm/hybrid-ctcwide-clsxl/MODEL-CARD.md`](../out/vcm/hybrid-ctcwide-clsxl/MODEL-CARD.md).
 
