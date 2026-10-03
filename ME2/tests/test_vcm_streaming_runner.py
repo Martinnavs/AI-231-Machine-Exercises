@@ -725,6 +725,7 @@ def test_streaming_runner_init_signature_unchanged_by_mode_period_wiring():
         "out",
         "summary_out",
         "poll_interval_s",
+        "log_timing",  # intentional contract update (soak test): opt-in `gate_ms`/`decode_ms` fields, appended last, default off
     ]
 
 

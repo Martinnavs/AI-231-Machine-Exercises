@@ -115,6 +115,7 @@ _FIELD_TYPES: dict[str, type] = {
     "mic_command": str,
     "listen_for": float,
     "log_all_windows": bool,
+    "log_timing": bool,
     "gate": str,
     "gate_period_s": float,
     "log_periods": bool,
@@ -131,6 +132,7 @@ _FIELD_TYPES: dict[str, type] = {
     "blank_floor": float,
     "cls_model": str,
     "cls_threshold": float,
+    "cls_slot_threshold": float,
     "cls_hold_ms": float,
     "cls_min_speech_ms": float,
 }
@@ -216,6 +218,7 @@ class StreamingConfig:
     mic_command: Optional[str] = None
     listen_for: Optional[float] = None
     log_all_windows: bool = False
+    log_timing: bool = False
     gate: str = "none"
     gate_period_s: float = 5.0
     log_periods: bool = False
@@ -234,6 +237,7 @@ class StreamingConfig:
     # --policy endpointed only: classifier-head fallback (the hybrid, docs/AI231-FIL50.md); off when cls_model is None
     cls_model: Optional[str] = None
     cls_threshold: float = 0.8787
+    cls_slot_threshold: float = 0.0  # slotted intents: also require the slot head's max-softmax (0 = off)
     cls_hold_ms: float = 500.0
     cls_min_speech_ms: float = 200.0
 

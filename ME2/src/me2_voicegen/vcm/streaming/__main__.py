@@ -119,6 +119,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="stop after this many seconds of captured audio (realtime mode only)",
     )
     parser.add_argument(
+        "--log-timing",
+        dest="log_timing",
+        action="store_true",
+        default=None,
+        help="add gate_ms and decode_ms (wall clock) to every emitted record",
+    )
+    parser.add_argument(
         "--log-all-windows",
         dest="log_all_windows",
         action="store_true",
@@ -145,6 +152,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
     # --policy endpointed: hybrid classifier fallback (heads ONNX from `vcm.export_onnx --heads-only`, or a heads checkpoint)
     parser.add_argument("--cls-model", dest="cls_model", type=str, default=None)
     parser.add_argument("--cls-threshold", dest="cls_threshold", type=float, default=None)
+    parser.add_argument("--cls-slot-threshold", dest="cls_slot_threshold", type=float, default=None)
     parser.add_argument("--cls-hold-ms", dest="cls_hold_ms", type=float, default=None)
     parser.add_argument("--cls-min-speech-ms", dest="cls_min_speech_ms", type=float, default=None)
     parser.add_argument(
@@ -292,12 +300,12 @@ def _print_banner(
         print(line, file=out)
 
 
-def _classifier_fallback(path: str, threshold: float):
+def _classifier_fallback(path: str, threshold: float, device: str = "cpu", slot_threshold: float = 0.0):
     """window waveform -> DecodeResult from the intent/slot heads, or None when the heads reject (`vcm.hybrid`)."""
     from me2_voicegen.vcm.hybrid import classifier_result, load_hybrid_part
 
-    heads = load_hybrid_part(path, "cls")
-    return lambda waveform: classifier_result(heads, waveform, threshold)
+    heads = load_hybrid_part(path, "cls", device=device)
+    return lambda waveform: classifier_result(heads, waveform, threshold, slot_threshold)
 
 
 def main(argv: Optional[list[str]] = None) -> None:
@@ -366,7 +374,7 @@ def main(argv: Optional[list[str]] = None) -> None:
             "stable_strides": cfg.stable_strides,
             "hold_ms": cfg.hold_ms,
             "blank_floor": cfg.blank_floor,
-            **({"fallback": _classifier_fallback(cfg.cls_model, cfg.cls_threshold), "fallback_hold_ms": cfg.cls_hold_ms,
+            **({"fallback": _classifier_fallback(cfg.cls_model, cfg.cls_threshold, cfg.device, cfg.cls_slot_threshold), "fallback_hold_ms": cfg.cls_hold_ms,
                 "fallback_min_speech_ms": cfg.cls_min_speech_ms} if cfg.cls_model else {}),
         },
     )
@@ -407,6 +415,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         beam_width=cfg.beam_width,
         listen_for_s=cfg.listen_for,
         log_all_windows=cfg.log_all_windows,
+        log_timing=cfg.log_timing,
         required_command_margin=cfg.required_command_margin,
         score_mode=cfg.score_mode,
     )

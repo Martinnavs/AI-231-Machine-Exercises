@@ -203,7 +203,7 @@ class OnnxHeads:
         return _HeadsOut(torch.from_numpy(outs["intent_logits"]), slots)
 
 
-def load_hybrid_part(path, role: str):
+def load_hybrid_part(path, role: str, device: str = "cpu"):
     """`.onnx` -> `OnnxCtc` / `OnnxHeads` (by role); anything else -> the PyTorch checkpoint."""
     from pathlib import Path
 
@@ -211,16 +211,17 @@ def load_hybrid_part(path, role: str):
         return OnnxCtc(path) if role == "ctc" else OnnxHeads(path)
     from me2_voicegen.vcm.pipeline import load_checkpoint
 
-    return load_checkpoint(path, device="cpu", weights_only=True)[0]
+    return load_checkpoint(path, device=device, weights_only=True)[0]
 
 
 _FEATURES = None
 
 
 @torch.no_grad()
-def classifier_result(heads, waveform, threshold: float):
+def classifier_result(heads, waveform, threshold: float, slot_threshold: float = 0.0):
     """Classifier-head answer for one window as a `DecodeResult` (the streaming policy's override), or None when the head
-    rejects (top class is unknown/silence or below `threshold`). `heads`: an `OnnxHeads` or a heads checkpoint."""
+    rejects (top class is unknown/silence or below `threshold`, or, for a slotted intent, the slot head's own max-softmax is below
+    `slot_threshold`: a wrong slot is a wrong action, so it is better to stay silent). `heads`: an `OnnxHeads` or a heads checkpoint."""
     import math
 
     import numpy as np
@@ -231,8 +232,11 @@ def classifier_result(heads, waveform, threshold: float):
     if _FEATURES is None:
         _FEATURES = LogMelFeatureExtractor()
     wav = torch.as_tensor(np.asarray(waveform, dtype=np.float32))
-    head = heads.forward_heads(_FEATURES(wav).unsqueeze(0))
-    probs = head.intent_logits[0].softmax(-1)
+    features = _FEATURES(wav).unsqueeze(0)
+    if hasattr(heads, "parameters"):  # a PyTorch heads model, possibly on a GPU
+        features = features.to(next(heads.parameters()).device)
+    head = heads.forward_heads(features)
+    probs = head.intent_logits[0].softmax(-1).cpu()
     k = int(probs.argmax())
     name = INTENT_CLASSES[k]
     if name in EXTRA_INTENT_CLASSES or float(probs[k]) < threshold:
@@ -240,6 +244,9 @@ def classifier_result(heads, waveform, threshold: float):
     slots = {}
     if name in SLOTS:
         slot_name, values = SLOTS[name]
-        slots = {slot_name: values[int(head.slot_logits[slot_head_name(name)][0].argmax())]}
+        slot_probs = head.slot_logits[slot_head_name(name)][0].softmax(-1).cpu()
+        if float(slot_probs.max()) < slot_threshold:
+            return None
+        slots = {slot_name: values[int(slot_probs.argmax())]}
     return DecodeResult(intent=name, slots=slots, text="[classifier]", confidence=math.log(float(probs[k])),
                         no_match=False, out_of_grammar_gap=0.0)

@@ -357,3 +357,18 @@ def test_fallback_rejection_and_ctc_path_unchanged():
     ended = _logp("stop", 60, trailing_blank=40)
     assert not policy2.observe(_obs(1, _result("PAUSE"), ended)).accept
     assert policy2.observe(_obs(2, _result("PAUSE"), ended)).result is None and calls == []
+
+
+def test_log_timing_adds_gate_and_decode_ms_only_when_enabled():
+    def run(**kw):
+        out = io.StringIO()
+        StreamingRunner(
+            source=_Source(9 * SAMPLE_RATE), backend=_GrowingStopBackend(), grammar=OPTIONB_GRAMMAR,
+            policy=_policy(_Gate(open_at=4 * STRIDE, rearm=True)), window_s=2.5, stride_s=0.25, refractory_s=1.5,
+            beam_width=25, out=out, **kw,
+        ).run()
+        return [__import__("json").loads(line) for line in out.getvalue().splitlines() if line.startswith("{")]
+    plain = run()[0]
+    timed = run(log_timing=True)[0]
+    assert "decode_ms" not in plain and "gate_ms" not in plain
+    assert timed["decode_ms"] > 0 and timed["gate_ms"] >= 0 and timed["intent"] == plain["intent"] == "STOP"

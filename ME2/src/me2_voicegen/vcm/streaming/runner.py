@@ -91,6 +91,7 @@ class StreamingRunner:
         out: TextIO = sys.stdout,
         summary_out: TextIO = sys.stderr,
         poll_interval_s: float = 0.005,
+        log_timing: bool = False,
     ) -> None:
         self.source = source
         self.backend = backend
@@ -107,6 +108,7 @@ class StreamingRunner:
             int(round(listen_for_s * SAMPLE_RATE)) if listen_for_s is not None else None
         )
         self.log_all_windows = log_all_windows
+        self.log_timing = log_timing  # adds `gate_ms` and `decode_ms` to each emitted record (off by default)
         # Incomplete-prefix rejection gate margin (docs/
         # INCOMPLETE-GRAMMAR-REJECTION.md, Step 3); None = gate disabled.
         self.required_command_margin = required_command_margin
@@ -240,11 +242,13 @@ class StreamingRunner:
 
         waveform = self._buffer.snapshot()
         period_request = getattr(self.policy, "period_request", None)
+        t_gate = time.perf_counter()
         if period_request is not None:
             request = period_request(samples_seen, waveform)
             if request is None:
                 return
             waveform = self._buffer.snapshot_range(request.start_samples, request.end_samples)
+        t_decode = time.perf_counter()
         logp = np.asarray(self.backend.logp_for_waveform(waveform))
         result = decode(
             logp,
@@ -260,6 +264,7 @@ class StreamingRunner:
             waveform=waveform, logp=logp
         )
         decision = self.policy.observe(obs)
+        t_done = time.perf_counter()
         period_closed = getattr(self.policy, "period_closed", None)
         if period_request is not None and period_closed is not None:
             period_closed(samples_seen, decision)
@@ -280,6 +285,9 @@ class StreamingRunner:
             "confidence": confidence,
             "policy_reason": decision.reason,
         }
+        if self.log_timing:
+            payload["gate_ms"] = round(1000 * (t_decode - t_gate), 3)
+            payload["decode_ms"] = round(1000 * (t_done - t_decode), 3)
         # stdout is a pipe in the live app-pipeline. Without an explicit
         # flush, its block buffer can hold accepted commands until the
         # streaming process exits, so app.forward never sees them promptly.
@@ -287,4 +295,4 @@ class StreamingRunner:
 
         if emitted:
             self._events += 1
-            self.triggers.append(TriggerEvent(**payload))
+            self.triggers.append(TriggerEvent(**{k: v for k, v in payload.items() if k not in ("gate_ms", "decode_ms")}))

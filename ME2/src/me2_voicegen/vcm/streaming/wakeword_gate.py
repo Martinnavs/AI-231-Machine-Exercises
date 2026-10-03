@@ -101,8 +101,8 @@ class WakewordTorchBackend:
         self._feature_extractor = LogMelFeatureExtractor()
 
     def wakeword_prob(self, waveform: np.ndarray) -> float:
-        wav_t = torch.as_tensor(waveform, dtype=torch.float32, device=self.device)
-        features = self._feature_extractor(wav_t).unsqueeze(0)
+        wav_t = torch.as_tensor(waveform, dtype=torch.float32)  # the feature extractor lives on the CPU
+        features = self._feature_extractor(wav_t).unsqueeze(0).to(self.device)
         with torch.no_grad():
             logits = self.model(features)
         return _softmax_wakeword_prob(logits[0].cpu().numpy())
