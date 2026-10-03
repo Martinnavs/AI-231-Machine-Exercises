@@ -1,8 +1,8 @@
 # Reproducing the hybrid: what works today and what does not
 
 The goal for this model is reproducibility from public data. This page separates three things: what you can re-run today and get the
-documented numbers, what you can retrain, and the one part of the training recipe that is not
-fully rebuildable from the published datasets (4 persona clips; section 3). Nothing below was run end to end on a clean machine; each step says what was actually checked.
+documented numbers, what you can retrain, and the part of the training recipe that is
+rebuildable from the published datasets (section 3). Nothing below was run end to end on a clean machine; each step says what was actually checked.
 
 ## 1. Check the checked-in model (verified)
 
@@ -34,7 +34,7 @@ Given `out/conversions/v2/ai231-fil50-supp/manifest.csv` (see section 3 for how 
 Expected: best epoch about 38 / 23, validation loss about 0.39 / 0.34. One seed each, so a rerun will differ; the size of that
 difference has not been measured. Retraining, export and scoring were all run for these two models; the *rebuild of the manifest* was not.
 
-## 3. Rebuilding the training manifest (reproducible from public data, minus 4 clips)
+## 3. Rebuilding the training manifest (reproducible from public data)
 
 `ai231-fil50-supp` = ai231 v2 (public) + persona clips + the ai231 `supplemental_synth` train-voice clips (public).
 
@@ -42,11 +42,12 @@ difference has not been measured. Retraining, export and scoring were all run fo
 PYTHONPATH=src uv run python scripts/rebuild_training_manifest.py --ai231 raw_datasets/ai231-me2-voice-commands-v2 --out out/conversions/v2/rebuilt
 ```
 
-It downloads the persona dataset (default split and the `gap_fill` config of `martinnavs/ai231-fil-supplemental-data`), runs the two builders below,
+It downloads the persona dataset (default split and the `gap_fill` and `numeral_wordings` configs of `martinnavs/ai231-fil-supplemental-data`), runs the two builders below,
 extracts the audio the manifest uses, and asserts the result equals the committed `recipes/ai231-fil50-supp/manifest.ai231-fil50-supp.csv`. **Verified
-2026-10-03** (about 36 s with local copies of the data): **28,854 of the committed 28,858 rows**; the four missing persona clips are spelled-out-number
-wordings ("wake me up at six am", "set an alarm for eight am", two "...twenty two degrees" commands) that were never published. They are dropped after
-selection, not before, because dropping them first would change the voice split and every pick.
+2026-10-03** (about 36 s with local copies of the data): **all 28,858 rows equal the committed manifest**, and the 8,405 persona and gap-fill clips it uses were
+extracted from the public shards (the persona ones byte-identical to the originals, by SHA-256). Four of those clips are spelled-out-number wordings
+("wake me up at six am", "set an alarm for eight am", two "...twenty two degrees" commands) that the persona dataset's default split leaves out; they are
+published as the small `numeral_wordings` config.
 
 | Step | Code | Inputs | Public? |
 |---|---|---|---|
@@ -55,15 +56,14 @@ selection, not before, because dropping them first would change the voice split 
 | + `supplemental_synth` -> `ai231-fil50-supp/manifest.csv` | `scripts/build_ai231_fil50_supp.py` | the base manifest and `supplemental_synth/` | yes |
 
 How it closes the earlier gap: the published persona dataset (14,120 clips) renamed its files (`fil50_NNNNN_<voice>_<COMMAND>.wav`) and the builder selects by the
-original name, so `recipes/ai231-fil50-supp/persona-pool/published_file_map.csv` maps the two by audio SHA-256 (9,770 of the 9,958 pool clips are published; the rest
-are old wordings and spelled-out numbers). The 1,849 gap-fill clips are the `gap_fill` config, with `qa_passed`, `qa_rescued` and `manifest_split` columns.
-The selection is a pure function of the committed CSVs: run from them it reproduced all 24,875 base rows and all 28,858 final rows exactly.
+original name, so `recipes/ai231-fil50-supp/persona-pool/published_file_map.csv` maps the two by audio SHA-256 (9,774 of the 9,958 pool clips are published, counting the four in `numeral_wordings`; the rest
+are old wordings and other spelled-out numbers that no manifest row uses). The 1,849 gap-fill clips are the `gap_fill` config, with `qa_passed`, `qa_rescued` and `manifest_split` columns.
+The selection is a pure function of the committed CSVs: run from them it reproduced all 24,875 base rows and all 28,858 final rows exactly, with nothing dropped.
 
 What is still not reproducible:
-1. The 4 unpublished persona clips above (publish them, or accept the 28,854-row manifest).
-2. Regenerating the audio: generation is not seeded, so the same job gives the same wording, voice and label but different audio. The published clips
+1. Regenerating the audio: generation is not seeded, so the same job gives the same wording, voice and label but different audio. The published clips
    are the audio to use. The reference-voice prompt recordings behind `persona-pool/voices.csv` are not published.
-3. Retraining on the rebuilt manifest was not re-run, and the seed-to-seed spread of the models is unmeasured, so a retrain will land near the checked-in
+2. Retraining on the rebuilt manifest was not re-run, and the seed-to-seed spread of the models is unmeasured, so a retrain will land near the checked-in
    models, not on them.
 
 ## 4. Other items a reviewer will ask about

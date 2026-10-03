@@ -1,14 +1,14 @@
 """Rebuild the `ai231-fil50-supp` training manifest from the public data and the committed recipe, and check it against the committed manifest.
 
 Inputs: the ai231 dataset (`--ai231`, downloaded from Hugging Face; holds `variations.csv` and `supplemental_synth/`), and the persona
-supplement `martinnavs/ai231-fil-supplemental-data` (default train split for the persona pool, `gap_fill` config for the gap-fill clips;
-`--persona-dir` / `--gap-fill-dir` use local copies instead of downloading). Everything else is in `recipes/ai231-fil50-supp/`.
+supplement `martinnavs/ai231-fil-supplemental-data` (default train split for the persona pool, `numeral_wordings` config for four spelled-out-number clips, `gap_fill` config for the gap-fill clips;
+`--persona-dir` / `--numerals-dir` / `--gap-fill-dir` use local copies instead of downloading). Everything else is in `recipes/ai231-fil50-supp/`.
 
     PYTHONPATH=src uv run python scripts/rebuild_training_manifest.py --ai231 raw_datasets/ai231-me2-voice-commands-v2 --out out/conversions/v2/rebuilt
 
-The selection is a pure function of the recipe CSVs and was verified identical to the committed manifest. Four selected persona clips (spelled-out
-numbers: "six am", "twenty two degrees") were never published, so they are dropped after selection, not before (dropping them first would change the
-voice split and every pick); the check allows exactly those. Audio is extracted from the parquet shards into `<out>/audio/` for the clips the manifest uses.
+The selection is a pure function of the recipe CSVs and was verified identical to the committed manifest; every selected clip is public, so the rebuilt
+manifest must equal the committed one. (A selected clip that were unpublished would be dropped after selection, not before, because dropping it first
+would change the voice split and every pick; the check below would then report the difference.) Audio is extracted from the parquet shards into `<out>/audio/` for the clips the manifest uses.
 """
 from __future__ import annotations
 
@@ -69,6 +69,7 @@ def main() -> None:
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--ai231-v2-manifest", type=Path, help="an existing import_ai231 output; default: run the importer into <out>/ai231-v2")
     ap.add_argument("--persona-dir", type=Path, help="local copy of the persona dataset's train-*.parquet shards")
+    ap.add_argument("--numerals-dir", type=Path, help="local copy of the numeral_wordings train-*.parquet shard")
     ap.add_argument("--gap-fill-dir", type=Path, help="local copy of the gap_fill train-*.parquet shard")
     ap.add_argument("--no-audio", action="store_true", help="manifests only: do not extract audio")
     a = ap.parse_args()
@@ -102,14 +103,14 @@ def main() -> None:
     dropped = [r for r in rows if "UNPUBLISHED" in r["path"]]
     kept = [r for r in rows if "UNPUBLISHED" not in r["path"]]
     write(out / "ai231-fil50/manifest.csv", kept, list(rows[0].keys()))
-    print(f"dropped {len(dropped)} selected clips that were never published: {[r['filename'] for r in dropped]}")
+    print(f"dropped {len(dropped)} selected clips that were never published" + (f": {[r['filename'] for r in dropped]}" if dropped else ""))
 
     if not a.no_audio:
         base_dir = out / "ai231-fil50"
         used = {Path((base_dir / r["path"]).resolve()) for r in kept if r["source_dataset"] == "fil50_persona"}
         persona_want = {p.name: p for p in used if p.parent.name == "persona"}
         gap_want = {p.name: p for p in used if p.parent.name == "gap_fill"}
-        got = extract(shards(a.persona_dir, "train-*.parquet", "data/train-*.parquet"), persona_want)
+        got = extract(shards(a.persona_dir, "train-*.parquet", "data/train-*.parquet") + shards(a.numerals_dir, "train-*.parquet", "numeral_wordings/train-*.parquet"), persona_want)
         got |= extract(shards(a.gap_fill_dir, "train-*.parquet", "gap_fill/train-*.parquet"), gap_want)
         missing = (set(persona_want) | set(gap_want)) - got
         assert not missing, f"{len(missing)} clips not found in the published shards, e.g. {sorted(missing)[:3]}"

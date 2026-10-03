@@ -33,12 +33,14 @@ def test_gap_fill_jobs_generated_and_used_clips_are_consistent():
     assert len(used) == 1157 and used <= passed | rescued
 
 
-def test_persona_file_map_covers_the_selection_except_four_unpublished_clips():
+def test_persona_file_map_covers_every_selected_persona_clip():
     fmap = rows(R / "persona-pool/published_file_map.csv")
-    assert len(fmap) == 9958 and sum(bool(r["published_file"]) for r in fmap) == 9770
+    assert len(fmap) == 9958 and sum(bool(r["published_file"]) for r in fmap) == 9774
     published = [r["published_file"] for r in fmap if r["published_file"]]
     assert len(set(published)) == len(published) and len({r["sha256"] for r in fmap}) == len(fmap)
     by_name = {r["filename"]: r["published_file"] for r in fmap}
     selected = [r for r in rows(R / "manifest.ai231-fil50.csv") if r["source_dataset"] == "fil50_persona" and not r["source_relpath"].startswith("vcm_train_gap")]
-    unpublished = sorted(r["filename"] for r in selected if not by_name[r["filename"].split("_", 2)[2]])
-    assert unpublished == ["persona_train_vcm_test_016649.wav", "persona_train_vcm_train_010782.wav", "persona_train_vcm_val_014572.wav", "persona_val_vcm_train_002637.wav"]
+    assert [r["filename"] for r in selected if not by_name[r["filename"].split("_", 2)[2]]] == []
+    # the four spelled-out-number clips live in the `numeral_wordings` config and keep their original names
+    assert {n: by_name[n] for n in ["vcm_train_010782.wav", "vcm_test_016649.wav", "vcm_val_014572.wav", "vcm_train_002637.wav"]} == {
+        n: n for n in ["vcm_train_010782.wav", "vcm_test_016649.wav", "vcm_val_014572.wav", "vcm_train_002637.wav"]}

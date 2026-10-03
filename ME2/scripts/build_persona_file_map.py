@@ -2,10 +2,11 @@
 
 The persona dataset on Hugging Face renamed its clips (`fil50_NNNNN_<voice>_<COMMAND>.wav`), but `build_ai231_fil50.py` selects by the original
 `filename`. This needs the original audio, so it runs once where that audio lives and its output (`persona-pool/published_file_map.csv`) is committed.
-`published_file` is empty for pool clips that were not published (old wordings such as "Place a call", and spelled-out numbers).
+`published_file` is empty for pool clips that were not published (old wordings such as "Place a call"; the four spelled-out-number clips the
+manifest uses are in the `numeral_wordings` config, the rest of that kind are not published).
 
     PYTHONPATH=src uv run python scripts/build_persona_file_map.py --pool-manifest out/conversions/v2/optionb-v3-vcmx-fil50/manifest.csv \
-        --published raw_datasets/fil50-persona-export/fil50_persona --out recipes/ai231-fil50-supp/persona-pool/published_file_map.csv
+        --published raw_datasets/fil50-persona-export/fil50_persona <numeral_wordings dir> --out recipes/ai231-fil50-supp/persona-pool/published_file_map.csv
 """
 from __future__ import annotations
 
@@ -20,11 +21,11 @@ import pyarrow.parquet as pq
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--pool-manifest", type=Path, required=True)
-    ap.add_argument("--published", type=Path, required=True, help="directory of the published train-*.parquet shards")
+    ap.add_argument("--published", type=Path, nargs="+", required=True, help="directories of the published train-*.parquet shards (default split, numeral_wordings)")
     ap.add_argument("--out", type=Path, required=True)
     a = ap.parse_args()
     published: dict[str, str] = {}
-    for shard in sorted(a.published.glob("train-*.parquet")):
+    for shard in sorted(s for d in a.published for s in d.glob("train-*.parquet")):
         for batch in pq.ParquetFile(shard).iter_batches(batch_size=256, columns=["audio", "file"]):
             for r in batch.to_pylist():
                 sha = hashlib.sha256(r["audio"]["bytes"]).hexdigest()
