@@ -1,5 +1,39 @@
 # ME2 — Spoken-command voice assistant (grammar-constrained VCM + wakeword DS-CNN)
 
+## Quick start: the current model (2026-10-03, branch `optionb-ctc-attention`)
+
+The best model so far is a **hybrid of two QuartzNet CTC networks** (wide CTC + XL classifier heads, 14.3 MB INT8, trained on public data only). It is checked in under
+`out/vcm/hybrid-ctcwide-clsxl/` and streams with the wake word `out/wakeword-sesame-ambient-rir-45m/`. It is **not promoted**: the description further down (and
+`make app-pipeline*`) still refers to the earlier ~1M-parameter model. Start at [`docs/CURRENT-MODEL.md`](docs/CURRENT-MODEL.md); what is reproducible from public data:
+[`docs/REPRODUCE-HYBRID.md`](docs/REPRODUCE-HYBRID.md); the deployment-shaped soak test: [`docs/SOAK-TEST.md`](docs/SOAK-TEST.md); all docs: [`docs/README.md`](docs/README.md).
+
+```bash
+module load uv && make sync                                  # once (see "Prerequisites")
+
+make hybrid-decode HYBRID_WAV="clip1.wav clip2.wav"          # decode wav files: JSON per clip, which model answered
+make hybrid-stream                                           # live microphone: wake word, then the command
+make hybrid-stream HYBRID_SOURCE=path/to/recording.wav       # the same, replaying a file
+make hybrid-test                                             # tests for the hybrid, streaming policy and wake-word gate
+make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=run SOAK_ARGS="--backend onnx"   # score the soak recording (needs continuous.wav, see docs/SOAK-TEST.md)
+```
+
+`make hybrid-stream` is this command (INT8 ONNX, CPU, the settings tuned on a validation soak):
+
+```bash
+uv run python -m me2_voicegen.vcm.streaming \
+  --model out/vcm/hybrid-ctcwide-clsxl/ctc-wide --backend onnx --onnx-variant int8 \
+  --grammar optionb --threshold=-0.1 --required-command-margin 4.0 --beam-width 50 \
+  --gate wakeword --policy endpointed --gate-period 3 --hold-ms 200 --stable-strides 1 \
+  --wakeword-model out/wakeword-sesame-ambient-rir-45m --wakeword-backend onnx --wakeword-threshold 0.8 --wakeword-poll-s 0.05 \
+  --cls-model out/vcm/hybrid-ctcwide-clsxl/cls-xl/export/vcm_heads.int8.onnx --cls-threshold 0.8787 --cls-slot-threshold 0.6 \
+  --log-periods --source mic            # or --source path/to/recording.wav; add --log-timing for per-window gate/decode milliseconds
+```
+
+Without `--cls-model` it is the plain CTC decode. On the holdout soak (186 commands behind a wake word, reverb and noise): 81% correct first trigger (hybrid) vs 74% (CTC only),
+0.38 s median latency after the end of speech, about 70 ms per decoded window on a server CPU core (Raspberry Pi 4 not measured yet).
+
+*Background below: the earlier project description and status.*
+
 A Raspberry-Pi-targeted, zero-cloud spoken-command system: a DS-CNN wake-word detector
 ("sesame" — the production phrase instance as of 2026-09-28/29, `wakeword-sesame-ambient-rir-45m`;
 superseded "computer" after the `ambient-reverb-cooccurrence` experiment, see the "Wakeword
@@ -17,7 +51,7 @@ streaming runtime. That history is still visible in the section ordering below (
 first, everything built on top of it after); the "VCM toy" section onward is the current state of
 the project, not a later add-on to a still-scoped-down spike.
 
-> **New here?** Read the process documentation first: an end-to-end, human-readable
+> **New here?** Read [`docs/CURRENT-MODEL.md`](docs/CURRENT-MODEL.md) first for the current model, then the process documentation (earlier model): an end-to-end, human-readable
 > walkthrough of the whole project — raw audio → TTS/voice-conversion → dataset build →
 > CTC training → grammar decode → wakeword DS-CNN → ONNX export → live streaming — with
 > the command for each stage, the modelling core (architecture, training recipe,
@@ -27,7 +61,7 @@ the project, not a later add-on to a still-scoped-down spike.
 > `docs/PROCESS-VCM-MODEL.md`, `docs/PROCESS-WAKEWORD.md`, and
 > `docs/PROCESS-STREAMING-SERVING.md`. Start at `PROCESS-OVERVIEW.md`.
 
-## Project status (2026-09-26, branch `optionb-grammar-v2`)
+## Project status (2026-09-26, branch `optionb-grammar-v2`; the table is as of that date, see the box above for the current model)
 
 | Area | Status | Key number |
 |---|---|---|

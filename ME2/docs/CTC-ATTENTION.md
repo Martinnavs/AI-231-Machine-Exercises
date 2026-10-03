@@ -1,7 +1,7 @@
 # CTC + attention heads on the QuartzNet encoder
 
-Status: **v2 (rebuilt dataset, reproducible noise) scored on two seeds; the heads-A model of seed 1 is checked in as the
-current best for streaming tests; ticket 04 not started.** The v1 sections further down (one seed, earlier dataset
+Status: **see [`CURRENT-MODEL.md`](CURRENT-MODEL.md) for the current model (the hybrid). This page is the heads design and the v2 results. v2 (rebuilt dataset, reproducible noise) scored on two seeds; the heads-A model of seed 1 is checked in as the
+current best for streaming tests at the time (superseded by the hybrid); ticket 04 deferred, see `AI231-FIL50.md`.** The v1 sections further down (one seed, earlier dataset
 version) are kept for the record and are superseded where they disagree.
 Dates: 2026-10-02. Follow-up experiment (persona-padded training data): `docs/AI231-FIL50.md`. Design record: `feature-engineering/ctc-attention/tickets/00-RECAP.md` (tickets 01-04).
 

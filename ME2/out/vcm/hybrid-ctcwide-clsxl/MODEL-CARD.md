@@ -1,5 +1,7 @@
 # Hybrid: wide CTC + xl classifier heads (policy A), both models resident
 
+Docs: `docs/CURRENT-MODEL.md` (start here), `docs/REPRODUCE-HYBRID.md` (what is reproducible), `docs/AI231-FIL50.md` (experiment log). Try it: `make hybrid-decode HYBRID_WAV="clip.wav"`.
+
 Two checkpoints decoded together by `me2_voicegen.vcm.hybrid.HybridDecoder` (`scripts/hybrid_decode_file.py` shows the call):
 the grammar-constrained CTC decode of the wide model answers when it accepts (threshold -0.1, incomplete-prefix margin 4.0, beam 50);
 otherwise the xl model's intent head answers when its max-softmax is >= 0.8787 (fit on validation to its own CTC false-accept rate, never tuned on test).
@@ -32,4 +34,6 @@ Per clip it returns a trace (each component's intent and confidence, agreement, 
   Wake word + command replay, 784 ai231 test sessions: 89.4% correct first trigger vs 88.3% CTC only (95.1% vs 93.9% where the wake word opened a period),
   latency p50 0.38 s after speech end (`eval/streaming-replay-*.json`). With `--wakeword-poll-s 0.05` (finer wake-word polling)
   the hybrid reaches 90.1% (706/784); the remaining 38 missed sessions are the wake-word model not firing.
+- **Soak test** (`docs/SOAK-TEST.md`; holdout behind a wake word with reverb and noise; wake-word threshold 0.8, slot gate 0.6): 152/186 (81.7%) correct first trigger on the A100, 151/186 on CPU INT8 (CTC only: 139 / 137);
+  0.38 s median latency after the end of speech; ~70 ms per decoded window on a server core; Raspberry Pi 4 not run yet.
 - **Status:** best hybrid so far for streaming tests, not promoted. Ticket 04 is deferred (see `docs/AI231-FIL50.md`).
