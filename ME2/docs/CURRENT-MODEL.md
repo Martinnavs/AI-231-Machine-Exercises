@@ -105,7 +105,7 @@ Intent + slot, one seed, one training run per model. **Read the caveats in the n
 | Source | Role | Where |
 |---|---|---|
 | `airimonda/ai231-me2-voice-commands` v2 (Hugging Face, public) | train / val / test / holdout, `synthetic_negatives`, `supplemental_synth`, `variations.csv` | `raw_datasets/ai231-me2-voice-commands-v2/`; converted with `vcm.optionb.import_ai231` to `out/conversions/v2/ai231-v2/` |
-| Filipino persona clips (17 cloned voices; `martinnavarez/ai231-fil-supplemental-data`, public) | extra train rows; 10 voices train, 2 val, 5 test, capped per wording (50 / 12 / 35) | manifest `out/conversions/v2/ai231-fil50/` (+ `ai231-fil50-supp/` adds the ai231 `supplemental_synth` train-voice clips) |
+| Filipino persona clips (17 cloned voices; `martinnavs/ai231-fil-supplemental-data`, public) | extra train rows; 10 voices train, 2 val, 5 test, capped per wording (50 / 12 / 35) | manifest `out/conversions/v2/ai231-fil50/` (+ `ai231-fil50-supp/` adds the ai231 `supplemental_synth` train-voice clips) |
 
 The training manifest of both models is `ai231-fil50-supp/manifest.csv`: 28,858 rows, 16.5 h; train 18,300 rows (12,868 ai231,
 4,535 persona, 897 negatives and noise), val 2,717, test 7,639, holdout 202. Noise and babble for augmentation come only from the

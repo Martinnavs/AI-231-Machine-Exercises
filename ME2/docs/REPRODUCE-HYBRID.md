@@ -36,6 +36,8 @@ difference has not been measured. Retraining, export and scoring were all run fo
 
 ## 3. Rebuilding the training manifest (NOT reproducible from public data yet)
 
+The per-clip recipe is committed in [`recipes/ai231-fil50-supp/`](../recipes/ai231-fil50-supp/README.md) (jobs, generation results, QA outcomes, voices, the manifests), and the 1,849 gap-fill clips are published as the `gap_fill` config of the persona dataset with the QA flags and the split each clip got. What is still missing is the reference-voice audio, a mapping from the published persona pool's renamed files to `job_id`, and a builder that reads only the public data.
+
 `ai231-fil50-supp` = ai231 v2 (public) + persona clips + the ai231 `supplemental_synth` train-voice clips (public).
 
 | Step | Code | Inputs | Public? |
@@ -44,13 +46,13 @@ difference has not been measured. Retraining, export and scoring were all run fo
 | persona-padded base `ai231-fil50/manifest.csv` | `accent_balance/build_ai231_fil50.py` (cap 50/12/35 per wording, 10/2/5 voices, seed 0) | `optionb-v3-vcmx-fil50/manifest.csv` persona clips, **plus 1,849 freshly generated gap-fill clips** (`gen_manifest.csv`, `qa_pass.csv`) | **no** |
 | + `supplemental_synth` -> `ai231-fil50-supp/manifest.csv` | `scripts/build_ai231_fil50_supp.py` | the base manifest and `supplemental_synth/` | the second input yes, the base no |
 
-Why it fails: the published persona dataset (`martinnavarez/ai231-fil-supplemental-data`, 14,120 clips) was exported from the internal
-persona manifest alone. It does **not** contain the 1,849 gap-fill clips that cover the thin wordings, and its files were renamed (`fil50_NNNNN_<voice>_<COMMAND>.wav`), so the builder's selection (which sorts by
+Why it fails: the published persona dataset (`martinnavs/ai231-fil-supplemental-data`, 14,120 clips) was exported from the internal
+persona manifest alone. It does **not** contain the 1,849 gap-fill clips (now published separately as the `gap_fill` config), and its files were renamed (`fil50_NNNNN_<voice>_<COMMAND>.wav`), so the builder's selection (which sorts by
 file name) would pick different clips even from the same pool. A rebuild from the public data would therefore be a similar recipe, not
 the same training set, and its numbers would not be comparable to the ones in this repo.
 
 What would close it (not done; publishing needs the owner's go-ahead):
-1. Publish the 1,849 gap-fill clips (or regenerate and publish the full pool) and the exact list of persona clips used per split.
+1. ~~Publish the 1,849 gap-fill clips~~ (done: `gap_fill` config). Still open: map the published persona pool's renamed files to the original `job_id`s, and list the persona clips used per split.
 2. Add a builder that reads only the two public datasets and reproduces `ai231-fil50-supp/manifest.csv`, with a test that its row
    counts match (persona train 4,535 / val 924 / test 2,946; train 18,300, val 2,717, test 7,639, holdout 202).
 3. Retrain once from that manifest and compare against the checked-in models.
@@ -65,5 +67,5 @@ Until then, treat the training recipe as documented but only the evaluation of t
 | Dataset DOI and licence | the two Hugging Face datasets are public; no DOI; several source corpora are non-commercial; the persona reference-voice provenance is an open item the uploader accepted (see the dataset card) |
 | Test set with unseen speakers | ai231 test is speaker-disjoint from train; the persona test uses 5 held-out voices; the real-speaker holdout is one person (186 clips) |
 | Baselines | same architecture at 1, 4 and 10 MB, the internal-data model (not reproducible) and old production (inflated on ai231 test by training overlap) |
-| Pi 4 | not measured; no Pi hardware on the node |
+| Pi 4 | measured 2026-10-03: same answers as the server, but decode 443 / 764 ms mean / p95 per window, RTF 3.21 at the 0.25 s stride (does not keep up live); see `BENCHMARKS.md` |
 | Seeds | one per model |
