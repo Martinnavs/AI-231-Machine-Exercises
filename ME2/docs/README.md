@@ -22,8 +22,6 @@ Then [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) for what can and cannot be rep
 | [`VCM-CONTRACT.md`](VCM-CONTRACT.md) | The VCM interface contract (features, decoder I/O, licence provenance) |
 | [`OPTIONB-GRAMMAR-CONTRACT.md`](OPTIONB-GRAMMAR-CONTRACT.md) | The 19-intent, 93-wording grammar |
 | [`INCOMPLETE-GRAMMAR-REJECTION.md`](INCOMPLETE-GRAMMAR-REJECTION.md) | The incomplete-prefix margin gate and its calibration |
-| [`DENSE-SCORING-DECISION.md`](DENSE-SCORING-DECISION.md) | Per-character scoring trial (not adopted) |
-| [`QUARTZNET-STUDENT.md`](QUARTZNET-STUDENT.md), [`QUARTZNET-OPERATING-POINT.md`](QUARTZNET-OPERATING-POINT.md), [`CASCADE-SOAK-TEST.md`](CASCADE-SOAK-TEST.md) | The 1 MB QuartzNet model, its threshold and margin, and the wake-word -> VCM soak test |
 | [`VCM-DATASET-COMPATIBILITY.md`](VCM-DATASET-COMPATIBILITY.md) | Dataset schema compatibility |
 
 ## Streaming and wake word
@@ -34,16 +32,23 @@ Then [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) for what can and cannot be rep
 | [`WAKEWORD-SLIDING.md`](WAKEWORD-SLIDING.md) | Wake word + sliding window, answer when the command ends |
 | [`WAKEWORD-DATASET-CONTRACT.md`](WAKEWORD-DATASET-CONTRACT.md) | The wake-word dataset |
 
-## Process narrative (earlier ~1M-parameter model)
-
-[`PROCESS-OVERVIEW.md`](PROCESS-OVERVIEW.md) (hub), [`PROCESS-DATA-GENERATION.md`](PROCESS-DATA-GENERATION.md),
-[`PROCESS-VCM-MODEL.md`](PROCESS-VCM-MODEL.md), [`PROCESS-WAKEWORD.md`](PROCESS-WAKEWORD.md),
-[`PROCESS-STREAMING-SERVING.md`](PROCESS-STREAMING-SERVING.md).
-
 ## Data generation and project history
 
-[`ACCENT-BALANCE-FIL50-COMMANDS.md`](ACCENT-BALANCE-FIL50-COMMANDS.md) (the earlier fil50 rebalance), [`adding-a-tts-backend.md`](adding-a-tts-backend.md),
+[`adding-a-tts-backend.md`](adding-a-tts-backend.md),
 [`MLOPS-PROJECTS.md`](MLOPS-PROJECTS.md) (dataset iterations and decisions), [`KAGGLE.md`](KAGGLE.md), [`BACKLOG.md`](BACKLOG.md),
-[`20260925_suggestions.md`](20260925_suggestions.md), `raw_requirements/` and `research/` (original planning notes, read-only).
+`raw_requirements/` and `research/` (original planning notes, read-only).
 
-Dates matter here: the PROCESS docs and the README status table describe the model as of late September; the current model is the one in `CURRENT-MODEL.md`.
+## Archive (the earlier ~1M-parameter model and its design notes)
+
+Everything in [`archive/`](archive/) describes the earlier model (`option-d-fil50-ambient-rir-135m`, a 1 MB QuartzNet student) or the process that produced it. It is kept for reference and is not maintained.
+
+| Doc | What it holds |
+|---|---|
+| [`archive/README-EARLIER-MODEL.md`](archive/README-EARLIER-MODEL.md) | The main README's earlier-model part: project background, 2026-09-26 status table, TTS data generation, the toy VCM, Option B grammar, first wake word, VCMX serving, streaming inference, UI site |
+| [`archive/PROCESS-OVERVIEW.md`](archive/PROCESS-OVERVIEW.md) (hub), [`PROCESS-DATA-GENERATION.md`](archive/PROCESS-DATA-GENERATION.md), [`PROCESS-VCM-MODEL.md`](archive/PROCESS-VCM-MODEL.md), [`PROCESS-WAKEWORD.md`](archive/PROCESS-WAKEWORD.md), [`PROCESS-STREAMING-SERVING.md`](archive/PROCESS-STREAMING-SERVING.md) | The process narrative, as of late September |
+| [`archive/QUARTZNET-STUDENT.md`](archive/QUARTZNET-STUDENT.md), [`QUARTZNET-OPERATING-POINT.md`](archive/QUARTZNET-OPERATING-POINT.md) | The 1 MB QuartzNet model, its threshold and margin |
+| [`archive/CASCADE-SOAK-TEST.md`](archive/CASCADE-SOAK-TEST.md) | The earlier wake-word -> VCM cascade soak test (the current soak is [`SOAK-TEST.md`](SOAK-TEST.md)) |
+| [`archive/DENSE-SCORING-DECISION.md`](archive/DENSE-SCORING-DECISION.md) | Per-character scoring trial (not adopted) |
+| [`archive/ACCENT-BALANCE-FIL50-COMMANDS.md`](archive/ACCENT-BALANCE-FIL50-COMMANDS.md), [`20260925_suggestions.md`](archive/20260925_suggestions.md) | The earlier fil50 rebalance and the 2026-09-25 re-architecture notes |
+
+Dates matter in the remaining docs too: the model-history docs (`MLOPS-PROJECTS.md`, `KAGGLE.md`, `BACKLOG.md`) are as of late September; the current model is the one in `CURRENT-MODEL.md`.

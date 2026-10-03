@@ -130,7 +130,7 @@ Same 4 ambient files (3.296 h total), same CLI and INT8 ONNX path, but with
 operating point (mean_frame, threshold -0.1, margin 20.0). One deliberate
 difference from the optiond commands above: `--required-command-margin 20.0`
 is **included**, because it is the calibrated gate for this checkpoint
-(docs/QUARTZNET-OPERATING-POINT.md section 2); the optiond runs above omitted
+(docs/archive/QUARTZNET-OPERATING-POINT.md section 2); the optiond runs above omitted
 it on purpose. The optiond P3b baseline (303) was measured at margin 4.0, so
 the margin settings differ between the two columns -- stated, not hidden.
 

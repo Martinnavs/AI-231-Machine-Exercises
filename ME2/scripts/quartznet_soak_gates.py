@@ -5,7 +5,7 @@ stride-2 run dir and ticket 02's chosen operating point (mean_frame,
 threshold -0.1, margin 20.0). Replays the identical soak audio
 (raw_datasets/ambient-noise/) and the same 821 composed test clips the
 optiond dense pilot used, so every count is directly comparable to the
-optiond baselines in docs/CASCADE-SOAK-TEST.md / docs/DENSE-SCORING-DECISION.md.
+optiond baselines in docs/archive/CASCADE-SOAK-TEST.md / docs/archive/DENSE-SCORING-DECISION.md.
 
 Optiond baselines on this exact audio/clips (reference only):
   P3  cascade `period: ACCEPT` total: 0 (vacuous -- wakeword never opened)

@@ -15,7 +15,7 @@ of unfinished phrases, and the CTC blank signal that the new streaming mode uses
 So the feature is a **hybrid**: keep the CTC head and add an attention-pooled intent head and slot heads on
 the same encoder, trained jointly. CTC keeps endpointing and rejection; the classifier is evaluated as a
 cross-check and as a way to cut the beam-search cost (the beam search is about 84 ms of the 135 ms p50 per
-window with QuartzNet INT8; `docs/QUARTZNET-STUDENT.md`).
+window with QuartzNet INT8; `docs/archive/QUARTZNET-STUDENT.md`).
 
 The feature also answers one open question cheaply: *is a classifier competitive on this data at all?* (run B,
 ticket 02).
@@ -25,7 +25,7 @@ ticket 02).
 - **D-1 Hybrid, not replacement.** The CTC head, decoder, grammar, noisy gate and streaming policies stay.
 - **D-2 Baseline** = the existing stride-2 QuartzNet, seed 0: `out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m`.
   Same data (`out/conversions/v2/optionb-v3-vcmx-fil50-ambient/manifest.csv`), recipe (all `vcm.train` defaults,
-  `--p-rir 0.7`, `--max-minutes 135`, `--seed 0`) and gates as `docs/QUARTZNET-STUDENT.md`.
+  `--p-rir 0.7`, `--max-minutes 135`, `--seed 0`) and gates as `docs/archive/QUARTZNET-STUDENT.md`.
 - **D-3 Label space (verified 2026-10-02 from `OPTIONB_GRAMMAR` and the manifest):**
   - intent head: 21 classes = the 19 Option B intents + `unknown` (manifest `label` of babble rows) + `silence`.
     Manifest `label` values already are these strings, so no relabeling.

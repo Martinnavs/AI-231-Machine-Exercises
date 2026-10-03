@@ -22,7 +22,7 @@
      `out/vcm/quartznet5x3-heads-fil50-ambient-rir-135m`.
    - **Run B:** same, `--ctc-weight 0` (classifier-only; the CTC head gets no gradient), out dir
      `out/vcm/quartznet5x3-heads-only-fil50-ambient-rir-135m`. Answers "is a classifier competitive?".
-   - Smoke each for 5 minutes first (as in `docs/QUARTZNET-STUDENT.md`); record seconds per epoch.
+   - Smoke each for 5 minutes first (as in `docs/archive/QUARTZNET-STUDENT.md`); record seconds per epoch.
 
 ## Acceptance criteria
 

@@ -70,7 +70,7 @@ than the 3 s mode, and latency p50 <= 0.5 s and p95 <= 0.9 s.
 
 ## Incomplete-prefix margin in streaming mode
 
-The whole-clip recalibration on the `quartznet-promotion` branch (`docs/QUARTZNET-OPERATING-POINT.md`)
+The whole-clip recalibration on the `quartznet-promotion` branch (`docs/archive/QUARTZNET-OPERATING-POINT.md`)
 picked margin 20.0 at threshold -0.01 for the 3 s mode. This mode was swept separately on val (hold 200 ms,
 stable 1, threshold -0.1), with the rule fixed beforehand: most correct first triggers among margins with no
 more wrong-intent triggers than the 3 s baseline, then fewest wrong-intent triggers within 0.5 pp, then p95.

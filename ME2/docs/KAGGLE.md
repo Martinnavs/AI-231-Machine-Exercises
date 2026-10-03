@@ -8,7 +8,7 @@ make experiment     # train -> eval (clean + noisy gate) -> INT8 export/bench ->
 # or: make kaggle   # both
 ```
 
-`make experiment` defaults to the QuartzNet recipe in `docs/QUARTZNET-STUDENT.md` ("Reproducing"): preset `quartznet5x3`, seed 0, 135 min,
+`make experiment` defaults to the QuartzNet recipe in `docs/archive/QUARTZNET-STUDENT.md` ("Reproducing"): preset `quartznet5x3`, seed 0, 135 min,
 `--p-rir 0.7`, train on `optionb-v3-vcmx-fil50-ambient`, gate on `optionb-v3-vcmx-fil50` (`optionb` grammar, beam 50, noisy seed 0).
 
 ## One-time / per-change, on this machine

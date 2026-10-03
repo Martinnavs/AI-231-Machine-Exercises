@@ -116,10 +116,10 @@ APP_PIPELINE_THRESHOLD ?= -0.075
 APP_PIPELINE_MARGIN ?= 4.0
 APP_PIPELINE_SCORE_MODE ?= mean_frame
 # Opt-in trial threshold for `make app-pipeline-perchar` (per-character scale, ~-1; see
-# docs/DENSE-SCORING-DECISION.md for the safe range).
+# docs/archive/DENSE-SCORING-DECISION.md for the safe range).
 APP_PERCHAR_THRESHOLD ?= -1.204
 # `app-pipeline-quartznet` operating point (quartznet-promotion ticket 02,
-# docs/QUARTZNET-OPERATING-POINT.md): -0.1 is the seed-0 clean-val Youden
+# docs/archive/QUARTZNET-OPERATING-POINT.md): -0.1 is the seed-0 clean-val Youden
 # choice with full test gates in
 # out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/metadata/eval_report.json;
 # 20.0 is the incomplete-prefix gate's val selection on the real-target
@@ -293,7 +293,7 @@ app-pipeline:
 
 # OPT-IN TRIAL (dense-d2-loose-impl): the same pipeline scored per character
 # instead of per frame, no incomplete-prefix margin gate. NOT the production
-# setting -- see docs/DENSE-SCORING-DECISION.md for the evidence, caveats, and
+# setting -- see docs/archive/DENSE-SCORING-DECISION.md for the evidence, caveats, and
 # what to report back. Rollback = use `make app-pipeline` (unchanged defaults).
 app-pipeline-perchar:
 	$(MAKE) app-pipeline APP_PIPELINE_SCORE_MODE=per_char APP_PIPELINE_THRESHOLD=$(APP_PERCHAR_THRESHOLD) APP_PIPELINE_MARGIN=
@@ -301,7 +301,7 @@ app-pipeline-perchar:
 # quartznet-promotion ticket 01: the same pipeline serving the stride-2
 # QuartzNet-5x3-tiny INT8 export at ticket 02's recalibrated operating point
 # (APP_QUARTZNET_THRESHOLD/APP_QUARTZNET_MARGIN,
-# docs/QUARTZNET-OPERATING-POINT.md); the default `make app-pipeline` above is
+# docs/archive/QUARTZNET-OPERATING-POINT.md); the default `make app-pipeline` above is
 # unchanged. Run `make quartznet-eval-report` first so the run dir's
 # metadata/eval_report.json exists (see that target).
 app-pipeline-quartznet:

@@ -165,7 +165,7 @@ Set before training in `.scratch/quartznet-ctc/tickets/00-RECAP.md`, against see
   `vcm/optionb/incomplete_probes.py`) and give wrong time values on a strided model. Neither is on the
   evaluation or streaming gate path.
 - **No real-audio soak.** The 8-hour cascade soak validated `optiond` only
-  (`docs/CASCADE-SOAK-TEST.md`). QuartzNet has synthetic noisy-gate evidence only.
+  (`docs/archive/CASCADE-SOAK-TEST.md`). QuartzNet has synthetic noisy-gate evidence only.
 - **No Pi measurement.** All latency figures are from a shared EPYC server. Raspberry Pi 4/5 end-to-end p95,
   fresh-process RSS and dropped streaming windows are untested.
 - **Only two seeds** for the main comparison and one for the ablations; INT8 size and latency were measured on

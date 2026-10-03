@@ -225,7 +225,7 @@ checkpoint. Clean val `_wakeword_` recall 0.9926 — on par with `wakeword-sesam
 inside the ≤20 ms/100 ms-frame budget.
 
 **Cascade soak test (2026-09-29, real hardware, ~8 cumulative hours):**
-`docs/CASCADE-SOAK-TEST.md` runs the actual `me2_voicegen.vcm.streaming` cascade
+`docs/archive/CASCADE-SOAK-TEST.md` runs the actual `me2_voicegen.vcm.streaming` cascade
 (`ListeningGate`/`wakeword_gate.py` → VCM, the two newly-promoted checkpoints) against
 real podcast/ambience recordings (`raw_datasets/ambient-noise/`) containing zero genuine
 "sesame" utterances — this measures the real end-to-end false-action rate, not the two

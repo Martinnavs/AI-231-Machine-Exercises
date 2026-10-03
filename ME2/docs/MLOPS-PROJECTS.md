@@ -1,6 +1,6 @@
 # MLOps Projects — dataset iterations, yields, and decisions
 
-Per `docs/20260925_suggestions.md` §1: "All dataset iterations and yields must be
+Per `docs/archive/20260925_suggestions.md` §1: "All dataset iterations and yields must be
 tracked verbatim in the MLOps Projects file." Every entry below records raw numbers
 as measured (no rounding beyond what the source artifact shows). Update the matching
 iteration's **Results** section when a run completes; do not edit historical entries —
@@ -674,7 +674,7 @@ collapse entirely and produce the best-performing sesame checkpoint measured to 
   wakeword p50 0.14-0.31ms).
 
 **Cascade soak test (2026-09-29, real hardware, ~8 cumulative hours,
-`docs/CASCADE-SOAK-TEST.md`):** the promotion above rested on each checkpoint's own
+`docs/archive/CASCADE-SOAK-TEST.md`):** the promotion above rested on each checkpoint's own
 *isolated* noisy-gate FAR; multiplying VCM's 0.039 by wakeword's 0.040 (`_unknown_` miss
 rate under noise) gives an estimated ~0.16% compound false-action rate assuming
 independence — never actually measured end to end. This test runs the real
@@ -765,7 +765,7 @@ of the old manifest at another seed to size run-to-run noise. Checkpoint is **no
 
 ## quartznet-ctc — QuartzNet-5x3-tiny stride-2 student vs. `optiond` (COMPLETE, PROMOTION PENDING)
 
-Full write-up: `docs/QUARTZNET-STUDENT.md`. A 911k-parameter QuartzNet-style CTC model with 2x temporal subsampling,
+Full write-up: `docs/archive/QUARTZNET-STUDENT.md`. A 911k-parameter QuartzNet-style CTC model with 2x temporal subsampling,
 trained with `optiond`'s exact data and recipe, beat `optiond` in both seeds on the fixed-seed noisy gate
 (two-seed mean noisy exact 97.8% vs. 94.8%; noisy babble FA 1 and 1 vs. 10 and 3), exports a smaller INT8 file
 (994,898 B vs. 1,042,226 B), and runs end to end 0.55x as long (p50 134.7 vs. 245.7 ms on EPYC, beam 50) because the

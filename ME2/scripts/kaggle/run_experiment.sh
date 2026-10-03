@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Full experiment: train -> eval (clean + fixed-seed noisy gate) -> INT8 export/bench
 # -> end-to-end latency -> RESULTS.md -> packaged tarball. Mirrors the recipe in
-# docs/QUARTZNET-STUDENT.md "Reproducing".
+# docs/archive/QUARTZNET-STUDENT.md "Reproducing".
 #
 # Stages are resumable at stage granularity (a stage that finished is skipped on re-run;
 # training itself has no mid-run resume, so an interrupted `train` restarts from scratch).

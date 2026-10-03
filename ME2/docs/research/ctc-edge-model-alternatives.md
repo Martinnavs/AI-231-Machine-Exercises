@@ -3,7 +3,7 @@
 > **Outcome (2026-10-01):** the proposed QuartzNet student was built and measured, and beat the
 > production `optiond` model on the noisy gate, size and latency in two seeds. Width ended at 192 channels
 > (911k parameters), set by the INT8 size gate, and the baseline was `optiond` rather than `optionc`. See
-> `docs/QUARTZNET-STUDENT.md`.
+> `docs/archive/QUARTZNET-STUDENT.md`.
 
 Research date: 2026-09-22
 

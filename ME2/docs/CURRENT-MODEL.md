@@ -182,4 +182,4 @@ Perturbed gate = `vcm.noisy_eval` (RIR + dataset noise at fixed seed 0, no babbl
 3. [`CTC-ATTENTION.md`](CTC-ATTENTION.md): the heads architecture, joint loss, perturbation table, v2 results on the ai231 data.
 4. [`SOAK-TEST.md`](SOAK-TEST.md), [`STREAMING-CONTRACT.md`](STREAMING-CONTRACT.md), [`WAKEWORD-SLIDING.md`](WAKEWORD-SLIDING.md): the soak test, the streaming policy, gate and replay.
 5. [`OPTIONB-GRAMMAR-CONTRACT.md`](OPTIONB-GRAMMAR-CONTRACT.md), [`INCOMPLETE-GRAMMAR-REJECTION.md`](INCOMPLETE-GRAMMAR-REJECTION.md): the grammar and the margin gate.
-6. [`PROCESS-OVERVIEW.md`](PROCESS-OVERVIEW.md) and the other `PROCESS-*` docs: the older end-to-end narrative (describes the earlier ~1M-parameter model).
+6. [`PROCESS-OVERVIEW.md`](archive/PROCESS-OVERVIEW.md) and the other `PROCESS-*` docs: the older end-to-end narrative (describes the earlier ~1M-parameter model).

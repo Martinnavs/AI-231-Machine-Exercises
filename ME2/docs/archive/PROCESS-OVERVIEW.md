@@ -10,7 +10,7 @@ The system in one sentence: **a DS-CNN listens for "computer"; once triggered, a
 CTC model decodes speech into one of a fixed set of intents/slots, constrained to a hand-written
 grammar so it can never emit an out-of-vocabulary sentence.**
 
-> **Update (2026-10-03):** the current model is no longer the ~1M-parameter model described below; see [`CURRENT-MODEL.md`](CURRENT-MODEL.md). This narrative is still correct for the data pipeline, grammar, decode gates, wake word and streaming runtime.
+> **Update (2026-10-03):** the current model is no longer the ~1M-parameter model described below; see [`CURRENT-MODEL.md`](../CURRENT-MODEL.md). This narrative is still correct for the data pipeline, grammar, decode gates, wake word and streaming runtime.
 
 Read this doc first, then the process doc for whichever stage you're touching:
 

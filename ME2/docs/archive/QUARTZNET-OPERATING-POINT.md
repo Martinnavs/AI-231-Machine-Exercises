@@ -2,7 +2,7 @@
 
 Date: 2026-10-01 · Worktree branch `quartznet-promotion` · Checkpoint
 `out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m` (seed 0, width 192, stride 2;
-`docs/QUARTZNET-STUDENT.md` for the model comparison). The three accept/reject
+`docs/archive/QUARTZNET-STUDENT.md` for the model comparison). The three accept/reject
 knobs were tuned on the production MatchboxCTC model (`optiond`,
 `out/vcm/option-d-fil50-ambient-rir-135m`) and depend on posterior frame count
 or raw beam mass, so each was re-measured on the seed-0 QuartzNet checkpoint
@@ -27,7 +27,7 @@ Youden sweep on the fil50 manifest (3,330 val targets, 738 reject probes):
 reject FA 8/738, J 0.97565 (the sweep's choice, matching the seed-0 gate eval).
 
 Test split (3,494 targets, 255 babble, 324 silence), same fixed-seed noisy
-perturbation as `docs/QUARTZNET-STUDENT.md`:
+perturbation as `docs/archive/QUARTZNET-STUDENT.md`:
 
 | point | clean exact | clean babble FA | clean silence FA | noisy exact | noisy babble FA | noisy silence FA |
 |---|---|---|---|---|---|---|
@@ -39,7 +39,7 @@ Pre-registered floors (G1/G2): noisy exact >= 0.9524, noisy babble FA <= 10/255.
 Both QuartzNet points clear both floors by wide margins.
 
 **Chosen: -0.1.** It is the point the QuartzNet clean-val Youden sweep selects
-(and the threshold at which every gate in `docs/QUARTZNET-STUDENT.md` was
+(and the threshold at which every gate in `docs/archive/QUARTZNET-STUDENT.md` was
 measured), it is not at a grid edge, and it dominates -0.075 on recall at both
 conditions (clean +5 exact, noisy +26 exact) for a negligible false-accept
 increase (noisy babble 0 -> 1, still 1/10 of optiond's 10/255; noisy silence
@@ -94,7 +94,7 @@ non-digital-zero probe FAR (35/2648 -> 15/2648; all-probe FAR 325/10,688 ->
 target exact is +2 clips above the optiond reference at baseline (116 vs 114).
 
 **Is 4.0 still adequate? No -- it is no longer the calibrated value.** Two
-structural findings, both consistent with `docs/QUARTZNET-STUDENT.md`'s reading
+structural findings, both consistent with `docs/archive/QUARTZNET-STUDENT.md`'s reading
 that the 20 ms frame rate cleans up the per-frame mass structure:
 
 1. QuartzNet rejects incomplete prefixes intrinsically. Gate-off val FAR is
@@ -136,7 +136,7 @@ PYTHONPATH=<worktree>/ME2/src uv run python -m me2_voicegen.vcm.incomplete_calib
 `evaluate --score-mode per_char` sweeps `PER_CHAR_THRESHOLD_GRID` on val and
 reports the test split at its Youden choice (optiond reference: -1.1 chosen,
 -1.204 the shipped trial point, band -1.1 .. -1.3 per
-`docs/DENSE-SCORING-DECISION.md`). Optiond baselines: C2 (-1.204) removed all
+`docs/archive/DENSE-SCORING-DECISION.md`). Optiond baselines: C2 (-1.204) removed all
 test clean/noisy FAs, 17 VCM-only soak triggers vs 303 at B, 737/821 first-trigger
 recall vs 720.
 
@@ -157,7 +157,7 @@ Test at the optiond-shipped point -1.204 (same seed, fixed grid,
 | QuartzNet -1.204 (optiond's point) | 3477 (0.995) | 1/255 | 0/324 | 3452 (0.988) | 2/255 | 1/324 |
 | optiond C2 -1.204 (reference) | - | 0/255 | 0/324 | - | 0/255 | 0/324 |
 
-(optiond C2 row: `docs/DENSE-SCORING-DECISION.md` -- "removed all test
+(optiond C2 row: `docs/archive/DENSE-SCORING-DECISION.md` -- "removed all test
 clean/noisy FAs, 17 VCM-only soak triggers vs 303 at B, 737/821 first-trigger
 recall vs 720".) So -1.204 sits inside the plausible band and satisfies the
 D2 val FA-budget rule on QuartzNet, but unlike optiond it leaves a small

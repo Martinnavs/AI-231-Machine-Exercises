@@ -8,7 +8,7 @@ followed by a real command clip:
 The room tone is a same-split `silence`-bucket clip from the VCM manifest
 (looped to length), mixed under the speech at SNR U[15, 25] dB relative to
 the command. Command selection matches the earlier streaming recall check
-(the P4 check in docs/DENSE-SCORING-DECISION.md): every PAUSE/STOP/TIME clip of the split
+(the P4 check in docs/archive/DENSE-SCORING-DECISION.md): every PAUSE/STOP/TIME clip of the split
 plus the first 30 of each other intent, in manifest order.
 
 The true end of the command's speech is found by CTC forced alignment of the
