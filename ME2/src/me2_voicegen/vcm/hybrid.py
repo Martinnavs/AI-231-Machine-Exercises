@@ -212,3 +212,34 @@ def load_hybrid_part(path, role: str):
     from me2_voicegen.vcm.pipeline import load_checkpoint
 
     return load_checkpoint(path, device="cpu", weights_only=True)[0]
+
+
+_FEATURES = None
+
+
+@torch.no_grad()
+def classifier_result(heads, waveform, threshold: float):
+    """Classifier-head answer for one window as a `DecodeResult` (the streaming policy's override), or None when the head
+    rejects (top class is unknown/silence or below `threshold`). `heads`: an `OnnxHeads` or a heads checkpoint."""
+    import math
+
+    import numpy as np
+
+    from me2_voicegen.vcm.decoder import DecodeResult
+
+    global _FEATURES
+    if _FEATURES is None:
+        _FEATURES = LogMelFeatureExtractor()
+    wav = torch.as_tensor(np.asarray(waveform, dtype=np.float32))
+    head = heads.forward_heads(_FEATURES(wav).unsqueeze(0))
+    probs = head.intent_logits[0].softmax(-1)
+    k = int(probs.argmax())
+    name = INTENT_CLASSES[k]
+    if name in EXTRA_INTENT_CLASSES or float(probs[k]) < threshold:
+        return None
+    slots = {}
+    if name in SLOTS:
+        slot_name, values = SLOTS[name]
+        slots = {slot_name: values[int(head.slot_logits[slot_head_name(name)][0].argmax())]}
+    return DecodeResult(intent=name, slots=slots, text="[classifier]", confidence=math.log(float(probs[k])),
+                        no_match=False, out_of_grammar_gap=0.0)

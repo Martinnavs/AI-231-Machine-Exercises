@@ -315,3 +315,45 @@ def test_replay_summary_scoring():
     assert s["latency_s"]["p50"] == pytest.approx(0.4)
     assert s["per_focus"]["STOP"] == [1, 1] and s["per_focus"]["PAUSE"] == [0, 1]
     assert s["decodes_per_session_mean"] == 8.0
+
+
+# --- hybrid: classifier fallback when the CTC does not accept ---------------------
+
+
+def _fallback(answer: Optional[DecodeResult], calls: list):
+    def f(waveform):
+        calls.append(waveform.shape)
+        return answer
+    return f
+
+
+def test_fallback_answers_when_ctc_rejects_after_longer_hold():
+    calls: list = []
+    policy = _policy(_Gate(open_at=0), fallback=_fallback(_result("PAUSE", confidence=-0.05), calls))
+    lp = _logp("pause song", 120, trailing_blank=60)  # 300 ms of speech, 600 ms of blank >= 500 ms fallback hold
+    decision = policy.observe(_obs(1, _result(None), lp))
+    assert decision.accept and decision.result.intent == "PAUSE" and "classifier fallback" in decision.reason
+    assert len(calls) == 1
+
+
+def test_fallback_waits_for_its_own_hold_and_needs_speech():
+    calls: list = []
+    policy = _policy(_Gate(open_at=0), fallback=_fallback(_result("PAUSE"), calls))
+    short_tail = _logp("pause song", 120, trailing_blank=35)  # 350 ms: enough for the CTC hold, not the fallback's
+    assert not policy.observe(_obs(1, _result(None), short_tail)).accept
+    silent = _logp("", 120, trailing_blank=120)  # no speech in the window
+    assert not policy.observe(_obs(2, _result(None), silent)).accept
+    assert calls == []
+
+
+def test_fallback_rejection_and_ctc_path_unchanged():
+    calls: list = []
+    policy = _policy(_Gate(open_at=0), fallback=_fallback(None, calls))
+    lp = _logp("pause song", 120, trailing_blank=60)
+    decision = policy.observe(_obs(1, _result(None), lp))
+    assert not decision.accept and "fallback rejected" in decision.reason and len(calls) == 1
+    # a confident CTC result still goes through stability + endpoint, never the classifier
+    policy2 = _policy(_Gate(open_at=0), fallback=_fallback(_result("STOP"), calls := []))
+    ended = _logp("stop", 60, trailing_blank=40)
+    assert not policy2.observe(_obs(1, _result("PAUSE"), ended)).accept
+    assert policy2.observe(_obs(2, _result("PAUSE"), ended)).result is None and calls == []

@@ -284,6 +284,9 @@ class EndpointedPeriodPolicy(ThresholdPolicy):
         hold_ms: float = 300.0,
         blank_floor: float = 0.9,
         on_period_event: Optional[PeriodEventCallback] = None,
+        fallback: Optional[Callable[[np.ndarray], Optional[DecodeResult]]] = None,
+        fallback_hold_ms: float = 500.0,
+        fallback_min_speech_ms: float = 200.0,
     ) -> None:
         super().__init__(threshold)
         if stable_strides < 1:
@@ -300,6 +303,11 @@ class EndpointedPeriodPolicy(ThresholdPolicy):
         self.hold_s = hold_ms / 1000.0
         self.log_blank_floor = float(np.log(blank_floor))
         self._on_period_event = on_period_event
+        # Hybrid (docs/AI231-FIL50.md): when the CTC decode has not accepted, the speech has ended (a longer hold than the
+        # CTC's) and the window holds enough non-blank frames, ask `fallback` (the classifier heads) once per window.
+        self._fallback = fallback
+        self.fallback_hold_s = fallback_hold_ms / 1000.0
+        self.fallback_min_speech_s = fallback_min_speech_ms / 1000.0
         self.reset()
 
     def reset(self) -> None:
@@ -350,21 +358,35 @@ class EndpointedPeriodPolicy(ThresholdPolicy):
             return None
         return PeriodRequest(max(self._anchor, samples_seen - self.window_samples), samples_seen)
 
-    def _ended(self, obs: WindowObservation) -> bool:
+    def _ended(self, obs: WindowObservation, hold_s: Optional[float] = None) -> bool:
         if obs.logp is None or obs.waveform is None or obs.logp.shape[0] == 0:
             return False
         n_frames = obs.logp.shape[0]
         frame_s = obs.waveform.shape[-1] / SAMPLE_RATE / n_frames
-        hold_frames = max(1, int(np.ceil(self.hold_s / frame_s - 1e-9)))
+        hold_frames = max(1, int(np.ceil((self.hold_s if hold_s is None else hold_s) / frame_s - 1e-9)))
         if hold_frames > n_frames:
             return False
         return bool(np.all(obs.logp[-hold_frames:, BLANK_ID] >= self.log_blank_floor))
+
+    def _speech_s(self, obs: WindowObservation) -> float:
+        if obs.logp is None or obs.waveform is None or obs.logp.shape[0] == 0:
+            return 0.0
+        frame_s = obs.waveform.shape[-1] / SAMPLE_RATE / obs.logp.shape[0]
+        return float(np.sum(obs.logp[:, BLANK_ID] < self.log_blank_floor)) * frame_s
+
+    def _try_fallback(self, obs: WindowObservation, base: PolicyDecision) -> PolicyDecision:
+        if self._fallback is None or not self._ended(obs, self.fallback_hold_s) or self._speech_s(obs) < self.fallback_min_speech_s:
+            return base
+        result = self._fallback(obs.waveform)
+        if result is None:
+            return PolicyDecision(accept=False, reason=f"{base.reason}; classifier fallback rejected")
+        return PolicyDecision(accept=True, reason=f"endpointed: classifier fallback ({base.reason})", result=result)
 
     def observe(self, obs: WindowObservation) -> PolicyDecision:
         base = super().observe(obs)
         if not base.accept:
             self._last_key, self._streak = None, 0
-            return base
+            return self._try_fallback(obs, base)
         key = (obs.result.intent, tuple(sorted(obs.result.slots.items())))
         self._streak = self._streak + 1 if key == self._last_key else 1
         self._last_key = key

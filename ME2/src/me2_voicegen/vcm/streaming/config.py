@@ -128,6 +128,10 @@ _FIELD_TYPES: dict[str, type] = {
     "stable_strides": int,
     "hold_ms": float,
     "blank_floor": float,
+    "cls_model": str,
+    "cls_threshold": float,
+    "cls_hold_ms": float,
+    "cls_min_speech_ms": float,
 }
 
 _FIELD_CHOICES: dict[str, tuple[str, ...]] = {
@@ -225,6 +229,11 @@ class StreamingConfig:
     stable_strides: int = 2
     hold_ms: float = 300.0
     blank_floor: float = 0.9
+    # --policy endpointed only: classifier-head fallback (the hybrid, docs/AI231-FIL50.md); off when cls_model is None
+    cls_model: Optional[str] = None
+    cls_threshold: float = 0.8787
+    cls_hold_ms: float = 500.0
+    cls_min_speech_ms: float = 200.0
 
     @classmethod
     def from_json(cls, path: str | Path) -> "StreamingConfig":

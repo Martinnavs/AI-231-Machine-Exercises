@@ -142,6 +142,11 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--stable-strides", dest="stable_strides", type=int, default=None)
     parser.add_argument("--hold-ms", dest="hold_ms", type=float, default=None)
     parser.add_argument("--blank-floor", dest="blank_floor", type=float, default=None)
+    # --policy endpointed: hybrid classifier fallback (heads ONNX from `vcm.export_onnx --heads-only`, or a heads checkpoint)
+    parser.add_argument("--cls-model", dest="cls_model", type=str, default=None)
+    parser.add_argument("--cls-threshold", dest="cls_threshold", type=float, default=None)
+    parser.add_argument("--cls-hold-ms", dest="cls_hold_ms", type=float, default=None)
+    parser.add_argument("--cls-min-speech-ms", dest="cls_min_speech_ms", type=float, default=None)
     parser.add_argument(
         "--wakeword-model",
         dest="wakeword_model",
@@ -280,6 +285,14 @@ def _print_banner(
         print(line, file=out)
 
 
+def _classifier_fallback(path: str, threshold: float):
+    """window waveform -> DecodeResult from the intent/slot heads, or None when the heads reject (`vcm.hybrid`)."""
+    from me2_voicegen.vcm.hybrid import classifier_result, load_hybrid_part
+
+    heads = load_hybrid_part(path, "cls")
+    return lambda waveform: classifier_result(heads, waveform, threshold)
+
+
 def main(argv: Optional[list[str]] = None) -> None:
     args = build_arg_parser().parse_args(argv)
     cfg = StreamingConfig.merge(json_path=args.config, cli_overrides=_cli_overrides(args))
@@ -345,6 +358,8 @@ def main(argv: Optional[list[str]] = None) -> None:
             "stable_strides": cfg.stable_strides,
             "hold_ms": cfg.hold_ms,
             "blank_floor": cfg.blank_floor,
+            **({"fallback": _classifier_fallback(cfg.cls_model, cfg.cls_threshold), "fallback_hold_ms": cfg.cls_hold_ms,
+                "fallback_min_speech_ms": cfg.cls_min_speech_ms} if cfg.cls_model else {}),
         },
     )
 
