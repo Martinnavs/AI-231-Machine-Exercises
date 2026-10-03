@@ -87,7 +87,7 @@ def mix(session: torch.Tensor, active: torch.Tensor, rir: torch.Tensor, noise: t
 
 def build(out_dir: Path, split: str, seed: int, vcm_manifest: Path, wake_manifest: Path, wake_split: str,
           align_checkpoint: Path, rir_pool_size: int, snr_range: tuple[float, float], limit: int | None,
-          sample: int | None = None) -> list[dict]:
+          sample: int | None = None, no_wake: bool = False) -> list[dict]:
     rng = random.Random(f"soak-{seed}")
     rows = [r for r in _read(vcm_manifest) if r["split"] == split]
     if sample is not None:  # a seeded random subset that keeps the command / out-of-scope mix
@@ -109,7 +109,8 @@ def build(out_dir: Path, split: str, seed: int, vcm_manifest: Path, wake_manifes
     for i, row in enumerate(rows):
         command = _load(vcm_manifest.parent / row["path"])
         wake_row = rng.choice(wakes)
-        wake = _load(wake_manifest.parent / wake_row["path"])
+        # --no-wake keeps every random draw (same commands, rooms, noise, SNR, lead) but inserts no wake word and no gap
+        wake = torch.zeros(0) if no_wake else _load(wake_manifest.parent / wake_row["path"])
         noise_row = rng.choice(noises)
         noise = _load(vcm_manifest.parent / noise_row["path"])
         lead_s = rng.randint(5, 15) / 10
@@ -119,7 +120,7 @@ def build(out_dir: Path, split: str, seed: int, vcm_manifest: Path, wake_manifes
         noise_offset = rng.random()
 
         n = lambda s: int(round(s * SAMPLE_RATE))  # noqa: E731
-        lead, gap, tail = (torch.zeros(n(s)) for s in (lead_s, gap_s, TAIL_S))
+        lead, gap, tail = (torch.zeros(n(s)) for s in (lead_s, 0.0 if no_wake else gap_s, TAIL_S))
         session = torch.cat([lead, wake, gap, command, tail])
         active = torch.zeros(session.numel(), dtype=torch.bool)
         wake_start = lead.numel()
@@ -138,7 +139,7 @@ def build(out_dir: Path, split: str, seed: int, vcm_manifest: Path, wake_manifes
             "transcript": resolve_transcript(row) if is_command else row.get("transcript", ""),
             "command_filename": row["filename"], "wakeword_filename": wake_row["filename"],
             "noise_filename": noise_row["filename"], "rir_index": rir_i, "snr_db": snr_db,
-            "lead_s": lead_s, "gap_s": gap_s,
+            "lead_s": lead_s, "gap_s": 0.0 if no_wake else gap_s,
             "wake_start_s": round(wake_start / SAMPLE_RATE, 4),
             "wake_end_s": round((wake_start + wake.numel()) / SAMPLE_RATE, 4),
             "command_start_s": round(command_start / SAMPLE_RATE, 4),
@@ -172,9 +173,10 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--snr-max", type=float, default=25.0)
     p.add_argument("--limit", type=int, default=None)
     p.add_argument("--sample", type=int, default=None, help="use a seeded random subset of this many rows (for a tuning soak from val)")
+    p.add_argument("--no-wake", action="store_true", help="no wake word and no gap: the command follows the lead directly (for --gate always soaks)")
     a = p.parse_args(argv)
     s = build(a.out_dir, a.split, a.seed, a.vcm_manifest, a.wakeword_manifest, a.wake_split, a.align_checkpoint,
-              a.rir_pool_size, (a.snr_min, a.snr_max), a.limit, a.sample)
+              a.rir_pool_size, (a.snr_min, a.snr_max), a.limit, a.sample, a.no_wake)
     gaps = sorted({x["gap_s"] for x in s})
     print(f"wrote {len(s)} sessions to {a.out_dir}; gaps used {gaps[0]}-{gaps[-1]} s ({len(gaps)} distinct); "
           f"{sum(x['is_oos'] for x in s)} out-of-scope; {sum(not x['aligned'] for x in s if not x['is_oos'])} commands not aligned")

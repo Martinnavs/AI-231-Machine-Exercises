@@ -36,6 +36,58 @@ Soak: 186 holdout commands + 16 out-of-scope clips behind a wake word, reverb an
 | Decode per window, mean / p95 | **443 / 764 ms** | 70 / 126 ms |
 | Real-time factor, p95 (1 = live limit) | **3.21** | 0.53 |
 
+What the soak table means in plain terms (the answers are identical on the Pi and the server, only the speed differs; counts from `soak/holdout-wake-gap-v1/results/rpi4.md`):
+
+**Commands: detected correctly or not** (186 spoken commands, each after "sesame"):
+
+| Outcome | Count | Share |
+| --- | ---: | ---: |
+| Correct: right intent and right slot (e.g. "timer 10 seconds") | 151 | 81.2% |
+| Wrong action: it answered, but with the wrong intent or slot | 9 | 4.8% |
+| Missed: no answer at all | 26 | 14.0% |
+| ...of which the wake word never opened a listening period | 5 | 2.7% |
+| ...of which the period opened but the command was rejected or timed out | 21 | 11.3% |
+
+A wrong action is the costly error (the device does the wrong thing); a miss only means the user repeats the command.
+
+**Pure CTC (no classifier fallback) on the same soak**, server CPU INT8, one thread, same tuned wake word (`soak/holdout-wake-gap-v1/results/tuned-cpu-onnx-int8-ctc-only.md`; not run on the Pi, but the answers don't depend on hardware):
+
+| | Hybrid (above) | Wide CTC alone |
+| --- | ---: | ---: |
+| Correct intent and slot | 151 (81.2%) | 137 (73.7%) |
+| Wrong action | 9 (4.8%) | 3 (1.6%) |
+| Missed | 26 (14.0%) | 46 (24.7%) |
+| ...wake word never opened a period | 5 | 5 |
+| Out-of-scope sentences wrongly triggered | 3 of 16 | 3 of 16 (same three: WEATHER, VOLUME_UP, LIGHT_OFF) |
+| Ambient-noise triggers | 0 | 0 |
+| Latency after end of speech, median / p95 | 0.38 / 0.65 s | 0.37 / 0.48 s |
+| Decode per window, mean / p95 (server CPU) | 70 / 126 ms | 70 / 111 ms |
+
+The classifier fallback turns 14 more commands into correct answers but adds 6 more wrong actions; the pure CTC is more conservative (it rejects what it isn't sure of). Whole-clip, pure-CTC accuracy is in the Performance table above.
+
+**No wake word at all (always listening)**: the "CTC only" row above still had the wake word in front of the decoder. This run removes it: same 202 holdout units, rooms, noise clips and SNRs (seed 0), but no "sesame" and no gap, so every 0.25 s window is decoded (`--gate always`). Audio: `soak/holdout-nowake-v1/` (27.7 min, ~15 min of it noise only); built with `scripts/build_soak_audio.py --no-wake`. Server CPU INT8, one thread; results in `soak/holdout-nowake-v1/results/nowake-*.md`, recipe in its README.
+
+| | Wide CTC alone | Hybrid |
+| --- | ---: | ---: |
+| Correct intent and slot (of 186) | 143 (76.9%) | 165 (88.7%) |
+| Wrong action | 5 (2.7%) | 7 (3.8%) |
+| Missed | 38 (20.4%) | 14 (7.5%) |
+| Out-of-scope sentences wrongly triggered (of 16) | 4 | 4 (CALL, STOP, CALL, LIGHT_OFF) |
+| Triggers in noise-only audio (~15 min) | 2 (WEATHER, CALL) | 4 (WEATHER, CALL, BRIGHTNESS x2) |
+| Latency after end of speech, median / p95 | 0.33 / 0.47 s | 0.34 / 0.72 s |
+| Decode per window, mean / p95 | 92 / 109 ms | 93 / 119 ms |
+
+Without the wake word the model hears the whole stream, so it answers more commands (no missed wake words) but also fires on noise (2-4 false actions in ~15 min) and on one more out-of-scope sentence. That is the false-action rate the wake word is there to prevent. Decoding every window takes about 4x the compute of the gated runs (~6,300 windows vs ~2,100). Not run on the Pi.
+
+**Noise and non-commands: correctly ignored or not:**
+
+| Input | Total | Correctly ignored | Wrongly triggered |
+| --- | ---: | ---: | ---: |
+| Ambient room noise between commands, no wake word (~15 min) | ~15 min | all of it | **0 triggers** |
+| Out-of-scope speech after a wake word (16 ordinary sentences that are not commands) | 16 | 13 (81%) | 3 (19%): WEATHER, VOLUME_UP, LIGHT_OFF |
+
+The between-command audio is ambient noise clips from the dataset (reverb added), not a separate babble or crowd-talk test. The 3 out-of-scope false triggers are real speech arriving after a wake word, which the wake word cannot filter. Ordinary conversation with no wake word (the case that would cause false wakes) is not measured here.
+
 Caveats: the holdout's human voices are one real Filipino speaker (50% whole-clip, so accent coverage is the weak spot); soak rooms and most noise clips overlap training; false wakes from ordinary speech are not measured.
 All tables, seen-vs-unseen data and the soak history: [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md), [`docs/SOAK-TEST.md`](docs/SOAK-TEST.md).
 
