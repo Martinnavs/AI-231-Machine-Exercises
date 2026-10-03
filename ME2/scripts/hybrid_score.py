@@ -11,17 +11,16 @@ import torch
 
 from me2_voicegen.common.features import LogMelFeatureExtractor
 from me2_voicegen.vcm.dataset import VCMDataset
-from me2_voicegen.vcm.hybrid import hybrid_decode_all
+from me2_voicegen.vcm.hybrid import hybrid_decode_all, load_hybrid_part
 from me2_voicegen.vcm.noisy_eval import apply_perturbation, build_perturbations, build_rir_pool_for_seed
 from me2_voicegen.vcm.optionb.grammar import OPTIONB_GRAMMAR
-from me2_voicegen.vcm.pipeline import load_checkpoint
 from me2_voicegen.vcm.semantic_eval import _slot_truth
 
 
 def score(a) -> None:
     torch.set_num_threads(1)
-    ctc_model, _ = load_checkpoint(a.ctc_checkpoint, device="cpu", weights_only=True)
-    cls_model = ctc_model if a.cls_checkpoint is None else load_checkpoint(a.cls_checkpoint, device="cpu", weights_only=True)[0]
+    ctc_model = load_hybrid_part(a.ctc_checkpoint, "ctc")
+    cls_model = ctc_model if a.cls_checkpoint is None else load_hybrid_part(a.cls_checkpoint, "cls")
     ds = VCMDataset(a.manifest, split=a.split, augmenter=None)
     ex = LogMelFeatureExtractor()
     pert = None

@@ -165,3 +165,50 @@ class HybridDecoder:
             self._bump("both" if ctc_r and cls_r else "only_ctc" if ctc_r else "only_cls" if cls_r else "neither")
             self._bump("final_right") if _answer_ok(decision.intent, decision.slots, *truth) else None
         return decision, trace
+
+
+class _HeadsOut:
+    def __init__(self, intent_logits: torch.Tensor, slot_logits: dict) -> None:
+        self.intent_logits, self.slot_logits = intent_logits, slot_logits
+
+
+class OnnxCtc:
+    """ONNX CTC model (`vcm_model.*.onnx`: features -> logits) usable wherever `hybrid` calls `ctc_model(features)`."""
+
+    def __init__(self, path, threads: int = 1) -> None:
+        import onnxruntime as ort
+
+        so = ort.SessionOptions()
+        so.intra_op_num_threads = threads
+        self.session = ort.InferenceSession(str(path), so, providers=["CPUExecutionProvider"])
+
+    def __call__(self, features: torch.Tensor) -> torch.Tensor:
+        return torch.from_numpy(self.session.run(None, {"features": features.numpy().astype("float32")})[0])
+
+
+class OnnxHeads:
+    """ONNX heads-only model (`vcm_heads.*.onnx` from `vcm.export_onnx --heads-only`) usable as `cls_model` in `hybrid`."""
+
+    def __init__(self, path, threads: int = 1) -> None:
+        import onnxruntime as ort
+
+        so = ort.SessionOptions()
+        so.intra_op_num_threads = threads
+        self.session = ort.InferenceSession(str(path), so, providers=["CPUExecutionProvider"])
+        self.names = [o.name for o in self.session.get_outputs()]
+
+    def forward_heads(self, features: torch.Tensor) -> _HeadsOut:
+        outs = dict(zip(self.names, self.session.run(None, {"features": features.numpy().astype("float32")})))
+        slots = {slot_head_name(n[len("slot_"):]): torch.from_numpy(v) for n, v in outs.items() if n.startswith("slot_")}
+        return _HeadsOut(torch.from_numpy(outs["intent_logits"]), slots)
+
+
+def load_hybrid_part(path, role: str):
+    """`.onnx` -> `OnnxCtc` / `OnnxHeads` (by role); anything else -> the PyTorch checkpoint."""
+    from pathlib import Path
+
+    if Path(path).suffix == ".onnx":
+        return OnnxCtc(path) if role == "ctc" else OnnxHeads(path)
+    from me2_voicegen.vcm.pipeline import load_checkpoint
+
+    return load_checkpoint(path, device="cpu", weights_only=True)[0]

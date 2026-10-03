@@ -12,9 +12,8 @@ import torch
 import torchaudio
 
 from me2_voicegen.common.features import LogMelFeatureExtractor
-from me2_voicegen.vcm.hybrid import HybridDecoder
+from me2_voicegen.vcm.hybrid import HybridDecoder, load_hybrid_part
 from me2_voicegen.vcm.optionb.grammar import OPTIONB_GRAMMAR
-from me2_voicegen.vcm.pipeline import load_checkpoint
 
 
 def main() -> None:
@@ -24,8 +23,8 @@ def main() -> None:
     ap.add_argument("--cls-checkpoint", type=Path, required=True)
     ap.add_argument("--cls-threshold", type=float, default=0.8787, help="val-fit threshold of the xl heads (docs/AI231-FIL50.md)")
     a = ap.parse_args()
-    ctc, _ = load_checkpoint(a.ctc_checkpoint, device="cpu", weights_only=True)
-    cls, _ = load_checkpoint(a.cls_checkpoint, device="cpu", weights_only=True)
+    ctc = load_hybrid_part(a.ctc_checkpoint, "ctc")
+    cls = load_hybrid_part(a.cls_checkpoint, "cls")
     hd = HybridDecoder(ctc, cls, LogMelFeatureExtractor(), OPTIONB_GRAMMAR, cls_threshold=a.cls_threshold, ctc_name="wide", cls_name="xl")
     for w in a.wavs:
         wav, sr = torchaudio.load(str(w))

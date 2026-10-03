@@ -131,6 +131,31 @@ def export_fp32(
     return out_path
 
 
+class HeadsOnly(torch.nn.Module):
+    """Encoder + attention pooling + intent/slot heads, without the CTC output layer (the classifier half of the hybrid).
+    Outputs `intent_logits` (B, 21) and one `slot_<INTENT>` (B, n_values) per slotted intent, in `SLOT_INTENTS` order.
+    Pools over every frame (no lengths), the same call `vcm.hybrid` and `vcm.semantic_eval` make."""
+
+    def __init__(self, model: torch.nn.Module) -> None:
+        super().__init__()
+        from me2_voicegen.vcm.semantic_labels import SLOT_INTENTS, slot_head_name
+
+        self.model = model
+        self.slot_keys = [slot_head_name(i) for i in SLOT_INTENTS]
+        self.output_names = ["intent_logits"] + [f"slot_{i}" for i in SLOT_INTENTS]
+
+    def forward(self, features: torch.Tensor):
+        enc = self.model._encode(features)
+        pooled, _ = self.model.pool(enc, None)
+        return (self.model.intent_head(pooled), *(self.model.slot_heads[k](pooled) for k in self.slot_keys))
+
+
+def export_heads_fp32(model: torch.nn.Module, out_path: str | Path, n_frames: int | None = None) -> Path:
+    wrapper = HeadsOnly(model).eval()
+    axes = {"features": {0: "batch", 2: "time"}, **{n: {0: "batch"} for n in wrapper.output_names}}
+    return export_fp32(wrapper, out_path, n_frames=n_frames, output_names=wrapper.output_names, dynamic_axes=axes)
+
+
 class ValSplitCalibrationReader:
     """`onnxruntime.quantization.CalibrationDataReader`-compatible reader
     sourced from the real `val` split (per this ticket's Unknowns section:
@@ -264,6 +289,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
     parser.add_argument("--out-dir", type=Path, default=None, help="default: out/<family>")
     parser.add_argument("--manifest", type=Path, default=None, help="default: that family's own DEFAULT_MANIFEST")
     parser.add_argument("--calibration-samples", type=int, default=32)
+    parser.add_argument("--heads-only", action="store_true",
+                        help="vcm heads checkpoints: export encoder + intent/slot heads (no CTC output) as vcm_heads.{fp32,int8}.onnx")
     parser.add_argument(
         "--skip-quantization",
         action="store_true",
@@ -319,8 +346,13 @@ def main(argv: list[str] | None = None) -> None:
         reader_cls = ValSplitCalibrationReader
         reader_kwargs = {"manifest_path": args.manifest, "n_samples": args.calibration_samples}
 
+    if getattr(args, "heads_only", False):
+        model_prefix = "vcm_heads"
     fp32_path = export_dir / f"{model_prefix}.fp32.onnx"
-    export_fp32(model, fp32_path, n_frames=n_frames, **export_kwargs)
+    if getattr(args, "heads_only", False):
+        export_heads_fp32(model, fp32_path, n_frames=n_frames)
+    else:
+        export_fp32(model, fp32_path, n_frames=n_frames, **export_kwargs)
     print(f"exported fp32 ONNX -> {fp32_path} ({fp32_path.stat().st_size:,} bytes)")
 
     if args.skip_quantization:
