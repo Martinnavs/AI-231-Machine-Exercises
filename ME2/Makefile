@@ -466,6 +466,34 @@ clean:
 # Kaggle / one-shot experiment workflow (kaggle-setup, experiment, kaggle, ...).
 include kaggle.mk
 
+# Current model (docs/CURRENT-MODEL.md): the hybrid -- wide CTC + XL classifier heads, both INT8 ONNX, checked in under out/vcm/hybrid-ctcwide-clsxl.
+# Not yet the default of `app-pipeline*` (those still point at the older production model).
+HYBRID_DIR ?= out/vcm/hybrid-ctcwide-clsxl
+HYBRID_CTC ?= $(HYBRID_DIR)/ctc-wide/export/vcm_model.int8.onnx
+HYBRID_CLS ?= $(HYBRID_DIR)/cls-xl/export/vcm_heads.int8.onnx
+HYBRID_CLS_THRESHOLD ?= 0.8787
+HYBRID_CLS_SLOT_THRESHOLD ?= 0.6   # slotted intents from the classifier also need this slot-head confidence (tuned on a val soak, docs/SOAK-TEST.md)
+HYBRID_WAKEWORD_THRESHOLD ?= 0.8   # tuned on a val soak (the older default is 0.9)
+SOAK_DIR ?= soak/holdout-wake-gap-v1
+SOAK_NAME ?= run
+SOAK_ARGS ?=
+HYBRID_WAV ?=
+HYBRID_SOURCE ?= mic
+HYBRID_WAKEWORD ?= out/wakeword-sesame-ambient-rir-45m
+.PHONY: hybrid-decode hybrid-stream hybrid-test soak-run
+hybrid-decode: ## Decode HYBRID_WAV="a.wav b.wav" with the hybrid (JSON per clip + which model answered)
+	@test -n "$(HYBRID_WAV)" || { echo "set HYBRID_WAV=\"clip.wav [more.wav]\""; exit 2; }
+	$(UV) run python scripts/hybrid_decode_file.py $(HYBRID_WAV) --ctc-checkpoint $(HYBRID_CTC) --cls-checkpoint $(HYBRID_CLS) --cls-threshold $(HYBRID_CLS_THRESHOLD)
+
+hybrid-stream: ## Hybrid streaming: wake word then command (HYBRID_SOURCE=mic or a wav path)
+	$(UV) run python -m me2_voicegen.vcm.streaming --model $(HYBRID_DIR)/ctc-wide --backend onnx --onnx-variant int8 --grammar optionb --threshold=-0.1 --required-command-margin 4.0 --beam-width 50 --gate wakeword --policy endpointed --gate-period 3 --hold-ms 200 --stable-strides 1 --wakeword-model $(HYBRID_WAKEWORD) --wakeword-backend onnx --wakeword-threshold $(HYBRID_WAKEWORD_THRESHOLD) --wakeword-poll-s 0.05 --log-periods --cls-model $(HYBRID_CLS) --cls-threshold $(HYBRID_CLS_THRESHOLD) --cls-slot-threshold $(HYBRID_CLS_SLOT_THRESHOLD) --source "$(HYBRID_SOURCE)"
+
+soak-run: ## Stream SOAK_DIR/continuous.wav once and score it (SOAK_NAME=..., SOAK_ARGS="--backend torch --device cuda:0 --gpu 5"); results in SOAK_DIR/results/
+	$(UV) run python scripts/soak_run.py --sessions $(SOAK_DIR) --continuous --name $(SOAK_NAME) --wakeword-threshold $(HYBRID_WAKEWORD_THRESHOLD) --cls-slot-threshold $(HYBRID_CLS_SLOT_THRESHOLD) $(SOAK_ARGS)
+
+hybrid-test: ## Tests for the hybrid decoder, the streaming policy and the wake-word gate
+	$(UV) run pytest -q tests/test_vcm_hybrid.py tests/test_vcm_streaming_endpointed.py tests/test_vcm_streaming_wakeword_gate.py tests/test_vcm_streaming_config.py tests/test_vcm_quartznet_heads.py tests/test_vcm_perturbation_plan.py tests/test_soak_run.py
+
 .DEFAULT_GOAL := help
 help: ## List documented targets
 	@grep -hE '^[a-zA-Z0-9_-]+:.*## ' $(MAKEFILE_LIST) | sed -E 's/:[^#]*## /\t/' | sort | awk -F'\t' '{printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
