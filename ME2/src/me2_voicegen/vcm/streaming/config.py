@@ -124,6 +124,7 @@ _FIELD_TYPES: dict[str, type] = {
     "wakeword_backend": str,
     "wakeword_onnx_variant": str,
     "wakeword_threshold": float,
+    "wakeword_poll_s": float,
     "min_audio_s": float,
     "stable_strides": int,
     "hold_ms": float,
@@ -224,6 +225,7 @@ class StreamingConfig:
     wakeword_backend: str = "torch"
     wakeword_onnx_variant: str = "fp32"
     wakeword_threshold: float = DEFAULT_WAKEWORD_THRESHOLD
+    wakeword_poll_s: Optional[float] = None  # None: one wake-word score per decode stride
     # --policy endpointed only (gate_period_s is its time-out)
     min_audio_s: float = 0.3
     stable_strides: int = 2

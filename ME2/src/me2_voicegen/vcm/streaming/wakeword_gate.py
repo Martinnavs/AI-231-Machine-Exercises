@@ -140,10 +140,15 @@ class WakeWordGate:
         *,
         threshold: float = DEFAULT_WAKEWORD_THRESHOLD,
         period_s: float = 5.0,
+        poll_step_s: Optional[float] = None,
     ) -> None:
         self._backend = backend
         self._threshold = threshold
         self._period_s = period_s
+        # Finer wake-word polling than the decode stride: between two `poll()` calls the classifier also scores the trailing
+        # window ending every `poll_step_s` of audio, so a wake word that only fits the 1.5 s window between strides is still caught.
+        self._poll_step = None if poll_step_s is None else max(1, int(poll_step_s * SAMPLE_RATE))
+        self._last_poll: Optional[int] = None
         self._open_at_samples: Optional[int] = None
         self._closed = False
 
@@ -157,10 +162,17 @@ class WakeWordGate:
             self._open_at_samples = None
 
         if window is not None and window.shape[-1] > 0:
-            cropped = _trailing_wakeword_window(np.asarray(window, dtype=np.float32))
-            prob = self._backend.wakeword_prob(cropped)
-            if prob >= self._threshold:
-                self._open_at_samples = samples_seen
+            window = np.asarray(window, dtype=np.float32)
+            ends = [samples_seen]
+            if self._poll_step is not None and self._last_poll is not None:
+                ends = list(range(self._last_poll + self._poll_step, samples_seen, self._poll_step)) + ends
+            for end in ends:  # ascending: the latest detection wins, as with one poll per stride
+                cut = window.shape[-1] - (samples_seen - end)
+                if cut <= 0:
+                    continue
+                if self._backend.wakeword_prob(_trailing_wakeword_window(window[:cut])) >= self._threshold:
+                    self._open_at_samples = end
+            self._last_poll = samples_seen
 
         return GateState(
             is_open=self._open_at_samples is not None,

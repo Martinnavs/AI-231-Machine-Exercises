@@ -176,6 +176,13 @@ def build_arg_parser() -> argparse.ArgumentParser:
         default=None,
         help="softmax probability of the _wakeword_ class --gate wakeword opens a period at",
     )
+    parser.add_argument(
+        "--wakeword-poll-s",
+        dest="wakeword_poll_s",
+        type=float,
+        default=None,
+        help="score the wake word every this many seconds of audio (default: once per decode stride); 0.05 recovers wake words that fall between strides",
+    )
     return parser
 
 
@@ -336,6 +343,7 @@ def main(argv: Optional[list[str]] = None) -> None:
                 period_s=cfg.gate_period_s,
                 wakeword_backend=wakeword_backend,
                 wakeword_threshold=cfg.wakeword_threshold,
+                wakeword_poll_s=cfg.wakeword_poll_s,
             )
         except GateUnavailableError as exc:
             raise SystemExit(str(exc)) from None

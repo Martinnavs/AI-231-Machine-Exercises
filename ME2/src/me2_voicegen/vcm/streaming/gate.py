@@ -159,6 +159,7 @@ def resolve_gate(
     stdin=sys.stdin,
     wakeword_backend: Optional[Any] = None,
     wakeword_threshold: float = DEFAULT_WAKEWORD_THRESHOLD,
+    wakeword_poll_s: Optional[float] = None,
 ) -> ListeningGate:
     """Unknown name -> SystemExit naming sorted(GATE_REGISTRY). `name ==
     "wakeword"` takes a different constructor shape (a `WakewordInference
@@ -178,5 +179,5 @@ def resolve_gate(
                 "internal error: --gate wakeword requires a wakeword_backend "
                 "(resolve_gate was called without constructing one first)"
             )
-        return gate_cls(wakeword_backend, threshold=wakeword_threshold, period_s=period_s)
+        return gate_cls(wakeword_backend, threshold=wakeword_threshold, period_s=period_s, poll_step_s=wakeword_poll_s)
     return gate_cls(stdin, period_s=period_s)

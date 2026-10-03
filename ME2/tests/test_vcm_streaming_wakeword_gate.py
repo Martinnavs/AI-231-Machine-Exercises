@@ -440,3 +440,43 @@ def test_wakeword_prob_latency_stays_under_default_stride_budget():
         backend.wakeword_prob(waveform)
     elapsed_ms = (time.perf_counter() - start) / n * 1000
     assert elapsed_ms < 150.0, elapsed_ms
+
+
+# ---------------------------------------------------------------------------
+# finer wake-word polling (`poll_step_s`)
+# ---------------------------------------------------------------------------
+
+
+class _EndBackend:
+    """Fires only for the trailing window that ends exactly at `fire_end` (checked via the audio's last sample marker)."""
+
+    def __init__(self, fire_marker: float) -> None:
+        self.fire_marker = fire_marker
+        self.calls = 0
+
+    def wakeword_prob(self, waveform: np.ndarray) -> float:
+        self.calls += 1
+        return 1.0 if waveform[-1] == self.fire_marker else 0.0
+
+
+def test_finer_polling_catches_a_wake_word_between_strides_and_opens_at_that_end():
+    sr = 16000
+    stride, step = sr // 4, sr // 20  # 0.25 s stride, 0.05 s steps
+    audio = np.arange(1, 6 * sr + 1, dtype=np.float32)  # sample i holds the value i, so the last sample identifies the window end
+    fire_end = 2 * sr + 3 * step  # between the 2.0 s and 2.25 s polls
+    coarse = WakeWordGate(_EndBackend(float(fire_end)), threshold=0.9, period_s=5.0)
+    fine = WakeWordGate(_EndBackend(float(fire_end)), threshold=0.9, period_s=5.0, poll_step_s=0.05)
+    states = {}
+    for name, g in (("coarse", coarse), ("fine", fine)):
+        for seen in range(stride, 4 * sr, stride):
+            st = g.poll(seen, audio[:seen])
+            if st.is_open:
+                states.setdefault(name, st)
+    assert "coarse" not in states  # the strided polls never end on fire_end
+    assert states["fine"].open_at_samples == fire_end
+    assert fine._backend.calls > coarse._backend.calls
+
+
+def test_default_polling_is_unchanged():
+    g = WakeWordGate(_ScriptedBackend([0.95]), threshold=0.9, period_s=5.0)
+    assert g.poll(4000, _DUMMY_WINDOW).open_at_samples == 4000 and g._backend.calls == 1

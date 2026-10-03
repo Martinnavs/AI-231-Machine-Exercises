@@ -47,6 +47,8 @@ def cli_args(cfg: dict) -> list[str]:
         "--wakeword-backend", "onnx", "--gate-period", str(cfg.get("period_s", 3.0)),
         "--policy", cfg["policy"], "--window-s", "2.5", "--stride-s", "0.25", "--log-all-windows",
     ]
+    if cfg.get("wakeword_poll_s") is not None:
+        args += ["--wakeword-poll-s", str(cfg["wakeword_poll_s"])]
     if cfg.get("margin") is not None:
         args += ["--required-command-margin", str(cfg["margin"])]
     if cfg["policy"] == "endpointed":
@@ -126,6 +128,7 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--cls-hold-ms", type=float, default=None)
     p.add_argument("--cls-min-speech-ms", type=float, default=None)
     p.add_argument("--wakeword-model", default=None)
+    p.add_argument("--wakeword-poll-s", type=float, default=None)
     p.add_argument("--workers", type=int, default=32)
     p.add_argument("--out", type=Path, required=True)
     a = p.parse_args(argv)
@@ -134,7 +137,7 @@ def main(argv: list[str] | None = None) -> None:
         "score_mode": a.score_mode, "period_s": a.period_s, "min_audio_s": a.min_audio_s,
         "stable_strides": a.stable_strides, "hold_ms": a.hold_ms, "blank_floor": a.blank_floor,
         "cls_model": a.cls_model, "cls_threshold": a.cls_threshold, "cls_hold_ms": a.cls_hold_ms,
-        "cls_min_speech_ms": a.cls_min_speech_ms, "wakeword_model": a.wakeword_model,
+        "cls_min_speech_ms": a.cls_min_speech_ms, "wakeword_model": a.wakeword_model, "wakeword_poll_s": a.wakeword_poll_s,
     }.items() if v is not None or k == "margin"}
     report = evaluate(a.sessions, cfg, a.workers)
     a.out.parent.mkdir(parents=True, exist_ok=True)
