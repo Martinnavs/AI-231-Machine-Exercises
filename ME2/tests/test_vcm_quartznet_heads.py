@@ -197,3 +197,25 @@ def test_unpadded_streaming_windows(seconds):
     assert out.attention.shape == (1, n) and out.attention.sum().item() == pytest.approx(1.0, abs=1e-5)
     for t in (out.ctc_logits, out.intent_logits, *out.slot_logits.values()):
         assert torch.isfinite(t).all()
+
+
+def test_wide_heads_preset_is_3_to_5_mb_int8_and_runs():
+    from me2_voicegen.vcm.model import PRESETS, build_model, estimated_int8_bytes
+
+    assert PRESETS["quartznet5x3-wide-heads"].heads is True
+    model = build_model("quartznet5x3-wide-heads").eval()
+    assert 3.0e6 <= estimated_int8_bytes(model) <= 5.0e6
+    assert estimated_int8_bytes(model) > 3 * estimated_int8_bytes(build_model("quartznet5x3-heads"))
+    feats = torch.randn(2, 40, 120)
+    out = model.forward_heads(feats, torch.tensor([120, 90]))
+    assert out.ctc_logits.shape[0] == 2 and out.intent_logits.shape == (2, 21)
+
+
+def test_xl_heads_preset_is_about_10_mb_int8_and_runs():
+    from me2_voicegen.vcm.model import PRESETS, build_model, estimated_int8_bytes
+
+    assert PRESETS["quartznet5x3-xl-heads"].heads is True
+    model = build_model("quartznet5x3-xl-heads").eval()
+    assert 9.5e6 <= estimated_int8_bytes(model) <= 10.0e6
+    out = model.forward_heads(torch.randn(2, 40, 120), torch.tensor([120, 90]))
+    assert out.ctc_logits.shape[0] == 2 and out.intent_logits.shape == (2, 21)

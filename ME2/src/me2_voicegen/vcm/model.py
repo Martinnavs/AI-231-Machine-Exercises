@@ -142,6 +142,15 @@ PRESETS: dict[str, MatchboxNetConfig | QuartzNetConfig] = {
     "quartznet5x3-s1": dataclasses.replace(QUARTZNET5X3_CONFIG, time_stride=1),
     # Same encoder + attention-pooled intent/slot heads (feature ctc-attention).
     "quartznet5x3-heads": dataclasses.replace(QUARTZNET5X3_CONFIG, heads=True),
+    # Wider variant with heads: 4.18 M parameters, ~4.2 MB estimated INT8 (the tiny model is ~0.95 MB). Same depth, kernels
+    # and stride; only the channel widths and the head width change.
+    "quartznet5x3-wide-heads": dataclasses.replace(
+        QUARTZNET5X3_CONFIG, heads=True, channels=416, epilogue_channels=512, head_dim=192
+    ),
+    # ~10 MB INT8 variant: 9.99 M parameters, ~9.99 MB estimated INT8. Same depth, kernels and stride as the wide preset.
+    "quartznet5x3-xl-heads": dataclasses.replace(
+        QUARTZNET5X3_CONFIG, heads=True, channels=648, epilogue_channels=800, head_dim=256
+    ),
 }
 
 
