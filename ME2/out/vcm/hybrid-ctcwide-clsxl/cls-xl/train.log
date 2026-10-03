@@ -1,0 +1,221 @@
+noise: source=dataset p_noise=0.5 pool=425 p_babble=0.15 babble_pool=417
+head label sources (loss-bearing rows) train={'nonslotted': 7427, 'phrase': 9110, 'manifest_slot_value': 614, 'nontarget': 1149} val={'nonslotted': 1133, 'phrase': 1389, 'manifest_slot_value': 74, 'nontarget': 121}
+model preset=quartznet5x3-xl-heads params=9,989,677 est_int8_bytes=9,990,101
+epoch 0 (pre-train) val_loss=32.1430
+epoch 1 train_loss=8.9082 val_loss=3.2717 elapsed_s=67.0
+  heads val: intent_acc=0.2186 slot_acc=0.3548 exact_acc=0.0828 intent_ce=2.6875 slot_ce=1.0938
+  expected='play song' decoded=''
+  expected='play music' decoded=''
+  expected='play music' decoded=''
+epoch 2 train_loss=3.8401 val_loss=2.3792 elapsed_s=116.8
+  heads val: intent_acc=0.7663 slot_acc=0.5379 exact_acc=0.5329 intent_ce=0.8300 slot_ce=0.9883
+  expected='play song' decoded='gtso'
+  expected='play music' decoded=''
+  expected='play music' decoded=''
+epoch 3 train_loss=2.5443 val_loss=1.4828 elapsed_s=165.8
+  heads val: intent_acc=0.8491 slot_acc=0.7970 exact_acc=0.7486 intent_ce=0.5180 slot_ce=0.5580
+  expected='play song' decoded='lghts ong'
+  expected='play music' decoded='lms'
+  expected='play music' decoded='ay music'
+epoch 4 train_loss=1.7714 val_loss=0.9023 elapsed_s=214.7
+  heads val: intent_acc=0.8980 slot_acc=0.9371 exact_acc=0.8693 intent_ce=0.3234 slot_ce=0.1930
+  expected='play song' decoded='pl song'
+  expected='play music' decoded='playusic'
+  expected='play music' decoded='play music'
+epoch 5 train_loss=1.4224 val_loss=0.8641 elapsed_s=261.9
+  heads val: intent_acc=0.9201 slot_acc=0.9528 exact_acc=0.8995 intent_ce=0.2605 slot_ce=0.1215
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='lmusi'
+  expected='play music' decoded='py music'
+epoch 6 train_loss=1.2202 val_loss=0.7343 elapsed_s=309.3
+  heads val: intent_acc=0.9150 slot_acc=0.9535 exact_acc=0.8977 intent_ce=0.3034 slot_ce=0.1217
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='pay music'
+epoch 7 train_loss=1.0486 val_loss=0.5861 elapsed_s=356.7
+  heads val: intent_acc=0.9463 slot_acc=0.9788 exact_acc=0.9363 intent_ce=0.1842 slot_ce=0.0507
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='ay music'
+epoch 8 train_loss=0.9252 val_loss=0.4772 elapsed_s=423.9
+  heads val: intent_acc=0.9477 slot_acc=0.9761 exact_acc=0.9367 intent_ce=0.1826 slot_ce=0.0617
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded=' music'
+epoch 9 train_loss=0.8498 val_loss=0.4879 elapsed_s=473.5
+  heads val: intent_acc=0.9522 slot_acc=0.9843 exact_acc=0.9466 intent_ce=0.1608 slot_ce=0.0374
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 10 train_loss=0.7528 val_loss=0.4864 elapsed_s=542.6
+  heads val: intent_acc=0.9558 slot_acc=0.9795 exact_acc=0.9466 intent_ce=0.1616 slot_ce=0.0548
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 11 train_loss=0.6704 val_loss=0.4370 elapsed_s=640.5
+  heads val: intent_acc=0.9522 slot_acc=0.9822 exact_acc=0.9444 intent_ce=0.1645 slot_ce=0.0409
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 12 train_loss=0.6233 val_loss=0.4118 elapsed_s=737.3
+  heads val: intent_acc=0.9621 slot_acc=0.9686 exact_acc=0.9485 intent_ce=0.1335 slot_ce=0.0684
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 13 train_loss=0.5740 val_loss=0.4850 elapsed_s=828.3
+  heads val: intent_acc=0.9628 slot_acc=0.9856 exact_acc=0.9566 intent_ce=0.1355 slot_ce=0.0390
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 14 train_loss=0.5569 val_loss=0.4280 elapsed_s=878.8
+  heads val: intent_acc=0.9514 slot_acc=0.9795 exact_acc=0.9430 intent_ce=0.1685 slot_ce=0.0593
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 15 train_loss=0.5335 val_loss=0.4386 elapsed_s=956.8
+  heads val: intent_acc=0.9603 slot_acc=0.9843 exact_acc=0.9544 intent_ce=0.1317 slot_ce=0.0406
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 16 train_loss=0.4606 val_loss=0.5973 elapsed_s=1054.1
+  heads val: intent_acc=0.9628 slot_acc=0.9863 exact_acc=0.9577 intent_ce=0.1312 slot_ce=0.0330
+  expected='play song' decoded='lightsong'
+  expected='play music' decoded='play muc'
+  expected='play music' decoded='play music'
+epoch 17 train_loss=0.4594 val_loss=0.4704 elapsed_s=1151.0
+  heads val: intent_acc=0.9647 slot_acc=0.9836 exact_acc=0.9577 intent_ce=0.1285 slot_ce=0.0443
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play muic'
+  expected='play music' decoded='play music'
+epoch 18 train_loss=0.4117 val_loss=0.4378 elapsed_s=1247.7
+  heads val: intent_acc=0.9566 slot_acc=0.9815 exact_acc=0.9507 intent_ce=0.1503 slot_ce=0.0352
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play muic'
+  expected='play music' decoded='play music'
+epoch 19 train_loss=0.3995 val_loss=0.5053 elapsed_s=1344.4
+  heads val: intent_acc=0.9628 slot_acc=0.9829 exact_acc=0.9569 intent_ce=0.1421 slot_ce=0.0544
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play musi'
+  expected='play music' decoded='play music'
+epoch 20 train_loss=0.3928 val_loss=0.4489 elapsed_s=1440.9
+  heads val: intent_acc=0.9687 slot_acc=0.9850 exact_acc=0.9632 intent_ce=0.1242 slot_ce=0.0373
+  expected='play song' decoded='lights out'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 21 train_loss=0.3650 val_loss=0.4520 elapsed_s=1535.4
+  heads val: intent_acc=0.9717 slot_acc=0.9884 exact_acc=0.9665 intent_ce=0.1121 slot_ce=0.0327
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 22 train_loss=0.3367 val_loss=0.3372 elapsed_s=1588.0
+  heads val: intent_acc=0.9698 slot_acc=0.9843 exact_acc=0.9636 intent_ce=0.1188 slot_ce=0.0379
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 23 train_loss=0.3122 val_loss=0.3363 elapsed_s=1642.3
+  heads val: intent_acc=0.9676 slot_acc=0.9870 exact_acc=0.9632 intent_ce=0.1149 slot_ce=0.0387
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 24 train_loss=0.2909 val_loss=0.3950 elapsed_s=1689.5
+  heads val: intent_acc=0.9665 slot_acc=0.9891 exact_acc=0.9632 intent_ce=0.1286 slot_ce=0.0347
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 25 train_loss=0.2861 val_loss=0.4580 elapsed_s=1737.3
+  heads val: intent_acc=0.9606 slot_acc=0.9843 exact_acc=0.9562 intent_ce=0.1429 slot_ce=0.0412
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 26 train_loss=0.3065 val_loss=0.3685 elapsed_s=1785.1
+  heads val: intent_acc=0.9702 slot_acc=0.9870 exact_acc=0.9665 intent_ce=0.1257 slot_ce=0.0368
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 27 train_loss=0.2618 val_loss=0.4426 elapsed_s=1832.5
+  heads val: intent_acc=0.9683 slot_acc=0.9904 exact_acc=0.9647 intent_ce=0.1324 slot_ce=0.0313
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 28 train_loss=0.2462 val_loss=0.3893 elapsed_s=1880.6
+  heads val: intent_acc=0.9702 slot_acc=0.9904 exact_acc=0.9676 intent_ce=0.1148 slot_ce=0.0189
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 29 train_loss=0.2886 val_loss=0.4588 elapsed_s=1927.9
+  heads val: intent_acc=0.9713 slot_acc=0.9877 exact_acc=0.9669 intent_ce=0.1124 slot_ce=0.0261
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 30 train_loss=0.2493 val_loss=0.3602 elapsed_s=1975.3
+  heads val: intent_acc=0.9713 slot_acc=0.9911 exact_acc=0.9680 intent_ce=0.1095 slot_ce=0.0258
+  expected='play song' decoded='lightson'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 31 train_loss=0.2163 val_loss=0.4240 elapsed_s=2023.4
+  heads val: intent_acc=0.9713 slot_acc=0.9870 exact_acc=0.9665 intent_ce=0.1246 slot_ce=0.0312
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 32 train_loss=0.2051 val_loss=0.4221 elapsed_s=2071.5
+  heads val: intent_acc=0.9676 slot_acc=0.9904 exact_acc=0.9650 intent_ce=0.1323 slot_ce=0.0301
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 33 train_loss=0.2100 val_loss=0.5113 elapsed_s=2122.6
+  heads val: intent_acc=0.9691 slot_acc=0.9911 exact_acc=0.9661 intent_ce=0.1222 slot_ce=0.0259
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 34 train_loss=0.2285 val_loss=0.3737 elapsed_s=2174.9
+  heads val: intent_acc=0.9717 slot_acc=0.9884 exact_acc=0.9672 intent_ce=0.1430 slot_ce=0.0252
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 35 train_loss=0.1903 val_loss=0.5215 elapsed_s=2223.0
+  heads val: intent_acc=0.9709 slot_acc=0.9904 exact_acc=0.9683 intent_ce=0.1375 slot_ce=0.0245
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 36 train_loss=0.1838 val_loss=0.4270 elapsed_s=2270.7
+  heads val: intent_acc=0.9691 slot_acc=0.9891 exact_acc=0.9669 intent_ce=0.1228 slot_ce=0.0247
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 37 train_loss=0.1702 val_loss=0.4466 elapsed_s=2318.3
+  heads val: intent_acc=0.9695 slot_acc=0.9904 exact_acc=0.9676 intent_ce=0.1297 slot_ce=0.0199
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 38 train_loss=0.1677 val_loss=0.4133 elapsed_s=2366.1
+  heads val: intent_acc=0.9709 slot_acc=0.9904 exact_acc=0.9669 intent_ce=0.1219 slot_ce=0.0231
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 39 train_loss=0.1600 val_loss=0.4750 elapsed_s=2413.4
+  heads val: intent_acc=0.9687 slot_acc=0.9918 exact_acc=0.9661 intent_ce=0.1188 slot_ce=0.0209
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 40 train_loss=0.1478 val_loss=0.4115 elapsed_s=2461.2
+  heads val: intent_acc=0.9709 slot_acc=0.9897 exact_acc=0.9683 intent_ce=0.1256 slot_ce=0.0226
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 41 train_loss=0.1462 val_loss=0.5125 elapsed_s=2508.1
+  heads val: intent_acc=0.9706 slot_acc=0.9911 exact_acc=0.9676 intent_ce=0.1320 slot_ce=0.0219
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 42 train_loss=0.1301 val_loss=0.4118 elapsed_s=2556.0
+  heads val: intent_acc=0.9746 slot_acc=0.9877 exact_acc=0.9691 intent_ce=0.1249 slot_ce=0.0257
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+epoch 43 train_loss=0.1399 val_loss=0.4928 elapsed_s=2604.3
+  heads val: intent_acc=0.9761 slot_acc=0.9884 exact_acc=0.9706 intent_ce=0.1165 slot_ce=0.0273
+  expected='play song' decoded='lights on'
+  expected='play music' decoded='play music'
+  expected='play music' decoded='play music'
+early stopping: no val_loss improvement in 20 epochs
+done: epochs=43 best_val_loss=0.3363 wall_clock_s=2604.4 deadline_hit=False nan_or_inf_seen=False
