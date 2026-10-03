@@ -85,7 +85,7 @@ Accuracy is the same in every row.
 
 - **What fixed the Pi:** the exact numba beam search (`optionb-ctc-attention-fast-beam`, `docs/BEAM-SEARCH.md`): decode per window 443 to 63 ms mean, 764 to 202 ms p95. Answers are bit-identical to the original search (every count matches).
 - **One thread is right.** Four threads sped the decode up (443 to 207 ms) but slowed the wake-word network from 38 to 131 ms (it runs five times per window), so the whole replay took longer (29 min against 21).
-- **Beam 10 buys nothing** once the search is fast: 65 against 66 ms per window, with the same accuracy.
+- **Beam 10 buys nothing** once the search is fast: 65 against 66 ms per window on the Pi, and the soak counts are the same. On the whole-clip test sets it is slightly worse (up to 0.6 points, 2.2 on the holdout, and one extra false accept on three sets), so beam 50 stays: [`BEAM-SEARCH.md`](BEAM-SEARCH.md) section 6.
 - **Heat matters a little:** with the fan the Pi held 1,500 MHz at 64-66 C; without it the clock averaged 1,456 MHz at 78-83 C. The original-search runs were taken while the Pi was throttled and, in the first, under-volted
   (power supply since fixed), so a clean original would be somewhat faster than shown; the comparison is a rough 2x on latency, not an exact figure.
 - **Little spare time:** the slowest 5% of windows take 239 ms or more of the 250 ms stride (worst 305 ms). A live microphone keeps up on average and falls briefly behind on those windows. Not yet tried: a longer stride (`--stride-s 0.5`).

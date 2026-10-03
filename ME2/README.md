@@ -43,7 +43,7 @@ How to read the latency rows: the replay latency is the time from the end of spe
 wake word + decode time (measured on the Pi, `soak/holdout-wake-gap-v1/results/`). The Pi now answers in about half a second, but with little spare time: the slowest 5% of windows take 239 ms or more of the 250 ms stride,
 so a live microphone keeps up on average and falls briefly behind on the slowest windows. The original search is shown for comparison; at a real-time factor of 3.2 it queues, so its true delay would be longer than 0.99 s.
 What changed: the exact numba beam search (`optionb-ctc-attention-fast-beam`, bit-identical answers, `docs/BEAM-SEARCH.md`). The fast Pi run had the fan on (64-66 C, 1.5 GHz for the whole run); the original-search run was
-throttled and under-volted, so a clean original would be somewhat faster than shown. Keep one thread: four threads slow the tiny wake-word network (38 to 131 ms), and a narrower beam (10) gains nothing once the search is fast.
+throttled and under-volted, so a clean original would be somewhat faster than shown. Keep one thread: four threads slow the tiny wake-word network (38 to 131 ms), and a narrower beam (10) gains nothing once the search is fast and costs a little accuracy (`docs/BEAM-SEARCH.md`).
 
 What the soak accuracy means in plain terms (the same on the Pi and the server; counts from `soak/holdout-wake-gap-v1/results/rpi4.md`):
 

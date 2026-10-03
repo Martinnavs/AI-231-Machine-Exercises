@@ -3,7 +3,8 @@
 **BLUF.** The grammar-constrained CTC prefix beam search used to be pure Python and was **86% of encoder + beam-search time at the shipped beam of 50** (92 ms of a 107 ms window on the server). It is now an
 **exact (bit-identical) numba kernel: 0.92 ms per window, 100x faster, 6% of encoder + search**, with an exact plain-Python fallback at 5.6x. Nothing about the output changed: the same prefixes, in the same order, with the same
 floats, on all 470 soak windows, so accuracy and the incomplete-prefix rejection are untouched and the beam stays at 50. Sections 1-4 describe the *original* search and why it was slow; section 6 records what was done.
-The Pi has not been re-measured since (open item 1), and its earlier 3.21 real-time factor was taken with 4 workers on 4 cores, so it may overstate the search cost.
+**On the Raspberry Pi 4 (one core) the real-time factor fell from 3.21 to 0.96** and the answer is ready about 0.5 s after the end of speech (median; 0.9 s p95), with identical answers (section 7, `docs/BENCHMARKS.md`).
+Beam 10 is not worth taking now: it costs a little accuracy and some extra false accepts on the test sets for about 0.7 ms per window (section 6).
 
 Measured 2026-10-03 on the server CPU (one thread), INT8 ONNX wide CTC, `optionb` grammar. Reproduce the encoder/beam numbers with `scripts/profile_beam_search.py`;
 the soak numbers are in `soak/holdout-wake-gap-v1/results/` (`rpi4.md`, `tuned-cpu-onnx-int8-hybrid.md`, `beam{10,15,25}.md`).
@@ -120,6 +121,27 @@ Implemented in `vcm/decoder.py` (+ `vcm/_beam_numba.py`); `scripts/profile_beam_
 Check through the real CLI (`python -m me2_voicegen.vcm.streaming`, 60 s of the soak audio, 240 windows, beam 50, `--required-command-margin 4.0`): stdout is byte-identical for `reference`, `python` and `numba`, and the whole run
 takes 30.8 s with the original search, 11.5 s with the plain-Python path, 12.3 s with numba (3.8 s of that is the one-off JIT warm-up).
 
+### Beam 10 against beam 50 on every test set (whole-clip CTC, threshold -0.1, margin 4.0)
+
+Scored with `vcm.semantic_eval score --beam 50` and `--beam 10` on the shipped wide CTC checkpoint (fp32 torch, the same pipeline as the earlier comparison tables), on the sets of `scripts/hybrid_eval.py`; compared with
+`scripts/compare_beam_widths.py`. Every beam-50 row (17,917 rows over 10 conditions) is identical to the rows cached from the original pure-Python search: intent, slots and confidence. Beam 10 is an approximation:
+
+| Set (targets) | Accuracy, beam 50 | Accuracy, beam 10 | False accepts, 50 | False accepts, 10 | Decisions changed |
+|---|---:|---:|---:|---:|---:|
+| ai231 test, original rows, clean (3,823) | 95.0% | 94.8% | 0/76 | **1/76** | 28 of 4,149 |
+| ai231 test, original rows, perturbed | 87.8% | 87.4% | 0/76 | **1/76** | 60 of 4,149 |
+| ai231 persona rows, clean (2,946) | 98.7% | 98.6% | 0/50 | 0/50 | 10 of 2,996 |
+| old internal test, non-persona, clean (1,927) | 96.2% | 96.0% | 1/579 | **2/579** | 34 of 4,073 |
+| holdout, real speaker (186) | 66.7% | **64.5%** | 0/16 | 0/16 | 13 of 202 |
+| leak-free internal held-out, clean (638) | 93.4% | 92.8% | 0/117 | 0/117 | 9 of 755 |
+| leak-free internal held-out, perturbed | 80.7% | 80.3% | 0/117 | 0/117 | 9 of 755 |
+| user voice raw (20), clean / perturbed | 95.0% / 95.0% | 95.0% / 95.0% | 0/50 | 0/50 | 1 of 70 each |
+| user voice converted (648), clean | 98.8% | 98.8% | 0/50 | 0/50 | 1 of 698 |
+
+Beam 10 is never better, loses up to 0.6 points (2.2 on the 186 real holdout commands) and adds one false accept on three sets: a narrower beam keeps fewer incomplete prefixes for the rejection margin to compare against.
+The earlier soak (section 5, one speaker) showed no change at beam 10; the wider sets do. At 0.92 ms (beam 50) against 0.24 ms (beam 10) the saving is about 0.7 ms per window, so the shipped beam of 50 stays.
+On the Pi, beam 10 was no faster once the search was fast (65 against 66 ms decode per window).
+
 **Not done, on purpose.** These were the other options considered; with the search at about 1 ms none is worth its cost:
 
 | Change | Why not |
@@ -133,10 +155,22 @@ takes 30.8 s with the original search, 11.5 s with the plain-Python path, 12.3 s
 
 **Not a lever:** `--threads`. The ONNX encoder is the only multi-threaded part; it may still help the encoder on the Pi, which is worth one run.
 
-## 7. Open items
+## 7. Raspberry Pi 4 and open items
 
-1. **Re-measure the Pi** with the new search: `pytest tests/test_vcm_decoder_fast_beam.py` on the Pi first (bit-identity on aarch64), then the soak with `--workers 1` at beam 50, once with `ME2_BEAM_BACKEND=reference` and once with `auto`.
-   Check that numba installs from `requirements-pi.txt` and note the JIT warm-up time. The earlier `rpi4.md` ran `--workers 4` on a 4-core Pi, so its 6x "slower than the server" ratio (and the 35 ms decode budget derived from
-   it in section 5) is suspect. Server estimate for the new window: encoder 15 ms + search about 1 ms, against a 250 ms stride.
-2. If the encoder becomes the Pi's bottleneck, `--threads` and the classifier-fallback windows' extra ONNX call are the next things to profile; their share of the p95 tail is not separated here.
-3. The numba compile is not cached on disk (`cache=False`): about 3.8 s at every streaming start and in each CLI test that starts a subprocess. `cache=True` would remove it after the first run, at the cost of a cache directory.
+Measured on the Pi 4 (one thread, tuned hybrid, 2026-10-03; `soak/holdout-wake-gap-v1/results/rpi4*.md`, table in `docs/BENCHMARKS.md`). Same 151/186 correct, 9 wrong actions, 3 of 16 out-of-scope triggered, 0 gap triggers in every run:
+
+| Pi 4 run | Decode per window, mean / p95 | Gate + decode, mean / p95 / max | Real-time factor | Estimated live latency, median / p95 |
+|---|---:|---:|---:|---:|
+| Original search, beam 50, 1 thread (throttled, under-volted) | 443 / 764 ms | 481 / 802 / 1,654 ms | 3.21 | 0.99 / 1.49 s |
+| **Numba search, beam 50, 1 thread, fan** | **63 / 202 ms** | **100 / 239 / 305 ms** | **0.96** | **0.48 / 0.92 s** |
+| Numba search, beam 50, 1 thread, no fan | 66 / 206 ms | 105 / 243 / 347 ms | 0.97 | 0.49 / 0.93 s |
+
+The 6x "Pi against server" ratio of section 5 was mostly the search: decode fell 7x on the Pi. Notes: all of these runs used `--workers 4` on the 4-core Pi (so they include some contention, and a single worker should be no slower); bit-identity on aarch64
+was confirmed through identical soak counts, and `pytest tests/test_vcm_decoder_fast_beam.py` on the Pi is still the direct check; the JIT warm-up time on the Pi is not recorded (it runs before the first window, outside `decode_ms`).
+There is little spare time: the slowest 5% of windows take 239 ms or more of the 250 ms stride.
+
+Open items:
+
+1. Run `pytest tests/test_vcm_decoder_fast_beam.py` on the Pi and record the JIT warm-up (`beam search: backend=numba warm-up=... ms` on stderr). Re-run one soak with `--workers 1` to remove the contention caveat.
+2. The Pi's remaining cost is the wake-word network (about 37 ms per decoded window) and the encoder; `--threads 4` was tried and made it worse (the wake-word network 38 to 131 ms). A longer stride (`--stride-s 0.5`) is untried.
+3. The numba compile is not cached on disk (`cache=False`): about 3.8 s at every streaming start on the server and in each CLI test that starts a subprocess. `cache=True` would remove it after the first run, at the cost of a cache directory.
