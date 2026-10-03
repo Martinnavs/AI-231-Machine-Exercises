@@ -1,0 +1,45 @@
+{
+ "config": {
+  "model": "out/vcm/hybrid-ctcwide-clsxl/ctc-wide",
+  "threshold": -0.1,
+  "policy": "endpointed",
+  "margin": 4.0,
+  "score_mode": "mean_frame",
+  "period_s": 3.0,
+  "stable_strides": 1,
+  "hold_ms": 200.0,
+  "cls_model": "out/vcm/hybrid-ctcwide-clsxl/cls-xl/export/vcm_heads.int8.onnx",
+  "cls_threshold": 0.8787
+ },
+ "split": "test",
+ "summary": {
+  "n": 784,
+  "correct_first_trigger": 701,
+  "correct_rate": 0.8941,
+  "wrong_intent_triggers": 10,
+  "missed": 73,
+  "extra_triggers": 0,
+  "early_first_triggers": 24,
+  "latency_s": {
+   "p50": 0.379,
+   "p95": 0.597,
+   "mean": 0.379
+  },
+  "decodes_per_session_mean": 6.92,
+  "per_focus": {
+   "PAUSE": [
+    99,
+    113
+   ],
+   "STOP": [
+    74,
+    83
+   ],
+   "TIME": [
+    103,
+    108
+   ]
+  },
+  "nonzero_exit": 0
+ }
+}

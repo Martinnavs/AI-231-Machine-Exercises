@@ -28,4 +28,7 @@ Per clip it returns a trace (each component's intent and confidence, agreement, 
   `OnnxHeads`). The heads file comes from `vcm.export_onnx --heads-only`. Scored end to end on every set (`eval/hybrid-onnx-vs-pytorch.md`):
   ONNX fp32 equals PyTorch on every set; INT8 costs at most one clip per set (129 real 98.4 -> 97.7, holdout 77.4 -> 76.9, perturbed 94.9 -> 94.8,
   clean unchanged at 98.8). Together about 14.3 MB INT8. Pi latency and memory are not measured (no Pi hardware on the node).
+- **Streaming:** `vcm.streaming --policy endpointed ... --cls-model cls-xl/export/vcm_heads.int8.onnx` (command in `docs/AI231-FIL50.md`).
+  Wake word + command replay, 784 ai231 test sessions: 89.4% correct first trigger vs 88.3% CTC only (95.1% vs 93.9% where the wake word opened a period),
+  latency p50 0.38 s after speech end (`eval/streaming-replay-*.json`).
 - **Status:** best hybrid so far for streaming tests, not promoted. Ticket 04 is deferred (see `docs/AI231-FIL50.md`).
