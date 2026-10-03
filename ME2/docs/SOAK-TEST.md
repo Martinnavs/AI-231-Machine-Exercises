@@ -18,9 +18,9 @@ and scored on accuracy and latency. The same audio is meant to be replayed on a 
   not the silent parts. The ambient noise between units continues the previous unit's own noise clip at the level measured in its noise-only tail.
 - **Truth:** `continuous.json` has, per unit, the label, slot, where the wake word ends, the gap, where the command's speech starts and ends (CTC forced alignment of the
   clean clip, times relative to the unit start), the RIR index, the noise clip and the SNR. 32.6 minutes, 16 kHz mono, 63 MB, `sha256` in `soak/holdout-wake-gap-v1/SHA256SUMS`.
-- **Not in git:** the wav files. `*.wav` is git-ignored here and the repo is public, while the clips come from datasets with several non-commercial terms and wake-word voices
-  of unconfirmed provenance (see `REPRODUCE-HYBRID.md`). The metadata, scripts and results are in `soak/holdout-wake-gap-v1/`; the audio is on the training cluster
-  (`out/soak/holdout-wake-gap-v1/` in the main checkout and `AI-222-Machine-Exercises/archive/soak/holdout-wake-gap-v1.zip`). It rebuilds from the seeds:
+- **In git, by decision:** `soak/holdout-wake-gap-v1/continuous.wav` is force-added (`*.wav` is git-ignored) so a Pi checkout has the audio. The repo is public and the clips come from datasets with several
+  non-commercial terms, plus wake-word voices of unconfirmed provenance (see `REPRODUCE-HYBRID.md`): treat the recording as research and education use only, and do not reuse it commercially.
+  The 63 MB file is also in `out/soak/holdout-wake-gap-v1/` and `AI-222-Machine-Exercises/archive/soak/holdout-wake-gap-v1.zip` on the cluster. It rebuilds from the seeds:
 
 ```bash
 M=out/conversions/v2     # ai231-v2 (import_ai231 output) and wakeword-sesame manifests

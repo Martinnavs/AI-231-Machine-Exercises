@@ -14,7 +14,7 @@ make hybrid-decode HYBRID_WAV="clip1.wav clip2.wav"          # decode wav files:
 make hybrid-stream                                           # live microphone: wake word, then the command
 make hybrid-stream HYBRID_SOURCE=path/to/recording.wav       # the same, replaying a file
 make hybrid-test                                             # tests for the hybrid, streaming policy and wake-word gate
-make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=run SOAK_ARGS="--backend onnx"   # score the soak recording (needs continuous.wav, see docs/SOAK-TEST.md)
+make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=run SOAK_ARGS="--backend onnx"   # score the soak recording (the 63 MB recording is in the repo; see docs/SOAK-TEST.md)
 ```
 
 `make hybrid-stream` is this command (INT8 ONNX, CPU, the settings tuned on a validation soak):

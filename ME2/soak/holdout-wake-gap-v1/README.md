@@ -5,13 +5,12 @@ each preceded by a wake word with a random 0.0-1.0 s gap (0.1 s steps), mixed wi
 noise between units. Truth for every unit is in `continuous.json` (times relative to the unit start; `offset_s` is where the unit starts in the file).
 Method, results and tuning: [`docs/SOAK-TEST.md`](../../docs/SOAK-TEST.md).
 
-**The wav is not committed** (public repo; clip and wake-word terms unconfirmed). Get it from the cluster (`out/soak/holdout-wake-gap-v1/continuous.wav`, or
-`AI-222-Machine-Exercises/archive/soak/holdout-wake-gap-v1.zip`), or rebuild it from the seeds (commands in `docs/SOAK-TEST.md`). Check it with `sha256sum -c SHA256SUMS`.
+**`continuous.wav` is committed** (63 MB, force-added: `*.wav` is git-ignored). The clips come from datasets with several non-commercial terms and wake-word voices of unconfirmed provenance:
+research and education use only, no commercial reuse. Check it with `sha256sum -c SHA256SUMS`; it can also be rebuilt from the seeds (commands in `docs/SOAK-TEST.md`).
 
 ## Run it (CPU INT8 ONNX, the same on a Raspberry Pi)
 
 ```bash
-cp <path>/continuous.wav soak/holdout-wake-gap-v1/                 # next to continuous.json
 make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=rpi4 SOAK_ARGS="--backend onnx --threads 1"
 cat soak/holdout-wake-gap-v1/results/rpi4.md
 ```
