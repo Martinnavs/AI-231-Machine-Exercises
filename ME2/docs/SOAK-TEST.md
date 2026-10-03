@@ -112,6 +112,7 @@ A longer period recovers timeouts but lets in wrong actions and false accepts, s
 
 ## Caveats
 
+- **Seen noise and rooms.** 131 of the 202 sessions mix an ambient clip that is in the ai231 train split (the models' training noise pool); the room impulse responses come from the same seed-0 pool as training. The speech (holdout clips and test wake words) is unseen. The unseen-noise analog that already exists is the 784-session wake word + command replay on the ai231 test split (room tone from the test split's own noise clips, no reverb): hybrid 90.1%, CTC only 88.9% (`AI231-FIL50.md`, "Hybrid in streaming"). A rebuild with val/test noise only is not done.
 - **False wakes from ordinary speech are not measured.** The gaps between units contain ambient noise only, so a lower wake-word threshold (0.8) could add false wakes from conversation that this soak cannot see.
 - One seed, one soak build, 186 commands from one real Filipino speaker plus 100 synthetic voices; the out-of-scope set is 16 clips.
 - Some wake-word clips in the older `sessions-ai231-test` replay (`out/vcm/hybrid-eval/`) carry ESC-50 noise; this soak uses only clean positives.

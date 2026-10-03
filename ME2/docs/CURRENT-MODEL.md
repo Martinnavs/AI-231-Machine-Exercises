@@ -91,6 +91,7 @@ Intent + slot, one seed, one training run per model. **Read the caveats in the n
   The models in this page were trained on public data only, so their ai231 numbers are clean. Use the leak-free sets
   (`scripts/build_internal_heldout.py`, `scripts/build_user_voice_eval.py`, `scripts/filter_internal_overlap.py`) when comparing
   against an internal-data model. Details: `AI231-FIL50.md`, "Leak finding".
+- **Seen vs unseen.** Test and holdout are clip-disjoint and speaker-disjoint from training (README, "Seen vs unseen"), but the perturbed gate and the soak use the same seed-0 synthetic rooms as training, and 131 of the 202 soak sessions use noise clips from the training split; whether any persona or synthetic voice is the same person as a real test speaker is unverified.
 - **One seed, small real-speaker sets.** The holdout is 186 clips from one speaker; the user-voice sets are 20 raw and 648 converted
   clips. The hybrid's cross-model edge over wide+wide (same-model hybrid) is small except on the holdout and the perturbed ai231 test.
 - **Pi 4 not measured.** There is no Raspberry Pi on the development node. Latency numbers are server cores
