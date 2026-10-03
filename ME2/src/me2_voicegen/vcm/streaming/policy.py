@@ -338,7 +338,7 @@ class EndpointedPeriodPolicy(ThresholdPolicy):
         self._last_open = opened
         if self._anchor is None:
             if not self._armed:
-                if rearmed:
+                if rearmed and not getattr(self._gate, "continuous", False):
                     # The closed period's wake word is still being detected:
                     # these detections belong to that period, not a new one.
                     self._closed_at = max(self._closed_at, opened)

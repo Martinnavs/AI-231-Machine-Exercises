@@ -142,14 +142,31 @@ class SpacebarGate:
         self._closed = True
 
 
-# Holds only "spacebar" here. "wakeword" is registered as a module-level
+class AlwaysOpenGate:
+    """`ListeningGate` with no wake word: the period is always open, re-pressed at every poll, so it never times out and
+    `EndpointedPolicy` reopens it right after each accept (`continuous`). Every window is decoded -- the always-on
+    baseline for the wake-word gate (soak test without the gate, docs/SOAK-TEST.md)."""
+
+    continuous = True
+
+    def __init__(self, stdin=None, *, period_s: float = 5.0) -> None:
+        self.period_s = period_s
+
+    def poll(self, samples_seen: int, window: Optional[np.ndarray] = None) -> GateState:
+        return GateState(is_open=True, open_at_samples=samples_seen)
+
+    def close(self) -> None:
+        pass
+
+
+# Holds "spacebar" and "always" here. "wakeword" is registered as a module-level
 # side effect by `config.py` (`GATE_REGISTRY["wakeword"] = WakeWordGate`),
 # not imported here directly: `wakeword_gate.py` imports `ListeningGate`/
 # `GateState`/`DEFAULT_WAKEWORD_THRESHOLD` from this module, so importing
 # `wakeword_gate` from here would be a cycle. `config.py` is where the
 # other registries (`MODEL_REGISTRY`, `POLICY_REGISTRY`) already live, so
 # that's where this registration lives too.
-GATE_REGISTRY: dict[str, type[ListeningGate]] = {"spacebar": SpacebarGate}
+GATE_REGISTRY: dict[str, type[ListeningGate]] = {"spacebar": SpacebarGate, "always": AlwaysOpenGate}
 
 
 def resolve_gate(

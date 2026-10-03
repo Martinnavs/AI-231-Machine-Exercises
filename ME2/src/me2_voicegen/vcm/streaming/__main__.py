@@ -141,7 +141,7 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "the period's consolidated result (rejected periods included) -- the "
         "JSONL on stdout is unchanged; use --log-all-windows for every window",
     )
-    parser.add_argument("--gate", type=str, default=None, choices=["none", "spacebar", "wakeword"])
+    parser.add_argument("--gate", type=str, default=None, choices=["none", "spacebar", "wakeword", "always"])
     parser.add_argument("--gate-period", dest="gate_period_s", type=float, default=None)
     # --policy endpointed: decode every stride inside the period, fire on the
     # first confident, stable, ended command; --gate-period is the time-out.

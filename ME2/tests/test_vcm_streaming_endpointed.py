@@ -15,7 +15,7 @@ from me2_voicegen.vcm import alphabet
 from me2_voicegen.vcm.decoder import DecodeResult
 from me2_voicegen.vcm.optionb import OPTIONB_GRAMMAR
 from me2_voicegen.vcm.streaming.config import resolve_policy
-from me2_voicegen.vcm.streaming.gate import GateState
+from me2_voicegen.vcm.streaming.gate import AlwaysOpenGate, GateState
 from me2_voicegen.vcm.streaming.policy import EndpointedPeriodPolicy, WindowObservation
 from me2_voicegen.vcm.streaming.runner import StreamingRunner
 
@@ -257,6 +257,19 @@ def test_same_wake_word_does_not_reopen_after_fast_accept():
     policy.period_closed(2 * STRIDE, decision)
     assert decision.accept
     assert all(policy.period_request(n * STRIDE, np.zeros(1)) is None for n in range(3, 20))
+
+
+def test_always_open_gate_never_times_out_and_reopens_after_accept():
+    """No wake word (`--gate always`): the window slides past the period length, and the next period starts right after an accept."""
+    policy = _policy(AlwaysOpenGate(), stable_strides=1)
+    assert policy.period_request(STRIDE, np.zeros(1)) is None  # opens here, under min_audio
+    reqs = [policy.period_request(n * STRIDE, np.zeros(1)) for n in range(3, 40)]  # to 10 s, well past the 3 s period
+    assert all(r is not None for r in reqs)
+    assert reqs[-1].start_samples == 39 * STRIDE - int(2.5 * SAMPLE_RATE)
+    lp = _logp("stop", 60, trailing_blank=40)
+    policy.period_closed(39 * STRIDE, policy.observe(_obs(39, _result("STOP"), lp)))
+    assert policy.period_request(40 * STRIDE, np.zeros(1)) is None  # under min_audio of the new period
+    assert policy.period_request(42 * STRIDE, np.zeros(1)).start_samples == 40 * STRIDE
 
 
 def test_fresh_wake_word_after_fast_accept_opens_new_period():

@@ -34,15 +34,17 @@ DEFAULT_WAKEWORD = ROOT / "out/wakeword-sesame-ambient-rir-45m"
 
 def cli_args(a: argparse.Namespace) -> list[str]:
     models = Path(a.models)
-    args = ["--model", str(models / "ctc-wide"), "--backend", a.backend, "--grammar", "optionb", "--beam-width", "50",
-            "--threshold=-0.1", "--required-command-margin", "4.0", "--gate", "wakeword", "--gate-period", str(a.gate_period), "--wakeword-threshold", str(a.wakeword_threshold),
+    args = ["--model", str(models / "ctc-wide"), "--backend", a.backend, "--grammar", "optionb", "--beam-width", str(a.beam_width),
+            "--threshold=-0.1", "--required-command-margin", "4.0", "--gate", a.gate, "--gate-period", str(a.gate_period),
             "--policy", "endpointed", "--hold-ms", "200", "--stable-strides", "1", "--window-s", "2.5", "--stride-s", str(a.stride_s),
-            "--wakeword-model", str(a.wakeword), "--wakeword-backend", a.backend, "--log-all-windows", "--log-timing"]
+            "--log-all-windows", "--log-timing"]
+    if a.gate == "wakeword":
+        args += ["--wakeword-model", str(a.wakeword), "--wakeword-backend", a.backend, "--wakeword-threshold", str(a.wakeword_threshold)]
     if a.backend == "onnx":
         args += ["--onnx-variant", "int8", "--ort-threads", str(a.threads)]
     else:
         args += ["--device", a.device]
-    if a.poll_s:
+    if a.poll_s and a.gate == "wakeword":
         args += ["--wakeword-poll-s", str(a.poll_s)]
     if not a.no_cls:
         cls = models / "cls-xl" / ("export/vcm_heads.int8.onnx" if a.backend == "onnx" else "checkpoints/checkpoint.pt")
@@ -150,10 +152,13 @@ def main() -> None:
     ap.add_argument("--no-cls", action="store_true", help="CTC only (no classifier fallback)")
     ap.add_argument("--cls-threshold", type=float, default=0.8787)
     ap.add_argument("--cls-slot-threshold", type=float, default=0.0, help="slotted intents from the classifier also need this slot-head confidence")
+    ap.add_argument("--gate", choices=["wakeword", "always"], default="wakeword",
+                    help="always = no wake word: every window is decoded (the always-on baseline)")
     ap.add_argument("--gate-period", type=float, default=3.0, help="seconds the wake word keeps the period open (live setting: 3)")
     ap.add_argument("--wakeword-threshold", type=float, default=0.9)
     ap.add_argument("--poll-s", type=float, default=0.05, help="wake-word polling step; 0 = once per stride")
     ap.add_argument("--stride-s", type=float, default=0.25, help="decode stride (the live setting is 0.25 s)")
+    ap.add_argument("--beam-width", type=int, default=50, help="grammar CTC beam search width (the tuned setting is 50)")
     ap.add_argument("--threads", type=int, default=1)
     ap.add_argument("--workers", type=int, default=4)
     ap.add_argument("--limit", type=int, default=None)

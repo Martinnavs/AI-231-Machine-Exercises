@@ -140,7 +140,7 @@ _FIELD_TYPES: dict[str, type] = {
 _FIELD_CHOICES: dict[str, tuple[str, ...]] = {
     "backend": ("onnx", "torch"),
     "onnx_variant": ("fp32", "int8"),
-    "gate": ("none", "spacebar", "wakeword"),
+    "gate": ("none", "spacebar", "wakeword", "always"),
     "wakeword_backend": ("onnx", "torch"),
     "wakeword_onnx_variant": ("fp32", "int8"),
     "score_mode": ("mean_frame", "per_char"),
