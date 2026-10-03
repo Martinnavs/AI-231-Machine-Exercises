@@ -161,14 +161,13 @@ def main() -> None:
     a = ap.parse_args()
     if a.gpu == 6:
         raise SystemExit("GPU 6 is off limits on this node")
-    meta = json.loads((a.sessions / "sessions.json").read_text())
-    sessions = meta["sessions"][: a.limit]
     raw_dir = a.sessions / "raw" / a.name
     raw_dir.mkdir(parents=True, exist_ok=True)
     (a.sessions / "results").mkdir(exist_ok=True)
     if a.continuous:
         results = run_continuous(a, raw_dir)
     else:
+        sessions = json.loads((a.sessions / "sessions.json").read_text())["sessions"][: a.limit]
         with ThreadPoolExecutor(a.workers) as ex:
             results = list(ex.map(lambda s: run_session(s, a, raw_dir), sessions))
     summary = score(results, a.stride_s)

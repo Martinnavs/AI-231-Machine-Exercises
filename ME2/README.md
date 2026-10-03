@@ -105,7 +105,25 @@ So the accuracy numbers are speaker-disjoint and clip-disjoint on wordings the m
 the holdout soak below adds reverb and a harder real-accent set, with the caveats above.
 
 **Soak test: the holdout behind a wake word, with reverb and noise** (186 commands + 16 out-of-scope clips, 32.6 min, wake word then a 0-1 s gap then the command, 1-8 s of ambient noise between;
-tuned settings; `docs/SOAK-TEST.md`; server CPU core, **Raspberry Pi 4 not run yet**):
+tuned settings; `docs/SOAK-TEST.md`; **Raspberry Pi 4 Model B, INT8 ONNX, one thread, 2026-10-03**, next to the same run on a server CPU core):
+
+| | Hybrid, Raspberry Pi 4 | Hybrid, server CPU (same settings) |
+| --- | ---: | ---: |
+| Correct first trigger (intent and slot) | 81.2% (151/186) | 81.2% (151/186) |
+| Wrong-action first triggers (wrong intent or slot) | 9 | 9 |
+| Wake word never opened a period | 5 | 5 |
+| Out-of-scope clips triggered | 3 of 16 | 3 of 16 |
+| Triggers in the ambient gaps | 0 | 0 |
+| Latency after end of speech, median / p95 (replay waits for each decode) | 0.38 / 0.65 s | 0.38 / 0.65 s |
+| Decode per window, mean / p95 / max | **443 / 764 / 1,575 ms** | 70 / 126 / 184 ms |
+| Wake-word gate per decoded window, mean | 38 ms | 5.6 ms |
+| Real-time factor, p95 (gate + decode over the 0.25 s stride) | **3.21** | 0.53 |
+
+The Pi gives exactly the same answers as the server (same INT8 ONNX models) but is about 6 times slower per window: at the 0.25 s stride on one core it **does not keep up live**
+(p95 0.80 s of work per 0.25 s of audio; a live microphone would queue and drop windows, and the latency above would grow by the decode time). The whole 32.6-minute replay took 20 min 47 s
+because only windows inside a wake-word period are decoded. Not yet tried on the Pi: `--threads 4` and a longer stride (`--stride-s 0.5`). Result: `soak/holdout-wake-gap-v1/results/rpi4.md`.
+
+<details><summary>Archived: the server-only soak table (before the Pi run)</summary>
 
 | | Hybrid, CPU INT8 | Hybrid, A100 | CTC only, CPU INT8 |
 | --- | ---: | ---: | ---: |
@@ -118,7 +136,10 @@ tuned settings; `docs/SOAK-TEST.md`; server CPU core, **Raspberry Pi 4 not run y
 | Decode per window, mean / p95 | 70 / 126 ms | 64 / 102 ms | 70 / 111 ms |
 | Real-time factor, p95 (gate + decode over the 0.25 s stride) | 0.53 | 0.45 | 0.47 |
 
-The soak audio is in `soak/holdout-wake-gap-v1/` (`continuous.wav` and the truth); run it on a Pi with `make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=rpi4 SOAK_ARGS="--backend onnx --threads 1"`
+</details>
+
+The soak audio is in `soak/holdout-wake-gap-v1/` (`continuous.wav` and the truth). On a Pi, `make soak-run` fails (`uv run` tries to install the x86 CUDA torch), so call the script with the Pi's venv:
+`python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1`,
 and compare with `soak/holdout-wake-gap-v1/results/`. Reverb, noise and the 16 out-of-scope clips come from public data only; wake-word false wakes from ordinary speech are not measured.
 
 ## Released files (all in this repo)

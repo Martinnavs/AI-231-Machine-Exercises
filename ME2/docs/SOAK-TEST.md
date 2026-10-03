@@ -116,6 +116,6 @@ A longer period recovers timeouts but lets in wrong actions and false accepts, s
 - **False wakes from ordinary speech are not measured.** The gaps between units contain ambient noise only, so a lower wake-word threshold (0.8) could add false wakes from conversation that this soak cannot see.
 - One seed, one soak build, 186 commands from one real Filipino speaker plus 100 synthetic voices; the out-of-scope set is 16 clips.
 - Some wake-word clips in the older `sessions-ai231-test` replay (`out/vcm/hybrid-eval/`) carry ESC-50 noise; this soak uses only clean positives.
-- No Raspberry Pi has been run yet. Server numbers are one thread per process on a shared 256-core node (other users' load can inflate timings a little).
+- Raspberry Pi 4 (one thread, tuned hybrid, 2026-10-03, `results/rpi4.md`): the same 151/186 correct as the server CPU, but decode 443 ms mean / 764 ms p95 per window, real-time factor 3.21 at the 0.25 s stride (does not keep up live). Server numbers are one thread per process on a shared 256-core node (other users' load can inflate timings a little).
 - `scripts/soak_run.py` and the streaming flags `--log-timing`, `--wakeword-poll-s`, `--wakeword-threshold`, `--cls-model`, `--cls-slot-threshold`, `--cls-hold-ms`, `--cls-min-speech-ms` are documented in
   [`AI231-FIL50.md`](AI231-FIL50.md) ("Hybrid in streaming") and `python -m me2_voicegen.vcm.streaming --help`.
