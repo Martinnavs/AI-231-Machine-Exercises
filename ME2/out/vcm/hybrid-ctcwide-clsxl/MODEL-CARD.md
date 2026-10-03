@@ -12,7 +12,8 @@ Per clip it returns a trace (each component's intent and confidence, agreement, 
 | role | CTC answer | intent and slot heads (fallback) |
 | best epoch / val loss | 38 / 0.3906 | 23 / 0.3363 |
 | checkpoint | 17 MB | 39 MB |
-| `export/vcm_model.int8.onnx` | 4.16 MB (CTC output only) | 9.86 MB (CTC output only) |
+| ONNX INT8 used by the hybrid | `export/vcm_model.int8.onnx`, 4.16 MB (features -> CTC logits) | `export/vcm_heads.int8.onnx`, 10.10 MB (features -> intent + 6 slot logits, no CTC layer) |
+| other ONNX | | `export/vcm_model.int8.onnx`, 9.86 MB (xl CTC output; not used by the hybrid) |
 
 - **Data:** public `airimonda/ai231-me2-voice-commands` v2 (train split incl. val speakers and `synthetic_negatives`) plus the public persona clips
   (`martinnavarez/ai231-fil-supplemental-data` and the capped fil50 persona rows), the "H-all" manifest. Noise and babble are the dataset's own
@@ -23,6 +24,8 @@ Per clip it returns a trace (each component's intent and confidence, agreement, 
   129 real recordings 98.4%, leak-free internal held-out 97.8% / 87.3% perturbed. Versus the vanilla networks and old production: `docs/AI231-FIL50.md`.
 - **Known limits:** non-command false accepts 3.4% (clean) to 6.1% (perturbed) on the ai231 negatives, mostly from the classifier fallback (CTC alone: 0.9%
   and 2.5%); the wake word sits in front in deployment. 19% of holdout commands are still rejected. Single seed; small holdout.
-- **ONNX caveat:** the exported ONNX files contain the CTC output only. The classifier heads are not exported, so the xl classifier needs the PyTorch
-  checkpoint (`forward_heads`) until a heads export exists. Pi latency and memory are not measured (no Pi hardware on the node).
+- **ONNX:** both halves run in ONNX Runtime (pass the `.onnx` paths to `scripts/hybrid_decode_file.py` / `hybrid_score.py`; `vcm.hybrid.OnnxCtc` /
+  `OnnxHeads`). The heads file comes from `vcm.export_onnx --heads-only`. Scored end to end on every set (`eval/hybrid-onnx-vs-pytorch.md`):
+  ONNX fp32 equals PyTorch on every set; INT8 costs at most one clip per set (129 real 98.4 -> 97.7, holdout 77.4 -> 76.9, perturbed 94.9 -> 94.8,
+  clean unchanged at 98.8). Together about 14.3 MB INT8. Pi latency and memory are not measured (no Pi hardware on the node).
 - **Status:** best hybrid so far for streaming tests, not promoted. Ticket 04 is deferred (see `docs/AI231-FIL50.md`).
