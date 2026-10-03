@@ -3,7 +3,7 @@
 Status: **v2 (rebuilt dataset, reproducible noise) scored on two seeds; the heads-A model of seed 1 is checked in as the
 current best for streaming tests; ticket 04 not started.** The v1 sections further down (one seed, earlier dataset
 version) are kept for the record and are superseded where they disagree.
-Dates: 2026-10-02. Design record: `feature-engineering/ctc-attention/tickets/00-RECAP.md` (tickets 01-04).
+Dates: 2026-10-02. Follow-up experiment (persona-padded training data): `docs/AI231-FIL50.md`. Design record: `feature-engineering/ctc-attention/tickets/00-RECAP.md` (tickets 01-04).
 
 ## v2 results (current): rebuilt dataset, noise and babble from the dataset itself
 
@@ -236,6 +236,15 @@ dataset and a seed alone:
   a shuffled deck so pool entries are used evenly. On the real train split: 9,310 clips, 33 classes, no quota violations,
   25.0% stretched / 70.0% reverb / 50.0% noise / 15.0% babble overall. `--dump-plan` writes every epoch's recipes
   (`<out>/metadata/perturbation_plan/epoch_NNN.csv.gz`) and a per-class summary.
+
+**Grouping key changed (ai231-fil50 work).** The table originally grouped clips by intent+slot class (31 classes plus
+`unknown` and `silence`). On the ai231-fil50 train split that left per-variation shares uneven (stretch 18-31%, reverb
+63-79%, noise 43-58%, babble 9-21%), and persona clips could get a different share than real ones. `perturbation_plan.class_key`
+now returns `label | slot_value | variation | source_dataset` for manifests that have a `variation` column (ai231 and later),
+which gives 24-26% / 69-71% / 50-51% / 14-16% per variation with real and persona clips matching within a point. Manifests without a
+`variation` column keep the intent+slot key, so runs on them reproduce as before. The earlier v2 runs (`v2*`, trained on
+ai231 v2) used the intent+slot key; re-running them now yields a different (equally valid) table. Test:
+`test_93_variations_two_sources_get_the_same_shares_real_and_persona`.
 
 In table mode the RIR pool is built once from the seed (the online path builds it lazily per worker from a generator state
 that depends on call order). SpecAugment is not part of the table: it still uses the augmenter's generator, so spectrogram
