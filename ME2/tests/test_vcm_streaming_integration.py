@@ -908,3 +908,33 @@ def test_main_banner_and_summary_lines_end_to_end(monkeypatch):
         "streaming run complete: windows=2 events=0 suppressed=0 dropped=0 "
         "exit_reason=source_eof"
     ) in summary_out.getvalue()
+
+
+def test_main_warms_up_beam_search_once_before_run(monkeypatch, capsys):
+    import me2_voicegen.vcm.streaming.__main__ as main_mod
+
+    gate_holder: dict = {}
+    _wire_fake_main(
+        monkeypatch,
+        backend=_FixedLogpBackend(_blank_logp()),
+        source=_ArrayAudioSource(np.zeros(8000, dtype=np.float32), block_samples=4000),
+    )
+    gate_holder["gate"] = _PressGate(period_s=5.0)
+    monkeypatch.setattr(main_mod, "resolve_gate", lambda name, **kw: gate_holder["gate"])
+    events: list = []
+    monkeypatch.setattr(
+        main_mod.beam_decoder, "warm_up", lambda root, bw: (events.append(("warm_up", bw)), ("python", 12.0))[1]
+    )
+    runners, _ = _capture_main_runner(monkeypatch)
+    real_factory = main_mod.StreamingRunner
+
+    def _factory(*a, **k):
+        events.append(("runner_built", None))
+        return real_factory(*a, **k)
+
+    monkeypatch.setattr(main_mod, "StreamingRunner", _factory)
+
+    main_mod.main(["--policy", "mode_period", "--gate", "spacebar", "--threshold", "-0.1", "--beam-width", "7"])
+
+    assert events == [("warm_up", 7), ("runner_built", None)]
+    assert "beam search: backend=python warm-up=12 ms" in capsys.readouterr().err

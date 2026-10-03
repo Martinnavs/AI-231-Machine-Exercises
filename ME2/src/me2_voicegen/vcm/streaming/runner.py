@@ -6,11 +6,10 @@ order, the realtime-vs-lockstep backpressure contract, and the JSONL event
 schema this module emits; see that doc's runner section (added by this
 task) for the loop-mode/shutdown details below.
 
-Per-window compute is dominated by grammar-constrained beam search, not the
-inference backend (~97% beam search / ~3% ONNX forward at the shipped
-defaults, T=251 beam=25) -- see this ticket's Execution Log for the
-measurement. Nothing here changes that; this module only wires the already
-sized/measured pieces together.
+Per-window compute: with the original pure-Python beam search it dominated
+(86% of encoder + search at the shipped T=126, beam 50); the exact numba
+search (`vcm.decoder`) brings it to about 6%. See `docs/BEAM-SEARCH.md`. This
+module only wires the already sized/measured pieces together.
 """
 
 from __future__ import annotations

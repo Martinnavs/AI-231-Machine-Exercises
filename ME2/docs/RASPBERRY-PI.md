@@ -19,8 +19,12 @@ export PYTHONPATH=src
 ```
 
 `requirements-pi.txt` is the complete dependency list of the streaming path: `torch` and `torchaudio` (log-mel features), `numpy`, `onnxruntime` (both models run as INT8 ONNX), `soundfile`
-(wav loading). The list was checked on x86_64 in an empty Python 3.10 environment holding only these five packages: the hybrid streaming command below fired the right intent on a soak clip.
+(wav loading), and `numba` (JIT-compiles the grammar beam search; see below). The list was checked on x86_64 in an empty Python 3.10 environment holding only these five packages: the hybrid streaming command below fired the right intent on a soak clip.
 **It has not been run on a Pi** (no Pi was available), so the first run there is the real check.
+
+**Beam search backend.** The decoder uses numba when it imports and falls back to the same search in plain Python (about 5x slower than numba's ~100x gain over the original, identical output). The start-up line
+`beam search: backend=numba warm-up=<ms> ms` on stderr says which one is running; the JIT compile takes about 4 s on the server and is **not measured on the Pi**. `ME2_BEAM_BACKEND=auto|numba|python|reference`
+forces one (`reference` is the original loop, for A/B timing). Before trusting a Pi number, run `pytest tests/test_vcm_decoder_fast_beam.py` there: it checks the fast paths are bit-identical to the original on aarch64.
 
 ## Run the hybrid with the microphone
 

@@ -3,15 +3,23 @@ trie (as compiled by a per-experiment grammar, e.g. `vcm.optiona.grammar` or
 `vcm.optionb.grammar`).
 
 Per decision (C) (see ticket .scratch/vcm-toy/tickets/03-grammar-decoder.md):
-plain Python only, no `kaldifst` (present in the venv but only transitive
-via `wetext`, not a declared dependency) and no `sherpa-onnx` (not
-installed). `kaldifst`/a real WFST is a plausible future scale-up path if
-the grammar ever grows past a few thousand phrases -- not needed here.
+no `kaldifst` (present in the venv but only transitive via `wetext`, not a
+declared dependency) and no `sherpa-onnx` (not installed). `kaldifst`/a real
+WFST is a plausible future scale-up path if the grammar ever grows past a few
+thousand phrases -- not needed here.
 
 At each search step, a beam can only extend to characters that are children
 of its current grammar-trie node (see `common.grammar_core.TrieNode`), so the
 search space is pruned to grammar-valid paths by construction rather than
 searched unconstrained and filtered after the fact.
+
+`prefix_beam_search` is an exact (bit-identical) fast path over a compiled copy
+of the trie; `_prefix_beam_search_reference` is the original straightforward
+loop and the oracle the tests compare against (docs/BEAM-SEARCH.md, section 6).
+The fast path runs a numba kernel (`vcm/_beam_numba.py`) when numba imports, else the same loop in plain
+Python; `ME2_BEAM_BACKEND` = auto (default) | numba | python | reference forces one (see `beam_backend`).
+Inputs the fast path cannot match exactly (NaN/+inf, non-integer or < 1
+`beam_width`, a non-tree trie, ...) are routed to the reference.
 
 Input/output contract: docs/VCM-CONTRACT.md section 7.
 """
@@ -19,6 +27,8 @@ Input/output contract: docs/VCM-CONTRACT.md section 7.
 from __future__ import annotations
 
 import math
+import os
+import time
 from dataclasses import dataclass
 
 import numpy as np
@@ -87,13 +97,11 @@ def _greedy_unconstrained(logp: np.ndarray) -> tuple[str, float]:
     return vcm_alphabet.decode(collapsed), mean_score
 
 
-def prefix_beam_search(
+def _prefix_beam_search_reference(
     logp: np.ndarray, root: TrieNode, beam_width: int = 50
 ) -> dict[str, BeamEntry]:
-    """Grammar-constrained CTC prefix beam search over `logp` (T, 29),
-    starting from grammar-trie node `root`. Returns the final beam:
-    prefix -> BeamEntry. Exposed (not private) so tests can verify it
-    against a brute-force reference on small synthetic cases."""
+    """The original loop, kept verbatim as the equivalence oracle for the fast
+    path below (and as the fallback for inputs it cannot match exactly)."""
     T = logp.shape[0]
     beams: dict[str, BeamEntry] = {"": BeamEntry(node=root, pb=0.0, pnb=NEG_INF)}
 
@@ -143,6 +151,222 @@ def prefix_beam_search(
         beams = next_beams
 
     return beams
+
+
+# ---------------------------------------------------------------------------
+# Exact fast path. Same arithmetic in the same order as the reference above
+# (so every float and the beam order are bit-identical), but over a compiled
+# trie: integer node ids instead of prefix strings, per-node child lists
+# instead of a walk over the whole alphabet, one `tolist()` per frame.
+# ---------------------------------------------------------------------------
+
+_N_CHARS = vcm_alphabet.ALPHABET_SIZE
+
+
+@dataclass(frozen=True)
+class _CompiledTrie:
+    nodes: list[TrieNode]
+    prefixes: list[str]
+    last_cid: list[int]                    # char id of the edge into each node (-1 for the start node)
+    children: list[list[tuple[int, int]]]  # per node: (char id, child index), ascending char id
+    ch_cid: np.ndarray                     # the same edges as (N, max children) int64 arrays, -1 padded (numba kernel)
+    ch_nid: np.ndarray
+    last_cid_arr: np.ndarray
+
+
+def _compile_trie(root: TrieNode) -> _CompiledTrie | None:
+    """Alphabet-reachable part of the trie under `root`, or None if it is not a
+    tree (a node reached twice). Edges whose character is not in the CTC
+    alphabet (e.g. the digits of "alarm 6 am") can never be emitted, and the
+    reference never looks them up, so they are dropped."""
+    nodes, prefixes, last_cid = [root], [""], [-1]
+    seen = {id(root)}
+    children: list[list[tuple[int, int]]] = []
+    i = 0
+    while i < len(nodes):
+        edges = []
+        for ch, child in sorted(
+            ((c, n) for c, n in nodes[i].children.items() if c in vcm_alphabet.CHAR_TO_ID),
+            key=lambda kv: vcm_alphabet.CHAR_TO_ID[kv[0]],
+        ):
+            if id(child) in seen:
+                return None
+            seen.add(id(child))
+            edges.append((vcm_alphabet.CHAR_TO_ID[ch], len(nodes)))
+            nodes.append(child)
+            prefixes.append(prefixes[i] + ch)
+            last_cid.append(vcm_alphabet.CHAR_TO_ID[ch])
+        children.append(edges)
+        i += 1
+    maxc = max((len(c) for c in children), default=0)
+    ch_cid = np.full((len(nodes), maxc), -1, dtype=np.int64)
+    ch_nid = np.full((len(nodes), maxc), -1, dtype=np.int64)
+    for i, edges in enumerate(children):
+        for j, (cid, child) in enumerate(edges):
+            ch_cid[i, j], ch_nid[i, j] = cid, child
+    return _CompiledTrie(nodes, prefixes, last_cid, children, ch_cid, ch_nid, np.asarray(last_cid, dtype=np.int64))
+
+
+_COMPILED_CACHE: dict[int, tuple[TrieNode, _CompiledTrie | None]] = {}
+_COMPILED_CACHE_MAX = 8
+
+
+def _get_compiled(root: TrieNode) -> _CompiledTrie | None:
+    """Compiled trie for `root`, cached by object identity (tries are immutable
+    after `compile_grammar`). The entry holds `root` itself so its id cannot be
+    reused by another object while cached."""
+    hit = _COMPILED_CACHE.get(id(root))
+    if hit is not None and hit[0] is root:
+        return hit[1]
+    compiled = _compile_trie(root)
+    if len(_COMPILED_CACHE) >= _COMPILED_CACHE_MAX:
+        _COMPILED_CACHE.pop(next(iter(_COMPILED_CACHE)))
+    _COMPILED_CACHE[id(root)] = (root, compiled)
+    return compiled
+
+
+def _prefix_beam_search_python(
+    rows: list[list[float]], compiled: _CompiledTrie, beam_width: int
+) -> dict[int, list[float]]:
+    """node index -> [pb, pnb], in the reference's beam order."""
+    last_cid, children = compiled.last_cid, compiled.children
+    lse = _logsumexp
+    beams: dict[int, list[float]] = {0: [0.0, NEG_INF]}
+    for row in rows:
+        blank = row[vcm_alphabet.BLANK_ID]
+        nxt: dict[int, list[float]] = {}
+        for nid, (pb, pnb) in beams.items():
+            total = lse(pb, pnb)
+            e = nxt.get(nid)
+            if e is None:
+                nxt[nid] = e = [NEG_INF, NEG_INF]
+            e[0] = lse(e[0], total + blank)
+            lc = last_cid[nid]
+            if lc > 0:
+                e[1] = lse(e[1], pnb + row[lc])
+            for cid, child in children[nid]:
+                d = (pb if cid == lc else total) + row[cid]
+                f = nxt.get(child)
+                if f is None:
+                    nxt[child] = f = [NEG_INF, NEG_INF]
+                f[1] = lse(f[1], d)
+        if len(nxt) > beam_width:
+            nxt = dict(sorted(nxt.items(), key=lambda kv: lse(kv[1][0], kv[1][1]), reverse=True)[:beam_width])
+        beams = nxt
+    return beams
+
+
+BEAM_BACKENDS = ("auto", "numba", "python", "reference")
+_BACKEND_ENV = "ME2_BEAM_BACKEND"
+_resolved: tuple[str, str | None] | None = None  # (backend, numba import error if auto fell back)
+_numba_search = None
+
+
+def _reset_backend() -> None:
+    """Forget the resolved backend (tests; re-reads `ME2_BEAM_BACKEND`)."""
+    global _resolved, _numba_search
+    _resolved, _numba_search = None, None
+
+
+def _load_numba():
+    global _numba_search
+    if _numba_search is None:
+        from . import _beam_numba  # lazy: numba import is ~1 s and must not happen at decoder import
+
+        _numba_search = _beam_numba.search
+    return _numba_search
+
+
+def _resolve_backend() -> tuple[str, str | None]:
+    global _resolved
+    if _resolved is None:
+        want = os.environ.get(_BACKEND_ENV, "auto") or "auto"
+        if want not in BEAM_BACKENDS:
+            raise ValueError(f"{_BACKEND_ENV} must be one of {BEAM_BACKENDS}, got {want!r}")
+        err: str | None = None
+        if want in ("auto", "numba"):
+            try:
+                _load_numba()
+                _resolved = ("numba", None)
+            except (ImportError, OSError) as exc:
+                if want == "numba":
+                    raise RuntimeError(f"{_BACKEND_ENV}=numba but numba is unavailable: {exc}") from exc
+                err = f"{type(exc).__name__}: {exc}"
+                _resolved = ("python", err)
+        else:
+            _resolved = (want, None)
+    return _resolved
+
+
+def beam_backend() -> str:
+    """Backend `prefix_beam_search` uses: "numba", "python" or "reference"."""
+    return _resolve_backend()[0]
+
+
+def numba_import_error() -> str | None:
+    """Why `auto` fell back to plain Python (None if it did not)."""
+    return _resolve_backend()[1]
+
+
+def warm_up(root: TrieNode, beam_width: int) -> tuple[str, float]:
+    """Run one tiny search so the numba JIT compile (seconds) happens at startup, not in the first live
+    window. Returns (backend, milliseconds)."""
+    t0 = time.perf_counter()
+    backend = beam_backend()
+    prefix_beam_search(np.full((4, _N_CHARS), -math.log(_N_CHARS)), root, beam_width)
+    return backend, 1000 * (time.perf_counter() - t0)
+
+
+def _prefix_beam_search_with(
+    logp: np.ndarray, root: TrieNode, beam_width: int, backend: str
+) -> dict[str, BeamEntry]:
+    if backend == "reference":
+        return _prefix_beam_search_reference(logp, root, beam_width)
+    if backend not in ("python", "numba"):
+        raise ValueError(f"unknown beam-search backend {backend!r}")
+    if (
+        isinstance(beam_width, bool)
+        or not isinstance(beam_width, (int, np.integer))
+        or beam_width < 1
+    ):
+        return _prefix_beam_search_reference(logp, root, beam_width)
+    logp = np.asarray(logp)
+    if (
+        logp.ndim != 2
+        or logp.shape[1] < _N_CHARS
+        or logp.dtype.kind != "f"
+        or not bool(np.all(logp < np.inf))  # NaN and +inf: ordering/arithmetic only the reference defines
+    ):
+        return _prefix_beam_search_reference(logp, root, beam_width)
+    compiled = _get_compiled(root)
+    if compiled is None:
+        return _prefix_beam_search_reference(logp, root, beam_width)
+    if backend == "numba":
+        # One JIT specialization only: always a fresh writable C-contiguous float64 array and a Python int.
+        ids, pb, pnb = _load_numba()(
+            np.array(logp, dtype=np.float64, order="C", copy=True),
+            int(beam_width),
+            compiled.ch_cid,
+            compiled.ch_nid,
+            compiled.last_cid_arr,
+        )
+        beams = {int(i): [float(pb[i]), float(pnb[i])] for i in ids}
+    else:
+        beams = _prefix_beam_search_python(logp.tolist(), compiled, int(beam_width))
+    return {
+        compiled.prefixes[i]: BeamEntry(node=compiled.nodes[i], pb=v[0], pnb=v[1]) for i, v in beams.items()
+    }
+
+
+def prefix_beam_search(
+    logp: np.ndarray, root: TrieNode, beam_width: int = 50
+) -> dict[str, BeamEntry]:
+    """Grammar-constrained CTC prefix beam search over `logp` (T, 29),
+    starting from grammar-trie node `root`. Returns the final beam:
+    prefix -> BeamEntry. Exposed (not private) so tests can verify it
+    against a brute-force reference on small synthetic cases. Output is
+    bit-identical to `_prefix_beam_search_reference`."""
+    return _prefix_beam_search_with(logp, root, beam_width, beam_backend())
 
 
 def decode_utterance(

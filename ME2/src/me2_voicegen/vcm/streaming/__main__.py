@@ -19,6 +19,7 @@ from pathlib import Path
 from typing import Optional
 
 from me2_voicegen.common.features import SAMPLE_RATE
+from me2_voicegen.vcm import decoder as beam_decoder
 from me2_voicegen.vcm.streaming.backends import InferenceBackend, OnnxBackend, TorchBackend
 from me2_voicegen.vcm.streaming.config import (
     StreamingConfig,
@@ -386,6 +387,11 @@ def main(argv: Optional[list[str]] = None) -> None:
         backend = TorchBackend(model_path, device=cfg.device)
 
     _print_banner(cfg, model_path, run_dir, threshold, grammar_label)
+
+    # Pay the beam-search JIT compile now, not inside the first live window (before the mic is opened).
+    beam_name, beam_ms = beam_decoder.warm_up(grammar.root, cfg.beam_width)
+    beam_note = f" (numba unavailable: {beam_decoder.numba_import_error()})" if beam_decoder.numba_import_error() else ""
+    print(f"beam search: backend={beam_name} warm-up={beam_ms:.0f} ms{beam_note}", file=sys.stderr)
 
     block_samples = max(1, int(round(cfg.block_s * SAMPLE_RATE)))
 

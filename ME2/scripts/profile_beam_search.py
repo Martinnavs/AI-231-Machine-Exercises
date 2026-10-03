@@ -1,7 +1,8 @@
 """Where the per-window decode time goes: encoder vs the grammar beam search, and what the beam search actually does.
 
 Slides a 2.5 s window over a wav at the live stride (0.25 s), times `OnnxBackend.logp_for_waveform` (log-mel features + INT8 ONNX + log-softmax)
-and `prefix_beam_search` at each beam width, and reports how blank-dominated the frames are, how many characters the grammar allows per
+and the beam search at each beam width for each backend (the original `reference` loop, the exact `python` fast path, and `numba`; all three
+must return bit-identical beams on every window or the script stops), and reports how blank-dominated the frames are, how many characters the grammar allows per
 step, and how full the beam is. Single thread, no profiler, so the times are the real ones (they include windows outside a wake-word period;
 the soak only decodes windows inside one). `docs/BEAM-SEARCH.md` quotes the output.
 
@@ -85,12 +86,30 @@ def main() -> None:
     T = logps[0].shape[0]
     print(f"{len(windows)} windows of {WINDOW_S} s at stride {STRIDE_S} s; T = {T} frames per window ({1000 * WINDOW_S / T:.0f} ms per frame)")
     print(f"encoder (features + ONNX + log-softmax): {enc_ms:.1f} ms per window")
+    backends = ["reference", "python"]
+    try:
+        D._load_numba()
+        backends.append("numba")
+        D.warm_up(grammar.root, 50)  # JIT compile outside the timings
+    except (ImportError, OSError) as exc:
+        print(f"numba unavailable ({exc}); skipping that backend")
+
+    def signature(beams):
+        return [(p, id(e.node), e.pb.hex(), e.pnb.hex()) for p, e in beams.items()]
+
     for b in a.beams:
-        t0 = time.perf_counter()
-        for lp in logps:
-            D.prefix_beam_search(lp, grammar.root, beam_width=b)
-        ms = 1000 * (time.perf_counter() - t0) / len(logps)
-        print(f"beam search, beam {b:>2}: {ms:6.1f} ms per window = {100 * ms / (ms + enc_ms):.0f}% of encoder + beam search")
+        ref_sigs, ref_ms = None, None
+        for backend in backends:
+            t0 = time.perf_counter()
+            results = [D._prefix_beam_search_with(lp, grammar.root, b, backend) for lp in logps]
+            ms = 1000 * (time.perf_counter() - t0) / len(logps)
+            sigs = [signature(r) for r in results]
+            if backend == "reference":
+                ref_sigs, ref_ms = sigs, ms
+            else:
+                assert sigs == ref_sigs, f"{backend} diverged from the reference at beam {b}"
+            note = "" if backend == "reference" else f", {ref_ms / ms:.1f}x, identical on all {len(logps)} windows"
+            print(f"beam search, beam {b:>2}, {backend:>9}: {ms:7.2f} ms per window = {100 * ms / (ms + enc_ms):.0f}% of encoder + beam search{note}")
 
     blank = np.concatenate([np.exp(lp[:, A.BLANK_ID]) for lp in logps])
     print(f"frames with P(blank) > 0.99: {100 * (blank > 0.99).mean():.1f}%, > 0.999: {100 * (blank > 0.999).mean():.1f}%")
@@ -106,7 +125,7 @@ def main() -> None:
     live = []
     for lp in sample:
         beams, per_frame = counted_beam_search(lp, grammar.root, max(a.beams))
-        assert set(beams) == set(D.prefix_beam_search(lp, grammar.root, beam_width=max(a.beams))), "instrumented copy diverged from decoder.py"
+        assert set(beams) == set(D._prefix_beam_search_reference(lp, grammar.root, beam_width=max(a.beams))), "instrumented copy diverged from decoder.py"
         live += per_frame
     live = np.array(live)
     print(f"beam {max(a.beams)}: mean live beams per frame {live.mean():.1f}, full on {100 * (live >= max(a.beams)).mean():.0f}% of frames; "
