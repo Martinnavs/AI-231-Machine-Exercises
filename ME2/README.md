@@ -63,6 +63,34 @@ Weak spots that a better room will not fix: out-of-scope false accepts, false wa
 The fast Pi keeps up on average and falls briefly behind on the slowest windows. The plain-language breakdown (misses, wrong actions, pure CTC without the classifier, no wake word at all, noise and out-of-scope),
 the latency definitions and the caveats are in [`docs/SOAK-TEST.md`](docs/SOAK-TEST.md); every table and the seen-vs-unseen data are in [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md).
 
+## Commands at a glance
+
+Run from `ME2/`. On a laptop or server use `make` (after `module load uv && make sync`). On a Raspberry Pi `uv sync` and `make` do not work (torch CUDA pin, Python 3.10 pin), so use the lean environment and call Python directly.
+
+| Task | Laptop / server | Raspberry Pi 4 |
+| --- | --- | --- |
+| One-time setup | `module load uv && make sync` | `uv venv --python 3.10 .venv-pi && uv pip install --python .venv-pi/bin/python -r requirements-pi.txt -r requirements-pi-test.txt`; then `export PYTHONPATH=src` |
+| Streaming, live microphone | `make hybrid-stream` | the command below (needs `alsa-utils`; `arecord -l` shows the card number) |
+| Streaming, replay a file | `make hybrid-stream HYBRID_SOURCE=clip.wav` | the same command with `--source clip.wav` and no `--mic-command` |
+| Holdout soak test | `make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=run SOAK_ARGS="--backend onnx --threads 1"` | `.venv-pi/bin/python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1` |
+| Tests | `make hybrid-test` | `.venv-pi/bin/python -m pytest -q tests/test_vcm_hybrid.py tests/test_vcm_streaming_endpointed.py tests/test_vcm_streaming_wakeword_gate.py tests/test_vcm_streaming_config.py tests/test_vcm_quartznet_heads.py tests/test_vcm_perturbation_plan.py tests/test_soak_run.py` |
+
+The Pi streaming command (the same settings as `make hybrid-stream`, plus `--ort-threads 1 --log-timing`; capture is 16 kHz, signed 16-bit, mono):
+
+```bash
+.venv-pi/bin/python -m me2_voicegen.vcm.streaming \
+  --model out/vcm/hybrid-ctcwide-clsxl/ctc-wide --backend onnx --onnx-variant int8 --ort-threads 1 \
+  --grammar optionb --threshold=-0.1 --required-command-margin 4.0 --beam-width 50 \
+  --gate wakeword --policy endpointed --gate-period 3 --hold-ms 200 --stable-strides 1 \
+  --wakeword-model out/wakeword-sesame-ambient-rir-45m --wakeword-backend onnx --wakeword-threshold 0.8 --wakeword-poll-s 0.05 \
+  --cls-model out/vcm/hybrid-ctcwide-clsxl/cls-xl/export/vcm_heads.int8.onnx --cls-threshold 0.8787 --cls-slot-threshold 0.6 \
+  --log-periods --log-timing \
+  --source mic --mic-command "arecord -D plughw:3,0 -f S16_LE -r 16000 -c 1 -t raw -"
+```
+
+The soak test takes about 8 minutes on a Pi 4 (7 min 30 s with the fast beam search; add `--limit 20` for a 1-minute check) and writes `soak/holdout-wake-gap-v1/results/<name>.md` only when it finishes.
+Run one soak at a time and keep the Pi cool (`vcgencmd get_throttled` should read `0x0`). More, including the mic and the Pi gotchas: [`docs/RASPBERRY-PI.md`](docs/RASPBERRY-PI.md).
+
 ## Serve
 
 ```bash
