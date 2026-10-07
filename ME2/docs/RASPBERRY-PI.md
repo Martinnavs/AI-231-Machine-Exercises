@@ -71,7 +71,7 @@ export PYTHONPATH=src
 .venv-pi/bin/python -m pytest -q tests/test_vcm_decoder_fast_beam.py                                                                 # fast paths are bit-identical to the original (about 4 minutes on a Pi 4)
 ```
 
-Checked on a cold clone of the branch: the second command passes (130 tests) and the first set collects 162 tests. Tests that need the archived model runs skip when the files are missing.
+Checked on a cold clone of the branch: the first set passes (162 tests, 4 deselected; about 1.5 minutes) and the second passes (130 tests). `requirements-pi-test.txt` includes `onnx`, which one export test needs. Tests that need the archived model runs skip when the files are missing.
 
 ## What a fresh clone does and does not contain
 

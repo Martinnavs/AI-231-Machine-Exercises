@@ -1,2 +1,4 @@
 # Test tools for the Pi environment (not needed to run the model): uv pip install --python .venv-pi/bin/python -r requirements-pi-test.txt
+# onnx is only for the tests that export a model to ONNX (tests/test_vcm_hybrid.py); serving uses onnxruntime.
 pytest==9.1.1
+onnx==1.16.1
