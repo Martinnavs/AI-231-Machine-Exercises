@@ -1,0 +1,2 @@
+# Test tools for the Pi environment (not needed to run the model): uv pip install --python .venv-pi/bin/python -r requirements-pi-test.txt
+pytest==9.1.1

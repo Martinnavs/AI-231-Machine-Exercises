@@ -38,7 +38,7 @@ uv run python scripts/build_soak_continuous.py --sessions out/soak/holdout-wake-
 # the current streaming settings, scored; results in <sessions>/results/<name>.{md,json} and raw JSONL in <sessions>/raw/<name>/
 make soak-run SOAK_DIR=out/soak/holdout-wake-gap-v1 SOAK_NAME=my-run                                       # CPU, INT8 ONNX (the same settings as the Pi, but run it on a laptop or server: `make` fails on a Pi, see below)
 make soak-run SOAK_DIR=out/soak/holdout-wake-gap-v1 SOAK_NAME=a100 SOAK_ARGS="--backend torch --device cuda:0 --gpu 5"   # PyTorch on a GPU (never GPU 6)
-# options: --no-cls (CTC only), --stride-s 0.125, --gate {wakeword,always} (always = no wake word), --beam-width N (default 50), --gate-period 3, --wakeword-threshold, --cls-slot-threshold, --workers N (per-session mode), --limit N
+# options: --no-cls (CTC only), --stride-s 0.125, --gate {wakeword,always} (always = no wake word), --beam-width N (default 50), --gate-period 3, --wakeword-threshold, --cls-slot-threshold, --workers N (per-session mode), --limit N (first N units; with --continuous it also stops streaming after them)
 ```
 
 `scripts/soak_run.py` streams `continuous.wav` once (or one process per session without `--continuous`) with `--log-all-windows --log-timing` and scores by time range.

@@ -6,6 +6,8 @@
 are x86_64 with CUDA; a Pi is aarch64 with no CUDA. `uv sync` also tries to install the whole CosyVoice/TTS stack (`openai-whisper`, `pyworld`, `modelscope`, ...), which the streaming runtime
 does not need and which may not build on ARM. So do not `uv sync` on the Pi: use the lean environment below.
 
+**Disk:** about 3 GB free for a cold start (measured: the clone is 0.4 GB with its history, the `.venv-pi` environment 0.7 GB, uv's download cache and the Python 3.10 uv fetches add more, and a soak writes a few MB). On a 16 GB SD card with other projects on it, check `df -h /` first; an install that runs out of space fails with `No space left on device` while extracting wheels.
+
 **Requirements:** 64-bit Raspberry Pi OS (a 32-bit OS has no torch wheels), Python 3.10 (the project pins `>=3.10,<3.11`; Bookworm ships 3.11, so let uv fetch 3.10), and for the microphone `alsa-utils`.
 
 ```bash
@@ -57,12 +59,33 @@ cat soak/holdout-wake-gap-v1/results/rpi4.md        # compare with results/tuned
 Look at "decode per window" and the real-time factor. On the server one decode takes about 70 ms against the 250 ms stride (p95 factor 0.5); a factor above 1 means the Pi cannot keep up live,
 and `--stride-s 0.5` or a CTC-only run (`--no-cls`) would be the next things to try. Method and server results: [`SOAK-TEST.md`](SOAK-TEST.md).
 
+## Run the tests on a Pi
+
+`make hybrid-test` needs the full `uv` environment, which does not install on a Pi. Use the lean one plus pytest:
+
+```bash
+uv pip install --python .venv-pi/bin/python -r requirements-pi-test.txt
+export PYTHONPATH=src
+.venv-pi/bin/python -m pytest -q tests/test_vcm_hybrid.py tests/test_vcm_streaming_endpointed.py tests/test_vcm_streaming_wakeword_gate.py \
+  tests/test_vcm_streaming_config.py tests/test_vcm_quartznet_heads.py tests/test_vcm_perturbation_plan.py tests/test_soak_run.py     # the make target's files
+.venv-pi/bin/python -m pytest -q tests/test_vcm_decoder_fast_beam.py                                                                 # fast paths are bit-identical to the original (about 4 minutes on a Pi 4)
+```
+
+Checked on a cold clone of the branch: the second command passes (130 tests) and the first set collects 162 tests. Tests that need the archived model runs skip when the files are missing.
+
+## What a fresh clone does and does not contain
+
+Tracked and enough for everything on this page: the hybrid model (`out/vcm/hybrid-ctcwide-clsxl/`), the wake word (`out/wakeword-sesame-ambient-rir-45m/`), and the 63 MB soak recording with its truth file (`soak/holdout-wake-gap-v1/`, check with `sha256sum -c SHA256SUMS`).
+**Not in a clone:** the earlier models. `make app-pipeline`, `make vcmx-serve`, `make stream-wakeword` and the older tests default to them; see [`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md) to restore them or point the variable at the hybrid.
+**`make` and Python 3.10:** the Makefile pins `UV_PYTHON=/usr/bin/python3.10`. Raspberry Pi OS does not ship 3.10 (this Pi has 3.13), so use the `uv venv --python 3.10` route above, which downloads it.
+
 ## Soak-run gotchas on a Pi
 
 - **One run at a time.** A second run halves the cores and corrupts the timings of both. Check first: `pgrep -fc '[v]cm.streaming --model'` must print `0`. A "wait, then run" loop plus a direct start once launched two copies.
 - **Do not `pkill -f` a pattern that appears in your own command line**: it kills the calling shell (exit 144). Use the bracket trick (`pkill -f '[v]cm.streaming'`) or kill by pid.
 - **No progress indicator.** `scripts/soak_run.py --continuous` writes `results/<name>.{md,json}` only when it finishes (about 7.5 minutes with the fast beam search, about 21 minutes with the original). The raw JSONL is also written only at the end; watch `top` to see it is alive.
 - **Keep the Pi cool and powered**: `vcgencmd get_throttled` should read `0x0` before and after; a throttled run is slower and under-volted.
+- **A quick check**: `--limit N` streams only the audio of the first N units (N=20 takes about 1 minute instead of 8, with the same counts for those units).
 - **Options**: `--gate {wakeword,always}` (`always` runs with no wake word), `--beam-width N` (default 50), `--threads 1` (more threads slow the tiny wake-word network).
 - `soak/holdout-wake-gap-v1/results/tuned-cpu-onnx-int8-hybrid.json` is committed but is not valid UTF-8 JSON (`file` reports `data`); read the `.md` beside it.
 

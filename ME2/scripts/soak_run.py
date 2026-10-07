@@ -70,7 +70,15 @@ def run_continuous(a: argparse.Namespace, raw_dir: Path) -> list[dict]:
     env = {**os.environ, "OMP_NUM_THREADS": str(a.threads), "MKL_NUM_THREADS": str(a.threads)}
     if a.gpu is not None:
         env["CUDA_VISIBLE_DEVICES"] = str(a.gpu)
-    cmd = [sys.executable, "-m", "me2_voicegen.vcm.streaming", *cli_args(a), "--source", str(a.sessions / "continuous.wav")]
+    source = a.sessions / "continuous.wav"
+    if a.limit:  # stream only as much audio as the scored sessions cover (a full pass takes as long as the recording)
+        import soundfile as sf
+        source = raw_dir / "continuous-limit.wav"
+        info = sf.info(str(a.sessions / "continuous.wav"))
+        stop = int(meta["sessions"][: a.limit][-1]["range_end_s"] * info.samplerate)
+        audio, rate = sf.read(str(a.sessions / "continuous.wav"), frames=stop, dtype="int16")
+        sf.write(str(source), audio, rate, subtype="PCM_16")
+    cmd = [sys.executable, "-m", "me2_voicegen.vcm.streaming", *cli_args(a), "--source", str(source)]
     p = subprocess.run(cmd, cwd=ROOT, env=env, capture_output=True, text=True)
     lines = [ln for ln in p.stdout.splitlines() if ln.startswith("{")]
     (raw_dir / "continuous.jsonl").write_text("\n".join(lines))
