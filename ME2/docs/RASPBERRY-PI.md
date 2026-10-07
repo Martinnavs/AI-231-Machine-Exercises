@@ -57,6 +57,28 @@ cat soak/holdout-wake-gap-v1/results/rpi4.md        # compare with results/tuned
 Look at "decode per window" and the real-time factor. On the server one decode takes about 70 ms against the 250 ms stride (p95 factor 0.5); a factor above 1 means the Pi cannot keep up live,
 and `--stride-s 0.5` or a CTC-only run (`--no-cls`) would be the next things to try. Method and server results: [`SOAK-TEST.md`](SOAK-TEST.md).
 
+## Soak-run gotchas on a Pi
+
+- **One run at a time.** A second run halves the cores and corrupts the timings of both. Check first: `pgrep -fc '[v]cm.streaming --model'` must print `0`. A "wait, then run" loop plus a direct start once launched two copies.
+- **Do not `pkill -f` a pattern that appears in your own command line**: it kills the calling shell (exit 144). Use the bracket trick (`pkill -f '[v]cm.streaming'`) or kill by pid.
+- **No progress indicator.** `scripts/soak_run.py --continuous` writes `results/<name>.{md,json}` only when it finishes (about 7.5 minutes with the fast beam search, about 21 minutes with the original). The raw JSONL is also written only at the end; watch `top` to see it is alive.
+- **Keep the Pi cool and powered**: `vcgencmd get_throttled` should read `0x0` before and after; a throttled run is slower and under-volted.
+- **Options**: `--gate {wakeword,always}` (`always` runs with no wake word), `--beam-width N` (default 50), `--threads 1` (more threads slow the tiny wake-word network).
+- `soak/holdout-wake-gap-v1/results/tuned-cpu-onnx-int8-hybrid.json` is committed but is not valid UTF-8 JSON (`file` reports `data`); read the `.md` beside it.
+
+## Running the VCM benchmark's replay on the Pi
+
+The results in [`VCM-BENCHMARK-RESULTS.md`](VCM-BENCHMARK-RESULTS.md) come from `scripts/vcm_benchmark/`. It needs its own small environment next to a clone of <https://github.com/airimonda/vcm-benchmark> at `<repo>/.vcm-benchmark/`:
+
+```bash
+git clone https://github.com/airimonda/vcm-benchmark .vcm-benchmark && cd .vcm-benchmark
+python3 -m venv .venv && .venv/bin/pip install -r requirements.txt       # numpy, soundfile, pandas, pyarrow, onnx, pytest
+cp ../ME2/scripts/vcm_benchmark/*.py .
+```
+
+`sounddevice` cannot be imported on a Pi without PortAudio (`sudo apt install libportaudio2`), so `python benchmark.py` fails at start-up and one of the benchmark's tests (`test_sim_run`) fails; the replay scripts never import it. They stream through the
+ME2 environment's Python (`ME2/.venv/bin/python`), so build that first (or edit `replay_bench.py` to use `.venv-pi`). The microphone capture for the acoustic runs is `arecord -D plughw:<card>,0 -f S16_LE -r 16000 -c 1 file.wav`.
+
 ## If torch still will not install
 
 - `pip download torch==2.3.1` on the Pi should pick a `manylinux2014_aarch64` wheel; if it picks nothing, the OS or Python is the wrong architecture or version (`uname -m` must print `aarch64`; `python3.10 -V`).

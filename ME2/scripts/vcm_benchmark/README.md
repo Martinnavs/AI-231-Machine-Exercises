@@ -10,4 +10,6 @@ Used for `docs/VCM-BENCHMARK-RESULTS.md`. They run from the root of a clone of <
 | `agc.py`, `agc_score.py` | causal AGC with a noise gate, and the fixed-gain / AGC scoring of the laptop recording |
 | `phone_align*.py`, `phone_score*.py` | per-trial alignment of a recording to the clean timeline, then raw and mel-mapped scoring (phone and laptop runs) |
 
+Environment: a plain venv in the clone (`python3 -m venv .venv && .venv/bin/pip install -r requirements.txt`; on a Pi `sounddevice` needs `libportaudio2` to import, the replay scripts do not import it), and the streaming step runs `ME2/.venv/bin/python`; see `docs/RASPBERRY-PI.md`.
+
 The acoustic runs need the played file (`vcm_full.wav`, built from `runs/full/stream.wav` plus three beeps) and an `arecord` capture; see the results document for the procedure and its limits.

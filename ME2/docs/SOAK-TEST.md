@@ -36,13 +36,13 @@ uv run python scripts/build_soak_continuous.py --sessions out/soak/holdout-wake-
 
 ```bash
 # the current streaming settings, scored; results in <sessions>/results/<name>.{md,json} and raw JSONL in <sessions>/raw/<name>/
-make soak-run SOAK_DIR=out/soak/holdout-wake-gap-v1 SOAK_NAME=my-run                                       # CPU, INT8 ONNX (what the Pi runs)
+make soak-run SOAK_DIR=out/soak/holdout-wake-gap-v1 SOAK_NAME=my-run                                       # CPU, INT8 ONNX (the same settings as the Pi, but run it on a laptop or server: `make` fails on a Pi, see below)
 make soak-run SOAK_DIR=out/soak/holdout-wake-gap-v1 SOAK_NAME=a100 SOAK_ARGS="--backend torch --device cuda:0 --gpu 5"   # PyTorch on a GPU (never GPU 6)
-# options: --no-cls (CTC only), --stride-s 0.125, --gate-period 3, --wakeword-threshold, --cls-slot-threshold, --workers N (per-session mode), --limit N
+# options: --no-cls (CTC only), --stride-s 0.125, --gate {wakeword,always} (always = no wake word), --beam-width N (default 50), --gate-period 3, --wakeword-threshold, --cls-slot-threshold, --workers N (per-session mode), --limit N
 ```
 
 `scripts/soak_run.py` streams `continuous.wav` once (or one process per session without `--continuous`) with `--log-all-windows --log-timing` and scores by time range.
-**On a Raspberry Pi:** copy the repo (or `scripts/soak_run.py` and the model files), put `continuous.wav` and `continuous.json` in a folder, and run the same command with
+**On a Raspberry Pi do not use `make soak-run`:** the Makefile pins `UV_PYTHON=/usr/bin/python3.10` and runs `uv run`, which tries to install the x86 CUDA torch. Call the lean environment's Python directly, as in [`RASPBERRY-PI.md`](RASPBERRY-PI.md) ("Run the soak recording on the Pi", with its notes on running one at a time). Copy the repo (or `scripts/soak_run.py` and the model files), put `continuous.wav` and `continuous.json` in a folder, and run the same command with
 `--backend onnx --threads 1`. The timings in the result use the same fields, so the two machines are directly comparable; `raw/<name>/continuous.jsonl` is every streaming record.
 
 **Scoring.** A command is correct if the first trigger in its time range (unit start to the next unit's start) has the right intent and slot; missed if there is no trigger

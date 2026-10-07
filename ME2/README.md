@@ -93,7 +93,7 @@ make hybrid-test                                              # hybrid decoder, 
 make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=run SOAK_ARGS="--backend onnx --threads 1"   # the soak (the 63 MB recording is in the repo)
 ```
 
-On a Pi `make soak-run` fails (`uv run` tries to install the x86 CUDA torch): call `.venv/bin/python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1` (needs numba, in `requirements-pi.txt`; keep the Pi cool: `vcgencmd get_throttled` should read `0x0`).
+On a Pi `make soak-run` fails (`uv run` tries to install the x86 CUDA torch): call (from `ME2/`, with `export PYTHONPATH=src`, in the lean Pi environment from [`docs/RASPBERRY-PI.md`](docs/RASPBERRY-PI.md)) `.venv-pi/bin/python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1` (needs numba, in `requirements-pi.txt`; keep the Pi cool: `vcgencmd get_throttled` should read `0x0`; run one soak at a time, see the Pi doc).
 Whole-clip scoring and replays: [`docs/CURRENT-MODEL.md`](docs/CURRENT-MODEL.md) ("Evaluating"). Method: [`docs/SOAK-TEST.md`](docs/SOAK-TEST.md).
 
 ## Train
