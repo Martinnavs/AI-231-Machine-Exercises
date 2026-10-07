@@ -11,6 +11,7 @@ Then [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) for what can and cannot be rep
 | [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) | Verified check of the checked-in model; retraining; the part of the data recipe that is not public |
 | [`BENCHMARKS.md`](BENCHMARKS.md) | Every benchmark table: headline metrics, results by split, seen vs unseen data, the unseen-noise replay, the soak on a Pi and a server |
 | [`SOAK-TEST.md`](SOAK-TEST.md) | The deployment-shaped soak: wake word + gap + command with reverb and noise, how to run it (also on a Raspberry Pi), results, tuning, failure analysis |
+| [`VCM-BENCHMARK-RESULTS.md`](VCM-BENCHMARK-RESULTS.md) | The final pre-production test: the class VCM benchmark on a Pi 4 (clean file replay, phone and laptop speaker -> USB mic runs, mel-band map, AGC check), what to report and what not to |
 | [`RASPBERRY-PI.md`](RASPBERRY-PI.md) | Running the hybrid on a Pi: the torch +cu121 fix, the lean install, the microphone command, the soak run |
 | [`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md) | Which model binaries were untracked from git, where the archive is, what needs them |
 | [`AI231-FIL50.md`](AI231-FIL50.md) | The experiment log: persona padding, rules A-D, wider models, internal data, the leak finding, the hybrid, streaming, wake-word polling, ticket 04 re-evaluation |

@@ -119,3 +119,80 @@ A longer period recovers timeouts but lets in wrong actions and false accepts, s
 - Raspberry Pi 4 (one thread, tuned hybrid, 2026-10-03): the same 151/186 correct as the server CPU in every run. With the original beam search it needed 443 ms mean per decoded window (real-time factor 3.21, estimated live latency 0.99 s median); with the exact numba beam search and a fan it needs 63 ms (factor 0.96, estimated live latency 0.48 s median, 0.92 s p95), so it keeps up live with little spare time. All five Pi runs and the breakdown: [`BENCHMARKS.md`](BENCHMARKS.md). Server numbers are one thread per process on a shared 256-core node (other users' load can inflate timings a little).
 - `scripts/soak_run.py` and the streaming flags `--log-timing`, `--wakeword-poll-s`, `--wakeword-threshold`, `--cls-model`, `--cls-slot-threshold`, `--cls-hold-ms`, `--cls-min-speech-ms` are documented in
   [`AI231-FIL50.md`](AI231-FIL50.md) ("Hybrid in streaming") and `python -m me2_voicegen.vcm.streaming --help`.
+
+## Results in plain terms (moved here from the README)
+
+Holdout soak (186 commands + 16 out-of-scope clips behind a wake word, reverb and noise), counts, the pure-CTC run, the no-wake-word run and the noise/out-of-scope tables. Text and numbers are unchanged from the README.
+
+Soak: 186 holdout commands + 16 out-of-scope clips behind a wake word, reverb and noise, 32.6 min, tuned settings (beam 50, wake word 0.8, slot gate 0.6), INT8 ONNX, one thread, stride 0.25 s.
+**Latency first.** The answers are identical on all three machines; only the speed differs:
+
+| | **Pi 4, fast beam search** | Pi 4, original beam search | Server CPU, original |
+| --- | ---: | ---: | ---: |
+| **Estimated live latency after end of speech**, median / p95 | **0.48 / 0.92 s** | 0.99 / 1.49 s (a lower bound: it falls behind) | not computed |
+| Replay latency after end of speech (compute not counted), median / p95 | 0.38 / 0.65 s | 0.38 / 0.65 s | 0.38 / 0.65 s |
+| Compute per 0.25 s window (wake word + decode), mean / p95 / max | **100 / 239 / 305 ms** | 481 / 802 / 1,654 ms | 76 / 132 / n/a ms |
+| Real-time factor, p95 (1 = live limit) | **0.96** | 3.21 | 0.53 |
+| Whole 32.6 min replay | 7 min 30 s | 20 min 47 s | n/a |
+| Correct first trigger | 81.2% (151/186) | 81.2% (151/186) | 81.2% (151/186) |
+| Wrong actions / out-of-scope triggered / gap triggers | 9 / 3 of 16 / 0 | 9 / 3 of 16 / 0 | 9 / 3 of 16 / 0 |
+
+How to read the latency rows: the replay latency is the time from the end of speech to the answer on the audio clock; it does not include the time to compute. The estimated live latency adds the answering window's own
+wake word + decode time (measured on the Pi, `soak/holdout-wake-gap-v1/results/`). The Pi now answers in about half a second, but with little spare time: the slowest 5% of windows take 239 ms or more of the 250 ms stride,
+so a live microphone keeps up on average and falls briefly behind on the slowest windows. The original search is shown for comparison; at a real-time factor of 3.2 it queues, so its true delay would be longer than 0.99 s.
+What changed: the exact numba beam search (`optionb-ctc-attention-fast-beam`, bit-identical answers, `docs/BEAM-SEARCH.md`). The fast Pi run had the fan on (64-66 C, 1.5 GHz for the whole run); the original-search run was
+throttled and under-volted, so a clean original would be somewhat faster than shown. Keep one thread: four threads slow the tiny wake-word network (38 to 131 ms), and a narrower beam (10) gains nothing once the search is fast and costs a little accuracy (`docs/BEAM-SEARCH.md`).
+
+What the soak accuracy means in plain terms (the same on the Pi and the server; counts from `soak/holdout-wake-gap-v1/results/rpi4.md`):
+
+**Commands: detected correctly or not** (186 spoken commands, each after "sesame"):
+
+| Outcome | Count | Share |
+| --- | ---: | ---: |
+| Correct: right intent and right slot (e.g. "timer 10 seconds") | 151 | 81.2% |
+| Wrong action: it answered, but with the wrong intent or slot | 9 | 4.8% |
+| Missed: no answer at all | 26 | 14.0% |
+| ...of which the wake word never opened a listening period | 5 | 2.7% |
+| ...of which the period opened but the command was rejected or timed out | 21 | 11.3% |
+
+A wrong action is the costly error (the device does the wrong thing); a miss only means the user repeats the command.
+
+**Pure CTC (no classifier fallback) on the same soak**, server CPU INT8, one thread, same tuned wake word (`soak/holdout-wake-gap-v1/results/tuned-cpu-onnx-int8-ctc-only.md`; not run on the Pi, but the answers don't depend on hardware):
+
+| | Hybrid (above) | Wide CTC alone |
+| --- | ---: | ---: |
+| Correct intent and slot | 151 (81.2%) | 137 (73.7%) |
+| Wrong action | 9 (4.8%) | 3 (1.6%) |
+| Missed | 26 (14.0%) | 46 (24.7%) |
+| ...wake word never opened a period | 5 | 5 |
+| Out-of-scope sentences wrongly triggered | 3 of 16 | 3 of 16 (same three: WEATHER, VOLUME_UP, LIGHT_OFF) |
+| Ambient-noise triggers | 0 | 0 |
+| Latency after end of speech, median / p95 | 0.38 / 0.65 s | 0.37 / 0.48 s |
+| Decode per window, mean / p95 (server CPU) | 70 / 126 ms | 70 / 111 ms |
+
+The classifier fallback turns 14 more commands into correct answers but adds 6 more wrong actions; the pure CTC is more conservative (it rejects what it isn't sure of). Whole-clip, pure-CTC accuracy is in the Performance table above.
+
+**No wake word at all (always listening)**: the "CTC only" row above still had the wake word in front of the decoder. This run removes it: same 202 holdout units, rooms, noise clips and SNRs (seed 0), but no "sesame" and no gap, so every 0.25 s window is decoded (`--gate always`). Audio: `soak/holdout-nowake-v1/` (27.7 min, ~15 min of it noise only); built with `scripts/build_soak_audio.py --no-wake`. Server CPU INT8, one thread; results in `soak/holdout-nowake-v1/results/nowake-*.md`, recipe in its README.
+
+| | Wide CTC alone | Hybrid |
+| --- | ---: | ---: |
+| Correct intent and slot (of 186) | 143 (76.9%) | 165 (88.7%) |
+| Wrong action | 5 (2.7%) | 7 (3.8%) |
+| Missed | 38 (20.4%) | 14 (7.5%) |
+| Out-of-scope sentences wrongly triggered (of 16) | 4 | 4 (CALL, STOP, CALL, LIGHT_OFF) |
+| Triggers in noise-only audio (~15 min) | 2 (WEATHER, CALL) | 4 (WEATHER, CALL, BRIGHTNESS x2) |
+| Latency after end of speech, median / p95 | 0.33 / 0.47 s | 0.34 / 0.72 s |
+| Decode per window, mean / p95 | 92 / 109 ms | 93 / 119 ms |
+
+Without the wake word the model hears the whole stream, so it answers more commands (no missed wake words) but also fires on noise (2-4 false actions in ~15 min) and on one more out-of-scope sentence. That is the false-action rate the wake word is there to prevent. Decoding every window takes about 4x the compute of the gated runs (~6,300 windows vs ~2,100). Not run on the Pi.
+
+**Noise and non-commands: correctly ignored or not:**
+
+| Input | Total | Correctly ignored | Wrongly triggered |
+| --- | ---: | ---: | ---: |
+| Ambient room noise between commands, no wake word (~15 min) | ~15 min | all of it | **0 triggers** |
+| Out-of-scope speech after a wake word (16 ordinary sentences that are not commands) | 16 | 13 (81%) | 3 (19%): WEATHER, VOLUME_UP, LIGHT_OFF |
+
+The between-command audio is ambient noise clips from the dataset (reverb added), not a separate babble or crowd-talk test. The 3 out-of-scope false triggers are real speech arriving after a wake word, which the wake word cannot filter. Ordinary conversation with no wake word (the case that would cause false wakes) is not measured here.
+
+Caveats: the holdout's human voices are one real Filipino speaker (50% whole-clip, so accent coverage is the weak spot); soak rooms and most noise clips overlap training; false wakes from ordinary speech are not measured.

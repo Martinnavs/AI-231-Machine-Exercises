@@ -120,3 +120,5 @@ Results: `soak/holdout-wake-gap-v1/results/rpi4.md` (original, beam 50), `rpi4-b
 The soak audio is in `soak/holdout-wake-gap-v1/` (`continuous.wav` and the truth). On a Pi, `make soak-run` fails (`uv run` tries to install the x86 CUDA torch), so call the script with the Pi's venv:
 `python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1` (needs numba; keep the Pi cool),
 and compare with `soak/holdout-wake-gap-v1/results/`. Reverb, noise and the 16 out-of-scope clips come from public data only; wake-word false wakes from ordinary speech are not measured.
+
+Final pre-production test (the class VCM benchmark on a Pi 4, with a laptop speaker and USB mic): [`VCM-BENCHMARK-RESULTS.md`](VCM-BENCHMARK-RESULTS.md).

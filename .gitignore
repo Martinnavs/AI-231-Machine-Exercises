@@ -16,3 +16,6 @@ __pycache__/
 # Datasets pulled at runtime
 data/
 MNIST/
+
+# VCM benchmark clone and its recordings (see ME2/scripts/vcm_benchmark/)
+.vcm-benchmark/
