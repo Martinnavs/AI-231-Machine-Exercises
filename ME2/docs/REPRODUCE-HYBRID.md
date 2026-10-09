@@ -75,7 +75,7 @@ What is still not reproducible:
 | Dataset DOI and licence | `airimonda/ai231-me2-voice-commands` revision `e8283202634f23257ad944ee104b9de7a1223bb5`, DOI 10.57967/hf/10723 (Ailene Nunez 2026, "ai231-me2-voice-commands (Revision e828320)", Hugging Face). The gap-fill (1,849) and numeral-wording (4) clips are not in it: they come from `martinnavs/ai231-fil-supplemental-data` @ `230c8b8`; persona clips come from the DOI dataset's `supplemental_fil`. Several source corpora are non-commercial; the persona reference-voice provenance is an open item the uploader accepted (see the dataset card) |
 | Test set with unseen speakers | ai231 test is speaker-disjoint from train; the persona test uses 5 held-out voices; the real-speaker holdout is one person (186 clips) |
 | Baselines | every model tried, with sources and caveats: [`BASELINES.md`](BASELINES.md) |
-| Pi 4 | measured 2026-10-03: same answers as the server, but decode 443 / 764 ms mean / p95 per window, RTF 3.21 at the 0.25 s stride (does not keep up live); see `BENCHMARKS.md` |
+| Pi 4 | same answers as the server; with the fast beam search (beam 50, 1 thread, fan on) estimated live latency is 0.48 / 0.92 s median / p95 and the p95 real-time factor is 0.96 at the 0.25 s stride, so it keeps up live (just). The original beam search (p95 RTF 3.21) did not; see `BENCHMARKS.md` |
 | Seeds | one per model |
 
 ### The single command
