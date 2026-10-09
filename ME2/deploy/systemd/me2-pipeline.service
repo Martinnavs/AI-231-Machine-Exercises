@@ -1,0 +1,18 @@
+[Unit]
+Description=ME2 live voice pipeline (mic -> streaming -> UI forwarder)
+After=me2-ui.service sound.target
+Wants=me2-ui.service
+
+[Service]
+WorkingDirectory=%h/Documents/AI-222-Machine-Exercises/ME2
+# Wait for the UI to answer so the first events are not dropped.
+ExecStartPre=/bin/bash -c 'for i in $(seq 60); do curl -sf -o /dev/null http://127.0.0.1:8000/ && exit 0; sleep 1; done; exit 1'
+# Stable ALSA name (card numbers can change between boots).
+ExecStart=/usr/bin/make app-pipeline-ctcwide "APP_MIC_COMMAND=arecord -D plughw:CARD=UACDemoV10,DEV=0 -f S16_LE -r 16000 -c 1 -t raw -"
+# The pipe has no pipefail: if the streaming process dies, the forwarder
+# exits 0 on EOF, so restart on any exit.
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=default.target

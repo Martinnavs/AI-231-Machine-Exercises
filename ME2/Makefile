@@ -130,7 +130,7 @@ APP_PERCHAR_THRESHOLD ?= -1.204
 APP_QUARTZNET_THRESHOLD ?= -0.1
 APP_QUARTZNET_MARGIN ?= 20.0
 
-.PHONY: help sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream app-pipeline-perchar app-pipeline-quartznet quartznet-eval-report wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline
+.PHONY: help sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream app-pipeline-perchar app-pipeline-quartznet quartznet-eval-report wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline app-pipeline-ctcwide app-lan
 
 WAKEWORD_CLONE_DIR ?= $(if $(TMPDIR),$(TMPDIR),/tmp)/me2_wakeword_clone
 WAKEWORD_POSITIVES_OUT_DIR ?= out/conversions/v2/wakeword/positives_real
@@ -278,8 +278,17 @@ stream-wakeword:
 # / terminal window). The model side reaches it one-way over its HTTP API:
 # terminal 1 runs a streaming recipe piped into `python -m app.forward`,
 # terminal 2 runs this. See the README "UI site" section.
+APP_HOST ?= 127.0.0.1
+APP_PORT ?= 8000
 app:
-	$(APP_VENV_BIN)/uvicorn app.main:app --host 127.0.0.1 --port 8000
+	$(APP_VENV_BIN)/uvicorn app.main:app --host $(APP_HOST) --port $(APP_PORT)
+
+# The same dashboard reachable from other machines on the LAN
+# (http://<this-host-ip>:8000). There is no auth: anyone on the network can
+# open the UI and POST /api/command, so use a trusted network only. Keep the
+# forwarder on its default http://127.0.0.1:8000 -- it runs on this host.
+app-lan:
+	$(MAKE) app APP_HOST=0.0.0.0
 
 # Feature `ui-site`: the live model-serving pipeline that feeds the
 # dashboard (terminal 1 of the two-window setup; terminal 2 runs `make
@@ -290,6 +299,16 @@ app:
 # APP_PIPELINE_SOURCE with a wav path for a file-replay run.
 app-pipeline:
 	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model $(APP_PIPELINE_MODEL) --backend onnx --onnx-variant int8 --grammar optionb --threshold $(APP_PIPELINE_THRESHOLD) $(if $(APP_PIPELINE_MARGIN),--required-command-margin $(APP_PIPELINE_MARGIN),) --score-mode $(APP_PIPELINE_SCORE_MODE) --beam-width 50 --gate wakeword --policy single_period --gate-period 3 --wakeword-model out/wakeword-sesame --wakeword-backend onnx --log-periods --source "$(APP_PIPELINE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward
+
+# The Pi 4 production operating point (hybrid CTC-wide + classifier heads,
+# endpointed policy, ambient-RIR wakeword) piped one-way into the UI, with
+# `--emit-listening` so the dashboard's listening indicator follows the gate.
+# Terminal 2 runs `make app`. APP_PIPELINE_SOURCE=mic uses APP_MIC_COMMAND
+# (override the ALSA device); set it to a wav path for a file replay.
+APP_MIC_COMMAND ?= arecord -D plughw:3,0 -f S16_LE -r 16000 -c 1 -t raw -
+APP_CTCWIDE_DIR ?= out/vcm/hybrid-ctcwide-clsxl
+app-pipeline-ctcwide:
+	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model $(APP_CTCWIDE_DIR)/ctc-wide --backend onnx --onnx-variant int8 --grammar optionb --threshold=-0.1 --required-command-margin 4.0 --beam-width 50 --gate wakeword --policy endpointed --gate-period 3 --hold-ms 200 --stable-strides 1 --wakeword-model out/wakeword-sesame-ambient-rir-45m --wakeword-backend onnx --wakeword-threshold 0.8 --wakeword-poll-s 0.05 --cls-model $(APP_CTCWIDE_DIR)/cls-xl/export/vcm_heads.int8.onnx --cls-threshold 0.8787 --cls-slot-threshold 0.6 --log-periods --emit-listening --source "$(APP_PIPELINE_SOURCE)" $(if $(filter mic,$(APP_PIPELINE_SOURCE)),--mic-command "$(APP_MIC_COMMAND)",) | $(APP_VENV_BIN)/python -m app.forward
 
 # OPT-IN TRIAL (dense-d2-loose-impl): the same pipeline scored per character
 # instead of per frame, no incomplete-prefix margin gate. NOT the production

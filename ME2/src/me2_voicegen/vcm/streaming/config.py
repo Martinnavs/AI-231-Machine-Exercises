@@ -119,6 +119,7 @@ _FIELD_TYPES: dict[str, type] = {
     "gate": str,
     "gate_period_s": float,
     "log_periods": bool,
+    "emit_listening": bool,
     "required_command_margin": float,
     "score_mode": str,
     "wakeword_model": str,
@@ -222,6 +223,7 @@ class StreamingConfig:
     gate: str = "none"
     gate_period_s: float = 5.0
     log_periods: bool = False
+    emit_listening: bool = False  # JSONL `listening` records on stdout (for app.forward)
     required_command_margin: Optional[float] = None
     score_mode: str = "mean_frame"
     wakeword_model: str = "default"

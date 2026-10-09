@@ -667,6 +667,15 @@ paths before the `try`). The startup banner reports the gate:
 period)` -- the as-shipped wording prints the float followed by a space
 and `s`, so `--gate-period 10` prints `10.0 s`.
 
+### `--emit-listening` (stdout `listening` records, opt-in)
+
+Off by default. With it, a gate period opening (`open`/`reopened`) prints
+`{"event": "listening", "state": "active", "t_seconds": t}` on stdout, and a
+period closing (accept, reject, time-out, or the run ending with a period
+open) prints the same with `"state": "passive"`. `app.forward` posts these to
+the UI's `/api/listening`; without the flag stdout is unchanged. It is
+independent of `--log-periods`. `make app-pipeline-ctcwide` uses it.
+
 ### The `--log-periods` digest (stderr; stdout JSONL untouched)
 
 The middle verbosity between "triggers only" and `--log-all-windows`:

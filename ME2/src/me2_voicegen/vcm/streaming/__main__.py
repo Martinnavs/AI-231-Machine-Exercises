@@ -142,6 +142,14 @@ def build_arg_parser() -> argparse.ArgumentParser:
         "the period's consolidated result (rejected periods included) -- the "
         "JSONL on stdout is unchanged; use --log-all-windows for every window",
     )
+    parser.add_argument(
+        "--emit-listening",
+        dest="emit_listening",
+        action="store_true",
+        default=None,
+        help="emit a JSONL 'listening' record on stdout when a gate period opens "
+        "(state=active) and closes (state=passive), for app.forward / the UI indicator",
+    )
     parser.add_argument("--gate", type=str, default=None, choices=["none", "spacebar", "wakeword", "always"])
     parser.add_argument("--gate-period", dest="gate_period_s", type=float, default=None)
     # --policy endpointed: decode every stride inside the period, fire on the
@@ -223,6 +231,30 @@ def _print_period_event(
         print(f"gate: {event:<9} {t}", file=out)
 
 
+def _emit_listening(state: str, samples_seen: int, out: object = None) -> None:
+    """One JSONL `listening` record on stdout (the schema app.forward reads)."""
+    record = {"event": "listening", "state": state, "t_seconds": samples_seen / SAMPLE_RATE}
+    print(json.dumps(record), file=out or sys.stdout, flush=True)
+
+
+def _make_period_sink(log_periods: bool, emit_listening: bool):
+    """The policy's `on_period_event` callback: stderr digest and/or stdout
+    `listening` records; None when neither is requested."""
+    if not (log_periods or emit_listening):
+        return None
+
+    def sink(event: str, samples_seen: Optional[int], decision: Optional[PolicyDecision]) -> None:
+        if log_periods:
+            _print_period_event(event, samples_seen, decision)
+        if emit_listening:
+            if event in ("open", "reopened"):
+                _emit_listening("active", samples_seen)
+            elif event == "closed":
+                _emit_listening("passive", samples_seen)
+
+    return sink
+
+
 class _RunEndGateLogger:
     """`ListeningGate` pass-through that balances the digest when the run
     ends with a period still open (Ctrl-C/EOF): the in-flight period is
@@ -230,19 +262,26 @@ class _RunEndGateLogger:
     end on an unbalanced `gate: open`. A poll that never observed an open
     period prints nothing, matching the digest (no `open` was printed)."""
 
-    def __init__(self, inner: ListeningGate, out: object = sys.stderr) -> None:
+    def __init__(self, inner: ListeningGate, out: object = sys.stderr, *, log: bool = True, emit: bool = False) -> None:
         self._inner = inner
         self._out = out
+        self._log = log
+        self._emit = emit
+        self._last_samples = 0
         self._was_open = False
 
     def poll(self, samples_seen: int, window=None) -> GateState:
         state = self._inner.poll(samples_seen, window)
         self._was_open = state.is_open
+        self._last_samples = samples_seen
         return state
 
     def close(self) -> None:
         if self._was_open:
-            _print_period_event("run_ended", None, None, out=self._out)
+            if self._log:
+                _print_period_event("run_ended", None, None, out=self._out)
+            if self._emit:
+                _emit_listening("passive", self._last_samples)
         self._inner.close()
 
 
@@ -356,8 +395,8 @@ def main(argv: Optional[list[str]] = None) -> None:
             )
         except GateUnavailableError as exc:
             raise SystemExit(str(exc)) from None
-        if cfg.log_periods:
-            gate = _RunEndGateLogger(gate)
+        if cfg.log_periods or cfg.emit_listening:
+            gate = _RunEndGateLogger(gate, log=cfg.log_periods, emit=cfg.emit_listening)
 
     model_path = resolve_model(cfg.model, cfg.backend, cfg.onnx_variant)
     run_dir = _candidate_run_dir(cfg.model)
@@ -368,7 +407,7 @@ def main(argv: Optional[list[str]] = None) -> None:
         threshold,
         gate=gate,
         period_s=cfg.gate_period_s,
-        on_period_event=_print_period_event if cfg.log_periods else None,
+        on_period_event=_make_period_sink(cfg.log_periods, cfg.emit_listening),
         endpoint_options={
             "window_s": cfg.window_s,
             "min_audio_s": cfg.min_audio_s,

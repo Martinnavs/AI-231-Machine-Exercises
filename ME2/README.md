@@ -72,8 +72,12 @@ Run from `ME2/`. On a laptop or server use `make` (after `module load uv && make
 | One-time setup | `module load uv && make sync` | `uv venv --python 3.10 .venv-pi && uv pip install --python .venv-pi/bin/python -r requirements-pi.txt -r requirements-pi-test.txt`; then `export PYTHONPATH=src` |
 | Streaming, live microphone | `make hybrid-stream` | the command below (needs `alsa-utils`; `arecord -l` shows the card number) |
 | Streaming, replay a file | `make hybrid-stream HYBRID_SOURCE=clip.wav` | the same command with `--source clip.wav` and no `--mic-command` |
+| UI dashboard (terminal 1), reachable on the LAN | `make app` (this machine only) or `make app-lan` (`0.0.0.0:8000`, no auth: trusted networks only) | `make app-lan` |
+| Live pipeline into the UI (terminal 2) | `make app-pipeline-ctcwide` (the settings below plus `--emit-listening`, piped into `app.forward`; override the mic with `APP_MIC_COMMAND`, a wav with `APP_PIPELINE_SOURCE`) | the same; `make` works for these targets because they call `.venv/bin` directly (`APP_VENV_BIN=.venv-pi/bin` for the lean venv) |
 | Holdout soak test | `make soak-run SOAK_DIR=soak/holdout-wake-gap-v1 SOAK_NAME=run SOAK_ARGS="--backend onnx --threads 1"` | `.venv-pi/bin/python scripts/soak_run.py --sessions soak/holdout-wake-gap-v1 --continuous --name rpi4 --wakeword-threshold 0.8 --cls-slot-threshold 0.6 --backend onnx --threads 1` |
 | Tests | `make hybrid-test` | `.venv-pi/bin/python -m pytest -q tests/test_vcm_hybrid.py tests/test_vcm_streaming_endpointed.py tests/test_vcm_streaming_wakeword_gate.py tests/test_vcm_streaming_config.py tests/test_vcm_quartznet_heads.py tests/test_vcm_perturbation_plan.py tests/test_soak_run.py` |
+
+`--emit-listening` makes the runner print a JSONL `{"event":"listening","state":"active"|"passive"}` record when the wake-word gate opens and closes, which the UI's listening indicator and music soft-pause follow ([`docs/STREAMING-CONTRACT.md`](docs/STREAMING-CONTRACT.md)). Without it stdout holds only trigger records.
 
 The Pi streaming command (the same settings as `make hybrid-stream`, plus `--ort-threads 1 --log-timing`; capture is 16 kHz, signed 16-bit, mono):
 
@@ -160,3 +164,15 @@ Data: [`airimonda/ai231-me2-voice-commands`](https://huggingface.co/datasets/air
 | Experiment log, streaming commands | [`docs/AI231-FIL50.md`](docs/AI231-FIL50.md), [`docs/CTC-ATTENTION.md`](docs/CTC-ATTENTION.md) |
 | Released files, model card | `out/vcm/hybrid-ctcwide-clsxl/` ([`MODEL-CARD.md`](out/vcm/hybrid-ctcwide-clsxl/MODEL-CARD.md)), `out/wakeword-sesame-ambient-rir-45m/`, `soak/holdout-wake-gap-v1/` |
 | All docs; the earlier ~1M-parameter model and the TTS data pipeline | [`docs/README.md`](docs/README.md), [`docs/archive/`](docs/archive/README-EARLIER-MODEL.md) |
+
+## Offline demo on a phone hotspot (Pi has no monitor)
+
+The Pi runs headless: the UI and the live pipeline start as user services at boot, and the laptop shows the UI in a browser. `http://raspberrypi.local:8000` resolved from a laptop on the phone hotspot (checked); the UI needs no internet.
+
+1. One-time, on the Pi: `./deploy/install-demo.sh` (enables `me2-ui` = `make app-lan` and `me2-pipeline` = `make app-pipeline-ctcwide`, plus linger so they start without a login). The mic is addressed by card name (`plughw:CARD=UACDemoV10,DEV=0`) because card numbers can change between boots; edit `deploy/systemd/me2-pipeline.service` for a different mic.
+2. One-time: save the hotspot so the Pi auto-joins it:
+   `nmcli device wifi connect "<ssid>" password "<pw>"`, then `nmcli connection modify "<ssid>" connection.autoconnect-priority 100`.
+3. Demo: turn the hotspot on, power the Pi, join the laptop to the hotspot, open `http://raspberrypi.local:8000`. If the name does not resolve, use the Pi's IP (the phone's connected-devices list, or `nmap -sn <subnet>/24` from the laptop).
+4. Debug: `journalctl --user -u me2-ui -u me2-pipeline -f`; restart with `systemctl --user restart me2-pipeline`. Run the services by hand only after `systemctl --user stop me2-ui me2-pipeline`, otherwise port 8000 and the mic are taken.
+
+Not yet verified: a cold boot through the services, and the stable mic name capturing audio. The Pi has no battery clock: offline, its time after a cold boot is the last saved time, so alarm and timer demos that read the wall clock may be off. The UI has no authentication, so use a network you trust. Fallbacks if the hotspot is a problem (client isolation, `.local` not resolving): an Ethernet cable with a shared fixed address, or the Pi's own Wi-Fi access point.
