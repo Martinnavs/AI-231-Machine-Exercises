@@ -1,0 +1,21 @@
+{
+ "config": "C1",
+ "n": 821,
+ "correct_first_trigger": 746,
+ "wrong_intent_triggers": 64,
+ "per_focus": {
+  "PAUSE": [
+   96,
+   100
+  ],
+  "STOP": [
+   131,
+   134
+  ],
+  "TIME": [
+   92,
+   107
+  ]
+ },
+ "nonzero_exit": 0
+}

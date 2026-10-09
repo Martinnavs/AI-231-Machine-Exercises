@@ -1,0 +1,2 @@
+2026-09-30T06:08:06+08:00
+c582fcac84f092f9977a5e955d7597a3cfe963d1a29846bbe93e52310ede5eab  src/me2_voicegen/vcm/dense_pilot.py

@@ -1,0 +1,378 @@
+{
+  "license_note": "Checkpoint trained on out/conversions/v2/test_set/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) in the silence bucket. Per docs/VCM-CONTRACT.md section 8, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution.",
+  "checkpoint_path": "out/vcm/optionb-optionc/checkpoints/checkpoint.pt",
+  "checkpoint_meta": {
+    "preset": "optionc",
+    "config": {
+      "n_mels": 40,
+      "n_blocks": 4,
+      "channels": 112,
+      "kernel_sizes": [
+        11,
+        13,
+        15,
+        17
+      ],
+      "prologue_channels": 64,
+      "epilogue_channels": 192,
+      "alphabet_size": 29
+    },
+    "alphabet_size": 29,
+    "seed": 0,
+    "epoch": 39,
+    "val_loss": 0.4336458110023202,
+    "license": "Checkpoint trained on out/conversions/v2/test_set/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) in the silence bucket. Per docs/VCM-CONTRACT.md section 8, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution."
+  },
+  "manifest_path": "out/conversions/v2/optionb/manifest.csv",
+  "device": "cuda",
+  "beam_width": 50,
+  "grammar_sections": [
+    {
+      "grammar": "OPTIONB_GRAMMAR",
+      "intent_labels": [
+        "ALARM",
+        "BRIGHTNESS",
+        "CALL",
+        "COLOR",
+        "CREATE_REMINDER",
+        "LIGHT_OFF",
+        "LIGHT_ON",
+        "LIST_REMINDERS",
+        "MESSAGE",
+        "NEXT",
+        "PAUSE",
+        "PLAY_MUSIC",
+        "STOP",
+        "TEMPERATURE",
+        "TIME",
+        "TIMER",
+        "VOLUME_DOWN",
+        "VOLUME_UP",
+        "WEATHER"
+      ],
+      "threshold_sweep_on_val": [
+        {
+          "threshold": 0.0,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.0,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.0,
+          "youden_j": 0.0
+        },
+        {
+          "threshold": -0.01,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.6313131313131313,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.0,
+          "youden_j": 0.6313131313131313
+        },
+        {
+          "threshold": -0.02,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.7373737373737373,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.0,
+          "youden_j": 0.7373737373737373
+        },
+        {
+          "threshold": -0.03,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.8052749719416387,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.006369426751592357,
+          "youden_j": 0.7989055451900463
+        },
+        {
+          "threshold": -0.05,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.8625140291806959,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.025477707006369428,
+          "youden_j": 0.8370363221743264
+        },
+        {
+          "threshold": -0.075,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9135802469135802,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.044585987261146494,
+          "youden_j": 0.8689942596524337
+        },
+        {
+          "threshold": -0.1,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9382716049382716,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.06369426751592357,
+          "youden_j": 0.874577337422348
+        },
+        {
+          "threshold": -0.15,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9579124579124579,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.10191082802547771,
+          "youden_j": 0.8560016298869803
+        },
+        {
+          "threshold": -0.2,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9753086419753086,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.18471337579617833,
+          "youden_j": 0.7905952661791303
+        },
+        {
+          "threshold": -0.25,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9842873176206509,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.24203821656050956,
+          "youden_j": 0.7422491010601413
+        },
+        {
+          "threshold": -0.3,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9859708193041526,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.2802547770700637,
+          "youden_j": 0.7057160422340889
+        },
+        {
+          "threshold": -0.35,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9887766554433222,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.3184713375796178,
+          "youden_j": 0.6703053178637044
+        },
+        {
+          "threshold": -0.4,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.989337822671156,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.34394904458598724,
+          "youden_j": 0.6453887780851688
+        },
+        {
+          "threshold": -0.5,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9904601571268238,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.34394904458598724,
+          "youden_j": 0.6465111125408365
+        },
+        {
+          "threshold": -0.75,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9932659932659933,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.34394904458598724,
+          "youden_j": 0.6493169486800061
+        },
+        {
+          "threshold": -1.0,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9938271604938271,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.34394904458598724,
+          "youden_j": 0.64987811590784
+        },
+        {
+          "threshold": -1.5,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9943883277216611,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.34394904458598724,
+          "youden_j": 0.6504392831356738
+        },
+        {
+          "threshold": -2.0,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9949494949494949,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.34394904458598724,
+          "youden_j": 0.6510004503635076
+        },
+        {
+          "threshold": -5.0,
+          "n_target_commands": 1782,
+          "target_accept_rate": 0.9949494949494949,
+          "n_reject_probes": 157,
+          "false_accept_rate": 0.34394904458598724,
+          "youden_j": 0.6510004503635076
+        }
+      ],
+      "chosen_operating_threshold": -0.1,
+      "chosen_operating_point_val_stats": {
+        "threshold": -0.1,
+        "n_target_commands": 1782,
+        "target_accept_rate": 0.9382716049382716,
+        "n_reject_probes": 157,
+        "false_accept_rate": 0.06369426751592357,
+        "youden_j": 0.874577337422348
+      },
+      "test_split": {
+        "n_target_commands": 1766,
+        "n_accepted": 1701,
+        "n_exact_correct": 1696,
+        "accept_rate": 0.9631936579841449,
+        "exact_accuracy": 0.9603624009060022,
+        "per_intent_confusion": {
+          "ALARM": {
+            "ALARM": 168,
+            "REJECTED": 2
+          },
+          "BRIGHTNESS": {
+            "BRIGHTNESS": 169,
+            "REJECTED": 11
+          },
+          "CALL": {
+            "CALL": 44,
+            "REJECTED": 4
+          },
+          "COLOR": {
+            "COLOR": 162,
+            "REJECTED": 8
+          },
+          "LIGHT_OFF": {
+            "REJECTED": 3,
+            "LIGHT_OFF": 50,
+            "LIGHT_ON": 5
+          },
+          "LIGHT_ON": {
+            "LIGHT_ON": 54,
+            "REJECTED": 2
+          },
+          "LIST_REMINDERS": {
+            "LIST_REMINDERS": 54,
+            "REJECTED": 4
+          },
+          "MESSAGE": {
+            "MESSAGE": 58
+          },
+          "NEXT": {
+            "NEXT": 52
+          },
+          "PAUSE": {
+            "PAUSE": 50
+          },
+          "PLAY_MUSIC": {
+            "PLAY_MUSIC": 57,
+            "REJECTED": 1
+          },
+          "CREATE_REMINDER": {
+            "CREATE_REMINDER": 177,
+            "REJECTED": 3
+          },
+          "STOP": {
+            "STOP": 56,
+            "REJECTED": 2
+          },
+          "TEMPERATURE": {
+            "TEMPERATURE": 172,
+            "REJECTED": 8
+          },
+          "TIME": {
+            "TIME": 46,
+            "REJECTED": 8
+          },
+          "TIMER": {
+            "TIMER": 173,
+            "REJECTED": 3
+          },
+          "VOLUME_DOWN": {
+            "VOLUME_DOWN": 50,
+            "REJECTED": 2
+          },
+          "VOLUME_UP": {
+            "VOLUME_UP": 56,
+            "REJECTED": 2
+          },
+          "WEATHER": {
+            "WEATHER": 48,
+            "REJECTED": 2
+          }
+        },
+        "false_accept_rate_babble": {
+          "n": 56,
+          "false_accepts": 0,
+          "rate": 0.0
+        },
+        "false_accept_rate_silence": {
+          "n": 22,
+          "false_accepts": 0,
+          "rate": 0.0
+        },
+        "speaker_group_breakdown": {
+          "filipino_reference": {
+            "n": 180,
+            "n_accepted": 178,
+            "n_exact_correct": 178,
+            "accept_rate": 0.9888888888888889,
+            "exact_accuracy": 0.9888888888888889,
+            "exact_accuracy_ci95": [
+              0.9603981999780283,
+              0.9969476890916927
+            ]
+          },
+          "foreign_reference": {
+            "n": 1586,
+            "n_accepted": 1523,
+            "n_exact_correct": 1518,
+            "accept_rate": 0.9602774274905422,
+            "exact_accuracy": 0.957124842370744,
+            "exact_accuracy_ci95": [
+              0.9460013316223171,
+              0.9660392138005729
+            ]
+          },
+          "n_unclassified": 0,
+          "exact_accuracy_gap_foreign_minus_filipino": -0.031764046518144906
+        },
+        "slot_accuracy": {
+          "n_slot_bearing_target_rows": 1056,
+          "n_unparseable_ground_truth": 0,
+          "n_intent_correct": 1021,
+          "n_intent_and_slots_correct": 1021,
+          "slot_exact_match_rate_given_intent_correct": 1.0,
+          "per_slot_name_accuracy": {
+            "ALARM_TIME": {
+              "n": 168,
+              "n_correct": 168,
+              "accuracy": 1.0
+            },
+            "COLOR": {
+              "n": 162,
+              "n_correct": 162,
+              "accuracy": 1.0
+            },
+            "DEGREES": {
+              "n": 172,
+              "n_correct": 172,
+              "accuracy": 1.0
+            },
+            "DURATION": {
+              "n": 173,
+              "n_correct": 173,
+              "accuracy": 1.0
+            },
+            "PERCENT": {
+              "n": 169,
+              "n_correct": 169,
+              "accuracy": 1.0
+            },
+            "TASK": {
+              "n": 177,
+              "n_correct": 177,
+              "accuracy": 1.0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "slot_eval_sections": null,
+  "slot_eval_skipped_reason": "out/vcm/optionb-optionc/metadata/slot_eval/manifest.csv not found (Task 07 clips may not exist yet)"
+}

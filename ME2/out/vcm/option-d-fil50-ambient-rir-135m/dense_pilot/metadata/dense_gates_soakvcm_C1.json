@@ -1,0 +1,48 @@
+{
+ "config": "C1",
+ "files": [
+  {
+   "file": "1 Hour Filipino Caf\u00e9\u29f8Coffee Shop Noise Ambience for Studying, Focus and Homework.wav",
+   "returncode": 0,
+   "triggers": 7,
+   "intents": [
+    "STOP",
+    "TIME",
+    "VOLUME_UP",
+    "WEATHER"
+   ],
+   "log": "vcmonly_C1_0.log"
+  },
+  {
+   "file": "ANXIETY RELIEF ANTI-STRESS RELAXING AND CALMING MORNING SOUNDS OF SUBURBAN PHILIPPINES (1+ HOURS).wav",
+   "returncode": 0,
+   "triggers": 4,
+   "intents": [
+    "MESSAGE",
+    "STOP",
+    "TIME"
+   ],
+   "log": "vcmonly_C1_1.log"
+  },
+  {
+   "file": "Boost productivity instantly with this 1 Hour Classroom Noises - Classroom Ambience - Study With Me.wav",
+   "returncode": 0,
+   "triggers": 0,
+   "intents": [],
+   "log": "vcmonly_C1_2.log"
+  },
+  {
+   "file": "COFFEE SHOP AMBIENCE \uff5c People Talking \uff5c FREE To Use.wav",
+   "returncode": 0,
+   "triggers": 3,
+   "intents": [
+    "NEXT",
+    "VOLUME_DOWN",
+    "WEATHER"
+   ],
+   "log": "vcmonly_C1_3.log"
+  }
+ ],
+ "triggers_total": 14,
+ "nonzero_exit": 0
+}

@@ -1,0 +1,1 @@
+Real val-row VCM log-posteriors (checkpoint option-d-fil50-ambient-rir-135m) for tests/test_vcm_dense_pilot.py. Produced by scripts/dense_pilot_dump.py --fixture-out. Derived from a model trained on ESC-50-derived data: CC-BY-NC-SA-4.0.

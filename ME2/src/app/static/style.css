@@ -1,0 +1,225 @@
+/* UI site dashboard (feature `ui-site`) — vanilla, dark, no build step. */
+
+:root {
+  --bg: #101418;
+  --panel: #1a2027;
+  --panel-border: #2a323c;
+  --text: #e6ebf0;
+  --muted: #8b98a5;
+  --accent: #4cc2ff;
+  --warn: #f5a524;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size: 14px;
+}
+
+.hidden { display: none !important; }
+
+/* --- indicator bar ------------------------------------------------------ */
+
+.indicator {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--panel-border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.indicator-orb { position: relative; width: 72px; height: 44px; flex: none; }
+
+.sweep { width: 72px; height: 44px; display: block; }
+
+/* The 3-second semicircle: a half-circle stroke drawn over 3 s. */
+.sweep path {
+  stroke: #39434e;
+  stroke-dasharray: 126;   /* ~= pi * 40, the semicircle length */
+  stroke-dashoffset: 126;
+}
+
+.sweep.sweeping path {
+  stroke: var(--accent);
+  animation: sweep 3s linear forwards;
+}
+
+@keyframes sweep {
+  from { stroke-dashoffset: 126; }
+  to   { stroke-dashoffset: 0; }
+}
+
+.listening-dot {
+  position: absolute;
+  left: 50%;
+  bottom: 3px;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #555;
+}
+
+.listening-dot.active {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  from { opacity: 0.45; }
+  to   { opacity: 1; }
+}
+
+.listening-label { font-size: 13px; color: var(--muted); }
+.detected { font-size: 15px; font-weight: 600; min-height: 1.2em; }
+.status-line { font-size: 14px; color: var(--accent); min-height: 1.2em; }
+
+/* --- panel grid --------------------------------------------------------- */
+/* Source order: reminders/thermostat, alarm/lights, timer/music, phone —
+   so the alarm panel sits directly above the timer panel. */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 16px 20px 32px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+@media (max-width: 760px) {
+  .grid { grid-template-columns: 1fr; }
+}
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+}
+
+.panel h2 {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* --- controls ------------------------------------------------------------ */
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  align-items: center;
+}
+
+button {
+  background: #232b34;
+  color: var(--text);
+  border: 1px solid #39434e;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+button:hover:not(:disabled) { border-color: var(--accent); }
+button:disabled { opacity: 0.4; cursor: default; }
+button.active { border-color: var(--accent); color: var(--accent); }
+
+select {
+  background: #232b34;
+  color: var(--text);
+  border: 1px solid #39434e;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font-size: 13px;
+}
+
+/* --- readouts -------------------------------------------------------------- */
+
+.readout { font-size: 15px; }
+.big { font-size: 34px; font-variant-numeric: tabular-nums; line-height: 1.2; }
+.muted { color: var(--muted); }
+
+#timer-state.done { color: var(--warn); }
+#alarm-readout.due {
+  color: var(--warn);
+  animation: pulse 1s ease-in-out infinite alternate;
+}
+
+/* --- lights ------------------------------------------------------------------ */
+
+.lights-row { display: flex; align-items: center; gap: 12px; }
+
+.lights-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #555;
+  flex: none;
+}
+
+.level-bar { display: flex; gap: 4px; margin-top: 10px; }
+
+.level-seg {
+  display: inline-block;
+  width: 26px;
+  height: 8px;
+  border-radius: 2px;
+  background: #39434e;
+}
+
+.level-seg.lit { background: var(--accent); }
+
+.swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  padding: 0;
+}
+
+.swatch.active { border-color: var(--text); }
+
+/* --- music --------------------------------------------------------------------- */
+
+.volbar {
+  height: 8px;
+  background: #39434e;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 10px;
+}
+
+#music-volume-bar { height: 100%; background: var(--accent); width: 50%; }
+
+/* --- logs (phone messages / reminders list) -------------------------------------- */
+
+.msglog {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  max-height: 140px;
+  overflow-y: auto;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.msglog li {
+  padding: 3px 0;
+  border-bottom: 1px solid #232b34;
+}

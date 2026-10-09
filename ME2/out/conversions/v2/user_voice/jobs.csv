@@ -1,0 +1,751 @@
+job_id,model,split,voice_id,text,label,source_row_ref,noisy_target,path,duration,seconds_elapsed,status,speech_start_s,speech_end_s,source_wav
+uv_uv_call_1__fsc_53,vcm,train,fsc_53,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_91,vcm,train,fsc_91,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_131,vcm,train,fsc_131,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__ref_tagalog6,vcm,train,ref_tagalog6,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_70,vcm,train,fsc_70,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_06,vcm,train,fsc_06,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_62,vcm,train,fsc_62,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_46,vcm,train,fsc_46,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_112,vcm,train,fsc_112,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_06,vcm,train,fsc_06,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_23,vcm,train,fsc_23,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__ref_tagalog14,vcm,train,ref_tagalog14,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_26,vcm,train,fsc_26,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_40,vcm,train,fsc_40,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_76,vcm,train,fsc_76,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_72,vcm,train,fsc_72,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_107,vcm,train,fsc_107,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__ref_tagalog12,vcm,train,ref_tagalog12,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_70,vcm,train,fsc_70,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_15,vcm,train,fsc_15,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_57,vcm,train,fsc_57,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_57,vcm,train,fsc_57,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_80,vcm,train,fsc_80,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_73,vcm,train,fsc_73,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_38,vcm,train,fsc_38,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_22,vcm,train,fsc_22,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_28,vcm,train,fsc_28,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_69,vcm,train,fsc_69,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__ref_tagalog16,vcm,train,ref_tagalog16,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__ref_ilonggo1,vcm,train,ref_ilonggo1,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_47,vcm,train,fsc_47,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_131,vcm,train,fsc_131,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_23,vcm,train,fsc_23,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_82,vcm,train,fsc_82,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_76,vcm,train,fsc_76,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_21,vcm,train,fsc_21,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_21,vcm,train,fsc_21,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_66,vcm,train,fsc_66,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_82,vcm,train,fsc_82,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__ref_tagalog14,vcm,train,ref_tagalog14,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_112,vcm,train,fsc_112,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_62,vcm,train,fsc_62,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_12,vcm,train,fsc_12,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__ref_ilonggo1,vcm,train,ref_ilonggo1,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_99,vcm,train,fsc_99,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_35,vcm,train,fsc_35,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__ref_tagalog15,vcm,train,ref_tagalog15,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_66,vcm,train,fsc_66,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_78,vcm,train,fsc_78,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_72,vcm,train,fsc_72,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_70,vcm,train,fsc_70,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_113,vcm,train,fsc_113,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__ref_tagalog6,vcm,train,ref_tagalog6,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_47,vcm,train,fsc_47,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__ref_tagalog15,vcm,train,ref_tagalog15,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_113,vcm,train,fsc_113,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__ref_tagalog5,vcm,train,ref_tagalog5,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_68,vcm,train,fsc_68,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__ref_tagalog8,vcm,train,ref_tagalog8,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_14,vcm,train,fsc_14,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_28,vcm,train,fsc_28,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_28,vcm,train,fsc_28,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_38,vcm,train,fsc_38,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_91,vcm,train,fsc_91,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_69,vcm,train,fsc_69,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_102,vcm,train,fsc_102,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__ref_ilonggo1,vcm,train,ref_ilonggo1,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_47,vcm,train,fsc_47,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_91,vcm,train,fsc_91,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_99,vcm,train,fsc_99,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_102,vcm,train,fsc_102,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_35,vcm,train,fsc_35,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_107,vcm,train,fsc_107,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_68,vcm,train,fsc_68,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_40,vcm,train,fsc_40,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_131,vcm,train,fsc_131,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_14,vcm,train,fsc_14,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_69,vcm,train,fsc_69,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_102,vcm,train,fsc_102,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_57,vcm,train,fsc_57,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_113,vcm,train,fsc_113,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__ref_tagalog16,vcm,train,ref_tagalog16,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_73,vcm,train,fsc_73,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_114,vcm,train,fsc_114,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_46,vcm,train,fsc_46,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_38,vcm,train,fsc_38,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_00,vcm,train,fsc_00,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_14,vcm,train,fsc_14,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_52,vcm,train,fsc_52,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_12,vcm,train,fsc_12,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_23,vcm,train,fsc_23,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_35,vcm,train,fsc_35,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__ref_tagalog15,vcm,train,ref_tagalog15,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_98,vcm,train,fsc_98,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_82,vcm,train,fsc_82,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_72,vcm,train,fsc_72,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_52,vcm,train,fsc_52,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_99,vcm,train,fsc_99,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_142,vcm,train,fsc_142,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_142,vcm,train,fsc_142,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_06,vcm,train,fsc_06,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_98,vcm,train,fsc_98,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_86,vcm,train,fsc_86,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__ref_tagalog12,vcm,train,ref_tagalog12,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_53,vcm,train,fsc_53,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_112,vcm,train,fsc_112,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_78,vcm,train,fsc_78,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_52,vcm,train,fsc_52,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__ref_tagalog8,vcm,train,ref_tagalog8,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__ref_tagalog5,vcm,train,ref_tagalog5,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_86,vcm,train,fsc_86,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_40,vcm,train,fsc_40,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_62,vcm,train,fsc_62,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_46,vcm,train,fsc_46,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_76,vcm,train,fsc_76,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__ref_tagalog14,vcm,train,ref_tagalog14,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_03,vcm,train,fsc_03,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_73,vcm,train,fsc_73,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_26,vcm,train,fsc_26,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__ref_tagalog6,vcm,train,ref_tagalog6,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_114,vcm,train,fsc_114,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_98,vcm,train,fsc_98,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_68,vcm,train,fsc_68,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__ref_tagalog5,vcm,train,ref_tagalog5,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_53,vcm,train,fsc_53,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_15,vcm,train,fsc_15,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_64,vcm,train,fsc_64,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_00,vcm,train,fsc_00,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_78,vcm,train,fsc_78,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_00,vcm,train,fsc_00,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_142,vcm,train,fsc_142,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__ref_tagalog16,vcm,train,ref_tagalog16,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_15,vcm,train,fsc_15,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_86,vcm,train,fsc_86,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_22,vcm,train,fsc_22,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_80,vcm,train,fsc_80,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_12,vcm,train,fsc_12,Make a phone call,CALL,uv_make_a_phone_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_80,vcm,train,fsc_80,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_22,vcm,train,fsc_22,Call,CALL,uv_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_21,vcm,train,fsc_21,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_26,vcm,train,fsc_26,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_66,vcm,train,fsc_66,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_114,vcm,train,fsc_114,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_107,vcm,train,fsc_107,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__fsc_03,vcm,train,fsc_03,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_64,vcm,train,fsc_64,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__ref_tagalog8,vcm,train,ref_tagalog8,Place a call,CALL,uv_place_a_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_call_1__ref_tagalog12,vcm,train,ref_tagalog12,Call,CALL,uv_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_call_1.wav
+uv_uv_make_a_phone_call_1__fsc_03,vcm,train,fsc_03,Make a phone call,CALL,uv_make_a_phone_call_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_make_a_phone_call_1.wav
+uv_uv_place_a_call_1__fsc_64,vcm,train,fsc_64,Place a call,CALL,uv_place_a_call_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_place_a_call_1.wav
+uv_uv_change_color_to_blue_1__fsc_06,vcm,train,fsc_06,Change color to blue,COLOR,uv_change_color_to_blue_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__ref_tagalog5,vcm,train,ref_tagalog5,Change color to green,COLOR,uv_change_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_86,vcm,train,fsc_86,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_80,vcm,train,fsc_80,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_91,vcm,train,fsc_91,Set color to green,COLOR,uv_set_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_06,vcm,train,fsc_06,Set color to red,COLOR,uv_set_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_22,vcm,train,fsc_22,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_62,vcm,train,fsc_62,Switch color to red,COLOR,uv_switch_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__ref_tagalog8,vcm,train,ref_tagalog8,Change color to blue,COLOR,uv_change_color_to_blue_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_22,vcm,train,fsc_22,Change color to green,COLOR,uv_change_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_70,vcm,train,fsc_70,Change color to green,COLOR,uv_change_color_to_green_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_112,vcm,train,fsc_112,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_68,vcm,train,fsc_68,Set color to green,COLOR,uv_set_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_70,vcm,train,fsc_70,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_52,vcm,train,fsc_52,Switch color to green,COLOR,uv_switch_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__ref_ilonggo1,vcm,train,ref_ilonggo1,Switch color to red,COLOR,uv_switch_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_28,vcm,train,fsc_28,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_102,vcm,train,fsc_102,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_131,vcm,train,fsc_131,Change color to green,COLOR,uv_change_color_to_green_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__ref_tagalog12,vcm,train,ref_tagalog12,Change color to red,COLOR,uv_change_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_53,vcm,train,fsc_53,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_26,vcm,train,fsc_26,Set color to red,COLOR,uv_set_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_107,vcm,train,fsc_107,Switch color to green,COLOR,uv_switch_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_06,vcm,train,fsc_06,Switch color to red,COLOR,uv_switch_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_14,vcm,train,fsc_14,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_53,vcm,train,fsc_53,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_80,vcm,train,fsc_80,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_73,vcm,train,fsc_73,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__ref_tagalog6,vcm,train,ref_tagalog6,Set color to green,COLOR,uv_set_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_03,vcm,train,fsc_03,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_86,vcm,train,fsc_86,Switch color to green,COLOR,uv_switch_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_12,vcm,train,fsc_12,Switch color to red,COLOR,uv_switch_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_131,vcm,train,fsc_131,Change color to blue,COLOR,uv_change_color_to_blue_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_00,vcm,train,fsc_00,Change color to green,COLOR,uv_change_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_57,vcm,train,fsc_57,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_86,vcm,train,fsc_86,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_102,vcm,train,fsc_102,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_73,vcm,train,fsc_73,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_131,vcm,train,fsc_131,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_86,vcm,train,fsc_86,Switch color to red,COLOR,uv_switch_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_82,vcm,train,fsc_82,Change color to blue,COLOR,uv_change_color_to_blue_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_113,vcm,train,fsc_113,Change color to green,COLOR,uv_change_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_98,vcm,train,fsc_98,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_107,vcm,train,fsc_107,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_113,vcm,train,fsc_113,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__ref_ilonggo1,vcm,train,ref_ilonggo1,Set color to red,COLOR,uv_set_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_21,vcm,train,fsc_21,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_03,vcm,train,fsc_03,Switch color to red,COLOR,uv_switch_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_35,vcm,train,fsc_35,Change color to blue,COLOR,uv_change_color_to_blue_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_57,vcm,train,fsc_57,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__ref_tagalog12,vcm,train,ref_tagalog12,Change color to green,COLOR,uv_change_color_to_green_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_64,vcm,train,fsc_64,Change color to red,COLOR,uv_change_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_69,vcm,train,fsc_69,Set color to green,COLOR,uv_set_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_80,vcm,train,fsc_80,Set color to red,COLOR,uv_set_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_00,vcm,train,fsc_00,Switch color to green,COLOR,uv_switch_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_57,vcm,train,fsc_57,Switch color to red,COLOR,uv_switch_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_52,vcm,train,fsc_52,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_78,vcm,train,fsc_78,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_64,vcm,train,fsc_64,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_21,vcm,train,fsc_21,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_131,vcm,train,fsc_131,Set color to green,COLOR,uv_set_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__ref_tagalog12,vcm,train,ref_tagalog12,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__ref_tagalog14,vcm,train,ref_tagalog14,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_107,vcm,train,fsc_107,Switch color to red,COLOR,uv_switch_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_57,vcm,train,fsc_57,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_73,vcm,train,fsc_73,Change color to green,COLOR,uv_change_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_73,vcm,train,fsc_73,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_35,vcm,train,fsc_35,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_03,vcm,train,fsc_03,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_21,vcm,train,fsc_21,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_114,vcm,train,fsc_114,Switch color to green,COLOR,uv_switch_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__ref_tagalog6,vcm,train,ref_tagalog6,Switch color to red,COLOR,uv_switch_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_78,vcm,train,fsc_78,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_35,vcm,train,fsc_35,Change color to green,COLOR,uv_change_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__ref_tagalog6,vcm,train,ref_tagalog6,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_76,vcm,train,fsc_76,Change color to red,COLOR,uv_change_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_06,vcm,train,fsc_06,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_22,vcm,train,fsc_22,Set color to red,COLOR,uv_set_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__ref_tagalog12,vcm,train,ref_tagalog12,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__ref_tagalog16,vcm,train,ref_tagalog16,Switch color to red,COLOR,uv_switch_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_12,vcm,train,fsc_12,Change color to blue,COLOR,uv_change_color_to_blue_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_66,vcm,train,fsc_66,Change color to green,COLOR,uv_change_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_40,vcm,train,fsc_40,Change color to green,COLOR,uv_change_color_to_green_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__ref_tagalog15,vcm,train,ref_tagalog15,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_86,vcm,train,fsc_86,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_112,vcm,train,fsc_112,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_35,vcm,train,fsc_35,Switch color to green,COLOR,uv_switch_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__ref_tagalog8,vcm,train,ref_tagalog8,Switch color to red,COLOR,uv_switch_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__ref_tagalog12,vcm,train,ref_tagalog12,Change color to blue,COLOR,uv_change_color_to_blue_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_70,vcm,train,fsc_70,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__ref_tagalog14,vcm,train,ref_tagalog14,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_62,vcm,train,fsc_62,Change color to red,COLOR,uv_change_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_12,vcm,train,fsc_12,Set color to green,COLOR,uv_set_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_72,vcm,train,fsc_72,Set color to red,COLOR,uv_set_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__ref_tagalog6,vcm,train,ref_tagalog6,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_38,vcm,train,fsc_38,Switch color to red,COLOR,uv_switch_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_114,vcm,train,fsc_114,Change color to blue,COLOR,uv_change_color_to_blue_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_82,vcm,train,fsc_82,Change color to green,COLOR,uv_change_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__ref_tagalog8,vcm,train,ref_tagalog8,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_69,vcm,train,fsc_69,Change color to red,COLOR,uv_change_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_40,vcm,train,fsc_40,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__ref_tagalog15,vcm,train,ref_tagalog15,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_03,vcm,train,fsc_03,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_78,vcm,train,fsc_78,Switch color to red,COLOR,uv_switch_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_69,vcm,train,fsc_69,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_21,vcm,train,fsc_21,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_15,vcm,train,fsc_15,Change color to green,COLOR,uv_change_color_to_green_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_53,vcm,train,fsc_53,Change color to red,COLOR,uv_change_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__ref_tagalog14,vcm,train,ref_tagalog14,Set color to green,COLOR,uv_set_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_62,vcm,train,fsc_62,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__ref_tagalog8,vcm,train,ref_tagalog8,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_91,vcm,train,fsc_91,Switch color to red,COLOR,uv_switch_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_23,vcm,train,fsc_23,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_64,vcm,train,fsc_64,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_76,vcm,train,fsc_76,Change color to green,COLOR,uv_change_color_to_green_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_22,vcm,train,fsc_22,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_78,vcm,train,fsc_78,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_86,vcm,train,fsc_86,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__ref_tagalog15,vcm,train,ref_tagalog15,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_131,vcm,train,fsc_131,Switch color to red,COLOR,uv_switch_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_102,vcm,train,fsc_102,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_112,vcm,train,fsc_112,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_22,vcm,train,fsc_22,Change color to green,COLOR,uv_change_color_to_green_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_03,vcm,train,fsc_03,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_47,vcm,train,fsc_47,Set color to green,COLOR,uv_set_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_38,vcm,train,fsc_38,Set color to red,COLOR,uv_set_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_142,vcm,train,fsc_142,Switch color to green,COLOR,uv_switch_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_64,vcm,train,fsc_64,Switch color to red,COLOR,uv_switch_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_38,vcm,train,fsc_38,Change color to blue,COLOR,uv_change_color_to_blue_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_52,vcm,train,fsc_52,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_00,vcm,train,fsc_00,Change color to green,COLOR,uv_change_color_to_green_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_00,vcm,train,fsc_00,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_15,vcm,train,fsc_15,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_114,vcm,train,fsc_114,Set color to red,COLOR,uv_set_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_68,vcm,train,fsc_68,Switch color to green,COLOR,uv_switch_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__ref_tagalog15,vcm,train,ref_tagalog15,Switch color to red,COLOR,uv_switch_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_142,vcm,train,fsc_142,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__ref_tagalog6,vcm,train,ref_tagalog6,Change color to green,COLOR,uv_change_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_46,vcm,train,fsc_46,Change color to green,COLOR,uv_change_color_to_green_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_142,vcm,train,fsc_142,Change color to red,COLOR,uv_change_color_to_red_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__ref_tagalog5,vcm,train,ref_tagalog5,Set color to green,COLOR,uv_set_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_131,vcm,train,fsc_131,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_switch_color_to_green_1__fsc_99,vcm,train,fsc_99,Switch color to green,COLOR,uv_switch_color_to_green_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_green_1.wav
+uv_uv_switch_color_to_red_1__fsc_47,vcm,train,fsc_47,Switch color to red,COLOR,uv_switch_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_switch_color_to_red_1.wav
+uv_uv_change_color_to_blue_1__fsc_107,vcm,train,fsc_107,Change color to blue,COLOR,uv_change_color_to_blue_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_blue_1.wav
+uv_uv_change_color_to_green_1__fsc_26,vcm,train,fsc_26,Change color to green,COLOR,uv_change_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_1.wav
+uv_uv_change_color_to_green_2__fsc_91,vcm,train,fsc_91,Change color to green,COLOR,uv_change_color_to_green_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_green_2.wav
+uv_uv_change_color_to_red_1__fsc_38,vcm,train,fsc_38,Change color to red,COLOR,uv_change_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_change_color_to_red_1.wav
+uv_uv_set_color_to_green_1__fsc_70,vcm,train,fsc_70,Set color to green,COLOR,uv_set_color_to_green_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_green_1.wav
+uv_uv_set_color_to_red_1__fsc_64,vcm,train,fsc_64,Set color to red,COLOR,uv_set_color_to_red_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_set_color_to_red_1.wav
+uv_uv_shut_off_the_lights_1__fsc_00,vcm,train,fsc_00,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_68,vcm,train,fsc_68,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_21,vcm,train,fsc_21,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_12,vcm,train,fsc_12,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_66,vcm,train,fsc_66,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_35,vcm,train,fsc_35,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_107,vcm,train,fsc_107,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_114,vcm,train,fsc_114,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__ref_tagalog5,vcm,train,ref_tagalog5,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_64,vcm,train,fsc_64,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_112,vcm,train,fsc_112,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__ref_ilonggo1,vcm,train,ref_ilonggo1,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__ref_tagalog12,vcm,train,ref_tagalog12,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__ref_tagalog16,vcm,train,ref_tagalog16,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_00,vcm,train,fsc_00,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_22,vcm,train,fsc_22,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_23,vcm,train,fsc_23,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_76,vcm,train,fsc_76,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_86,vcm,train,fsc_86,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_113,vcm,train,fsc_113,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_72,vcm,train,fsc_72,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_57,vcm,train,fsc_57,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_131,vcm,train,fsc_131,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_64,vcm,train,fsc_64,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_78,vcm,train,fsc_78,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_62,vcm,train,fsc_62,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_102,vcm,train,fsc_102,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__ref_tagalog14,vcm,train,ref_tagalog14,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_21,vcm,train,fsc_21,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_114,vcm,train,fsc_114,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_68,vcm,train,fsc_68,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__ref_tagalog6,vcm,train,ref_tagalog6,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_53,vcm,train,fsc_53,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_15,vcm,train,fsc_15,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_107,vcm,train,fsc_107,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_28,vcm,train,fsc_28,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_46,vcm,train,fsc_46,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_64,vcm,train,fsc_64,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_98,vcm,train,fsc_98,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_113,vcm,train,fsc_113,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_78,vcm,train,fsc_78,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_80,vcm,train,fsc_80,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_112,vcm,train,fsc_112,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_57,vcm,train,fsc_57,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_47,vcm,train,fsc_47,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_40,vcm,train,fsc_40,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_06,vcm,train,fsc_06,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_22,vcm,train,fsc_22,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_76,vcm,train,fsc_76,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_142,vcm,train,fsc_142,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__ref_tagalog6,vcm,train,ref_tagalog6,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_91,vcm,train,fsc_91,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__ref_tagalog14,vcm,train,ref_tagalog14,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__ref_tagalog14,vcm,train,ref_tagalog14,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_73,vcm,train,fsc_73,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_70,vcm,train,fsc_70,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_23,vcm,train,fsc_23,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__ref_tagalog6,vcm,train,ref_tagalog6,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__ref_tagalog5,vcm,train,ref_tagalog5,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_06,vcm,train,fsc_06,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__ref_tagalog8,vcm,train,ref_tagalog8,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_86,vcm,train,fsc_86,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_26,vcm,train,fsc_26,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_26,vcm,train,fsc_26,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_99,vcm,train,fsc_99,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_131,vcm,train,fsc_131,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_03,vcm,train,fsc_03,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_82,vcm,train,fsc_82,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_46,vcm,train,fsc_46,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_80,vcm,train,fsc_80,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_12,vcm,train,fsc_12,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_14,vcm,train,fsc_14,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_142,vcm,train,fsc_142,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_73,vcm,train,fsc_73,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_82,vcm,train,fsc_82,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_06,vcm,train,fsc_06,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_14,vcm,train,fsc_14,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_142,vcm,train,fsc_142,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_62,vcm,train,fsc_62,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_98,vcm,train,fsc_98,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_40,vcm,train,fsc_40,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_66,vcm,train,fsc_66,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_102,vcm,train,fsc_102,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_70,vcm,train,fsc_70,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__ref_ilonggo1,vcm,train,ref_ilonggo1,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_28,vcm,train,fsc_28,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_66,vcm,train,fsc_66,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_52,vcm,train,fsc_52,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__ref_ilonggo1,vcm,train,ref_ilonggo1,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_73,vcm,train,fsc_73,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_70,vcm,train,fsc_70,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_38,vcm,train,fsc_38,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_112,vcm,train,fsc_112,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_69,vcm,train,fsc_69,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_46,vcm,train,fsc_46,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_107,vcm,train,fsc_107,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_131,vcm,train,fsc_131,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__ref_tagalog12,vcm,train,ref_tagalog12,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__ref_tagalog15,vcm,train,ref_tagalog15,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_28,vcm,train,fsc_28,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_40,vcm,train,fsc_40,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_68,vcm,train,fsc_68,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__ref_tagalog15,vcm,train,ref_tagalog15,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_22,vcm,train,fsc_22,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_62,vcm,train,fsc_62,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__ref_tagalog5,vcm,train,ref_tagalog5,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_91,vcm,train,fsc_91,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_38,vcm,train,fsc_38,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_114,vcm,train,fsc_114,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_26,vcm,train,fsc_26,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__ref_tagalog16,vcm,train,ref_tagalog16,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_99,vcm,train,fsc_99,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_69,vcm,train,fsc_69,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_78,vcm,train,fsc_78,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_82,vcm,train,fsc_82,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_72,vcm,train,fsc_72,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_86,vcm,train,fsc_86,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_102,vcm,train,fsc_102,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_53,vcm,train,fsc_53,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_69,vcm,train,fsc_69,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_72,vcm,train,fsc_72,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__ref_tagalog8,vcm,train,ref_tagalog8,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_113,vcm,train,fsc_113,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_98,vcm,train,fsc_98,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_52,vcm,train,fsc_52,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_15,vcm,train,fsc_15,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__ref_tagalog16,vcm,train,ref_tagalog16,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_47,vcm,train,fsc_47,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_12,vcm,train,fsc_12,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_47,vcm,train,fsc_47,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_00,vcm,train,fsc_00,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_52,vcm,train,fsc_52,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_14,vcm,train,fsc_14,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_35,vcm,train,fsc_35,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_91,vcm,train,fsc_91,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_23,vcm,train,fsc_23,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_80,vcm,train,fsc_80,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_03,vcm,train,fsc_03,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_35,vcm,train,fsc_35,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__ref_tagalog15,vcm,train,ref_tagalog15,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__ref_tagalog8,vcm,train,ref_tagalog8,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_38,vcm,train,fsc_38,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_15,vcm,train,fsc_15,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_99,vcm,train,fsc_99,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_21,vcm,train,fsc_21,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_03,vcm,train,fsc_03,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__ref_tagalog12,vcm,train,ref_tagalog12,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_shut_off_the_lights_1__fsc_53,vcm,train,fsc_53,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_1.wav
+uv_uv_shut_off_the_lights_2__fsc_76,vcm,train,fsc_76,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_2.wav
+uv_uv_shut_off_the_lights_3__fsc_57,vcm,train,fsc_57,Shut off the lights,LIGHT_OFF,uv_shut_off_the_lights_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_shut_off_the_lights_3.wav
+uv_uv_show_my_reminders_1__fsc_80,vcm,train,fsc_80,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_131,vcm,train,fsc_131,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_47,vcm,train,fsc_47,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_52,vcm,train,fsc_52,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_35,vcm,train,fsc_35,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_98,vcm,train,fsc_98,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__ref_tagalog15,vcm,train,ref_tagalog15,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_40,vcm,train,fsc_40,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_70,vcm,train,fsc_70,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_57,vcm,train,fsc_57,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_86,vcm,train,fsc_86,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_64,vcm,train,fsc_64,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_14,vcm,train,fsc_14,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_00,vcm,train,fsc_00,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__ref_tagalog6,vcm,train,ref_tagalog6,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_06,vcm,train,fsc_06,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_66,vcm,train,fsc_66,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_12,vcm,train,fsc_12,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_46,vcm,train,fsc_46,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_68,vcm,train,fsc_68,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__ref_tagalog8,vcm,train,ref_tagalog8,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__ref_tagalog16,vcm,train,ref_tagalog16,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_23,vcm,train,fsc_23,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_99,vcm,train,fsc_99,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_62,vcm,train,fsc_62,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_53,vcm,train,fsc_53,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_72,vcm,train,fsc_72,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_38,vcm,train,fsc_38,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_113,vcm,train,fsc_113,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_76,vcm,train,fsc_76,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_28,vcm,train,fsc_28,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_21,vcm,train,fsc_21,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_73,vcm,train,fsc_73,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_112,vcm,train,fsc_112,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_26,vcm,train,fsc_26,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_03,vcm,train,fsc_03,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_82,vcm,train,fsc_82,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__ref_tagalog12,vcm,train,ref_tagalog12,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__ref_ilonggo1,vcm,train,ref_ilonggo1,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_78,vcm,train,fsc_78,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_22,vcm,train,fsc_22,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__ref_tagalog5,vcm,train,ref_tagalog5,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__ref_tagalog14,vcm,train,ref_tagalog14,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_114,vcm,train,fsc_114,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_102,vcm,train,fsc_102,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_142,vcm,train,fsc_142,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_107,vcm,train,fsc_107,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_15,vcm,train,fsc_15,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_69,vcm,train,fsc_69,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_show_my_reminders_1__fsc_91,vcm,train,fsc_91,Show my reminders,LIST_REMINDERS,uv_show_my_reminders_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_show_my_reminders_1.wav
+uv_uv_send_my_message_1__ref_tagalog6,vcm,train,ref_tagalog6,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__ref_ilonggo1,vcm,train,ref_ilonggo1,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_73,vcm,train,fsc_73,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_47,vcm,train,fsc_47,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_131,vcm,train,fsc_131,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_14,vcm,train,fsc_14,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_91,vcm,train,fsc_91,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_86,vcm,train,fsc_86,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__ref_tagalog15,vcm,train,ref_tagalog15,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_40,vcm,train,fsc_40,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__ref_tagalog6,vcm,train,ref_tagalog6,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_46,vcm,train,fsc_46,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_112,vcm,train,fsc_112,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_57,vcm,train,fsc_57,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_99,vcm,train,fsc_99,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_38,vcm,train,fsc_38,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_38,vcm,train,fsc_38,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_12,vcm,train,fsc_12,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_03,vcm,train,fsc_03,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_72,vcm,train,fsc_72,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_69,vcm,train,fsc_69,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_70,vcm,train,fsc_70,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_102,vcm,train,fsc_102,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_78,vcm,train,fsc_78,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_00,vcm,train,fsc_00,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_14,vcm,train,fsc_14,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_102,vcm,train,fsc_102,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_26,vcm,train,fsc_26,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_12,vcm,train,fsc_12,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_76,vcm,train,fsc_76,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_15,vcm,train,fsc_15,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_98,vcm,train,fsc_98,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_112,vcm,train,fsc_112,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_57,vcm,train,fsc_57,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_69,vcm,train,fsc_69,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__ref_tagalog8,vcm,train,ref_tagalog8,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_53,vcm,train,fsc_53,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_06,vcm,train,fsc_06,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__ref_tagalog16,vcm,train,ref_tagalog16,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_64,vcm,train,fsc_64,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_73,vcm,train,fsc_73,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_00,vcm,train,fsc_00,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_82,vcm,train,fsc_82,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_82,vcm,train,fsc_82,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_91,vcm,train,fsc_91,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_06,vcm,train,fsc_06,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_53,vcm,train,fsc_53,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_113,vcm,train,fsc_113,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_68,vcm,train,fsc_68,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_142,vcm,train,fsc_142,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_64,vcm,train,fsc_64,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__ref_tagalog8,vcm,train,ref_tagalog8,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_47,vcm,train,fsc_47,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_47,vcm,train,fsc_47,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_12,vcm,train,fsc_12,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_112,vcm,train,fsc_112,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_66,vcm,train,fsc_66,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_35,vcm,train,fsc_35,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_78,vcm,train,fsc_78,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__ref_tagalog6,vcm,train,ref_tagalog6,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_72,vcm,train,fsc_72,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_28,vcm,train,fsc_28,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_62,vcm,train,fsc_62,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__ref_ilonggo1,vcm,train,ref_ilonggo1,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_70,vcm,train,fsc_70,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_15,vcm,train,fsc_15,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_14,vcm,train,fsc_14,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_62,vcm,train,fsc_62,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_26,vcm,train,fsc_26,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_62,vcm,train,fsc_62,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_91,vcm,train,fsc_91,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_142,vcm,train,fsc_142,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_99,vcm,train,fsc_99,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_113,vcm,train,fsc_113,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_40,vcm,train,fsc_40,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__ref_tagalog5,vcm,train,ref_tagalog5,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_64,vcm,train,fsc_64,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__ref_tagalog5,vcm,train,ref_tagalog5,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_23,vcm,train,fsc_23,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_99,vcm,train,fsc_99,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_107,vcm,train,fsc_107,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_98,vcm,train,fsc_98,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__ref_tagalog12,vcm,train,ref_tagalog12,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__ref_tagalog12,vcm,train,ref_tagalog12,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_107,vcm,train,fsc_107,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_76,vcm,train,fsc_76,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_80,vcm,train,fsc_80,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__ref_tagalog12,vcm,train,ref_tagalog12,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_46,vcm,train,fsc_46,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__ref_ilonggo1,vcm,train,ref_ilonggo1,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_76,vcm,train,fsc_76,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_26,vcm,train,fsc_26,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_52,vcm,train,fsc_52,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_69,vcm,train,fsc_69,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_22,vcm,train,fsc_22,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_82,vcm,train,fsc_82,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_142,vcm,train,fsc_142,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_107,vcm,train,fsc_107,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_72,vcm,train,fsc_72,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_28,vcm,train,fsc_28,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_35,vcm,train,fsc_35,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_98,vcm,train,fsc_98,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_86,vcm,train,fsc_86,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_68,vcm,train,fsc_68,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_03,vcm,train,fsc_03,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__ref_tagalog16,vcm,train,ref_tagalog16,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_00,vcm,train,fsc_00,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_86,vcm,train,fsc_86,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_102,vcm,train,fsc_102,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_52,vcm,train,fsc_52,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_28,vcm,train,fsc_28,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_73,vcm,train,fsc_73,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__ref_tagalog16,vcm,train,ref_tagalog16,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_35,vcm,train,fsc_35,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_22,vcm,train,fsc_22,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__ref_tagalog5,vcm,train,ref_tagalog5,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_68,vcm,train,fsc_68,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_80,vcm,train,fsc_80,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_21,vcm,train,fsc_21,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_38,vcm,train,fsc_38,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_66,vcm,train,fsc_66,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_40,vcm,train,fsc_40,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_22,vcm,train,fsc_22,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_114,vcm,train,fsc_114,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__ref_tagalog14,vcm,train,ref_tagalog14,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_70,vcm,train,fsc_70,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_52,vcm,train,fsc_52,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_66,vcm,train,fsc_66,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_06,vcm,train,fsc_06,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__ref_tagalog14,vcm,train,ref_tagalog14,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__ref_tagalog15,vcm,train,ref_tagalog15,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_114,vcm,train,fsc_114,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_131,vcm,train,fsc_131,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_15,vcm,train,fsc_15,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__ref_tagalog14,vcm,train,ref_tagalog14,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_113,vcm,train,fsc_113,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_03,vcm,train,fsc_03,Send my message,MESSAGE,uv_send_my_message_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_53,vcm,train,fsc_53,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_21,vcm,train,fsc_21,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__ref_tagalog8,vcm,train,ref_tagalog8,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_57,vcm,train,fsc_57,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__ref_tagalog15,vcm,train,ref_tagalog15,Send my message,MESSAGE,uv_send_my_message_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_80,vcm,train,fsc_80,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_23,vcm,train,fsc_23,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_78,vcm,train,fsc_78,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_114,vcm,train,fsc_114,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_131,vcm,train,fsc_131,Send my message,MESSAGE,uv_send_my_message_3,0,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_send_my_message_1__fsc_46,vcm,train,fsc_46,Send my message,MESSAGE,uv_send_my_message_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_1.wav
+uv_uv_send_my_message_2__fsc_23,vcm,train,fsc_23,Send my message,MESSAGE,uv_send_my_message_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_2.wav
+uv_uv_send_my_message_3__fsc_21,vcm,train,fsc_21,Send my message,MESSAGE,uv_send_my_message_3,1,,,,,,,out/conversions/v2/user_voice/source/uv_send_my_message_3.wav
+uv_uv_what_time_is_it_1__fsc_107,vcm,train,fsc_107,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__ref_tagalog12,vcm,train,ref_tagalog12,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_99,vcm,train,fsc_99,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_131,vcm,train,fsc_131,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__ref_tagalog15,vcm,train,ref_tagalog15,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__ref_tagalog6,vcm,train,ref_tagalog6,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__ref_tagalog5,vcm,train,ref_tagalog5,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_00,vcm,train,fsc_00,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__ref_tagalog12,vcm,train,ref_tagalog12,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_82,vcm,train,fsc_82,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__ref_tagalog8,vcm,train,ref_tagalog8,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_86,vcm,train,fsc_86,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_64,vcm,train,fsc_64,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_98,vcm,train,fsc_98,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_76,vcm,train,fsc_76,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_73,vcm,train,fsc_73,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_78,vcm,train,fsc_78,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_113,vcm,train,fsc_113,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_12,vcm,train,fsc_12,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_21,vcm,train,fsc_21,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_14,vcm,train,fsc_14,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__ref_tagalog14,vcm,train,ref_tagalog14,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_131,vcm,train,fsc_131,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_91,vcm,train,fsc_91,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_21,vcm,train,fsc_21,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_72,vcm,train,fsc_72,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_91,vcm,train,fsc_91,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_114,vcm,train,fsc_114,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_22,vcm,train,fsc_22,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_28,vcm,train,fsc_28,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_03,vcm,train,fsc_03,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_14,vcm,train,fsc_14,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_73,vcm,train,fsc_73,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_53,vcm,train,fsc_53,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_98,vcm,train,fsc_98,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_112,vcm,train,fsc_112,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_70,vcm,train,fsc_70,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_06,vcm,train,fsc_06,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_142,vcm,train,fsc_142,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__ref_tagalog16,vcm,train,ref_tagalog16,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_66,vcm,train,fsc_66,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_102,vcm,train,fsc_102,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_68,vcm,train,fsc_68,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_66,vcm,train,fsc_66,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_38,vcm,train,fsc_38,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_142,vcm,train,fsc_142,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_52,vcm,train,fsc_52,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_62,vcm,train,fsc_62,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_86,vcm,train,fsc_86,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_52,vcm,train,fsc_52,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_47,vcm,train,fsc_47,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_23,vcm,train,fsc_23,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_80,vcm,train,fsc_80,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_76,vcm,train,fsc_76,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_46,vcm,train,fsc_46,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_68,vcm,train,fsc_68,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_102,vcm,train,fsc_102,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_46,vcm,train,fsc_46,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_82,vcm,train,fsc_82,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_22,vcm,train,fsc_22,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_72,vcm,train,fsc_72,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_64,vcm,train,fsc_64,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_112,vcm,train,fsc_112,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_35,vcm,train,fsc_35,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_62,vcm,train,fsc_62,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_12,vcm,train,fsc_12,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_26,vcm,train,fsc_26,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__ref_ilonggo1,vcm,train,ref_ilonggo1,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_28,vcm,train,fsc_28,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_80,vcm,train,fsc_80,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__ref_tagalog16,vcm,train,ref_tagalog16,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_40,vcm,train,fsc_40,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_69,vcm,train,fsc_69,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_70,vcm,train,fsc_70,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_06,vcm,train,fsc_06,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_78,vcm,train,fsc_78,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_113,vcm,train,fsc_113,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_15,vcm,train,fsc_15,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__ref_tagalog6,vcm,train,ref_tagalog6,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_03,vcm,train,fsc_03,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__ref_tagalog14,vcm,train,ref_tagalog14,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_38,vcm,train,fsc_38,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_53,vcm,train,fsc_53,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__ref_tagalog8,vcm,train,ref_tagalog8,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_40,vcm,train,fsc_40,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_69,vcm,train,fsc_69,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_15,vcm,train,fsc_15,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_99,vcm,train,fsc_99,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_23,vcm,train,fsc_23,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__ref_tagalog15,vcm,train,ref_tagalog15,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_35,vcm,train,fsc_35,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_57,vcm,train,fsc_57,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_114,vcm,train,fsc_114,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_47,vcm,train,fsc_47,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__ref_ilonggo1,vcm,train,ref_ilonggo1,What time is it,TIME,uv_what_time_is_it_1,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__ref_tagalog5,vcm,train,ref_tagalog5,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_57,vcm,train,fsc_57,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_26,vcm,train,fsc_26,What time is it,TIME,uv_what_time_is_it_2,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav
+uv_uv_what_time_is_it_1__fsc_00,vcm,train,fsc_00,What time is it,TIME,uv_what_time_is_it_1,1,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_1.wav
+uv_uv_what_time_is_it_2__fsc_107,vcm,train,fsc_107,What time is it,TIME,uv_what_time_is_it_2,0,,,,,,,out/conversions/v2/user_voice/source/uv_what_time_is_it_2.wav

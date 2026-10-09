@@ -1,0 +1,45 @@
+{
+  "hardware_label": "AMD EPYC 7742 (256-thread node) estimate",
+  "not_measured_on": "Raspberry Pi 4/5 (no such hardware exists on this node)",
+  "window_seconds": 1.5,
+  "n_frames": 151,
+  "onnxruntime_threads": {
+    "intra_op": 1,
+    "inter_op": 1
+  },
+  "checkpoint": "out/vcm/optionb/checkpoints/checkpoint.pt",
+  "preset": "default",
+  "fp32": {
+    "onnx_size_bytes": 1020103,
+    "onnx_size_mb": 0.9728460311889648,
+    "hardware_label": "AMD EPYC 7742 (256-thread node) estimate",
+    "not_measured_on": "Raspberry Pi 4/5 (no such hardware exists on this node)",
+    "n_warmup": 10,
+    "n_iters": 100,
+    "p50_latency_ms": 1.0590760502964258,
+    "p95_latency_ms": 1.0687489993870258,
+    "process_peak_rss_kb": 454152,
+    "process_peak_rss_mb": 443.5078125,
+    "inference_rss_delta_kb": 0
+  },
+  "spec_budgets_indicative_only": {
+    "latency_ms_per_100ms_frame_le": 20.0,
+    "int8_model_mb_le": 5.0,
+    "peak_ram_mb_le": 25.0,
+    "note": "Original spec budgets for real RPi 4/5 hardware -- shown here as indicative context only, NOT as a pass/fail claim about this node's numbers (which are all AMD EPYC 7742 (256-thread node) estimate)."
+  },
+  "int8": {
+    "measured": true,
+    "onnx_size_bytes": 277192,
+    "onnx_size_mb": 0.26435089111328125,
+    "hardware_label": "AMD EPYC 7742 (256-thread node) estimate",
+    "not_measured_on": "Raspberry Pi 4/5 (no such hardware exists on this node)",
+    "n_warmup": 10,
+    "n_iters": 100,
+    "p50_latency_ms": 1.0315538384020329,
+    "p95_latency_ms": 1.0420777834951878,
+    "process_peak_rss_kb": 532576,
+    "process_peak_rss_mb": 520.09375,
+    "inference_rss_delta_kb": 0
+  }
+}

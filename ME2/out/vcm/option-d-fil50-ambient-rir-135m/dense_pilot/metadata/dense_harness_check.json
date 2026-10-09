@@ -1,0 +1,7 @@
+{
+ "grid_rows_checked": 20,
+ "grid_mismatches": [],
+ "chosen_threshold_youden": -1.1,
+ "test_counts_match_at_chosen": true,
+ "verdict": "MATCH"
+}

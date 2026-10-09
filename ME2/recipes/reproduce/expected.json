@@ -1,0 +1,13 @@
+{
+  "data": {
+    "ai231": {"repo": "airimonda/ai231-me2-voice-commands", "revision": "e8283202634f23257ad944ee104b9de7a1223bb5", "doi": "10.57967/hf/10723"},
+    "supplemental": {"repo": "martinnavs/ai231-fil-supplemental-data", "revision": "230c8b8d58caf78e4bc90886d9c6fa77fe6024b8"}
+  },
+  "manifest": {"rows": 28858, "unpublished": 0},
+  "verify": {
+    "test": {"correct": 3778, "targets": 3823, "false_accepts": 10, "non_targets": 326},
+    "holdout": {"correct": 143, "targets": 186, "false_accepts": 1, "non_targets": 16}
+  },
+  "soak": {"commands": 186, "correct": 151, "wrong_action": 9, "oos_sessions": 16, "oos_false_accepts": 3, "gap_triggers": 0},
+  "retrain": {"band_points": 2}
+}

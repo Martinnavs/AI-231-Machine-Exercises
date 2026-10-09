@@ -1,0 +1,44 @@
+{
+ "config": {
+  "model": "out/vcm/hybrid-ctcwide-clsxl/ctc-wide",
+  "threshold": -0.1,
+  "policy": "endpointed",
+  "margin": 4.0,
+  "score_mode": "mean_frame",
+  "period_s": 3.0,
+  "stable_strides": 1,
+  "hold_ms": 200.0,
+  "wakeword_poll_s": 0.05
+ },
+ "split": "test",
+ "summary": {
+  "n": 784,
+  "correct_first_trigger": 697,
+  "correct_rate": 0.889,
+  "wrong_intent_triggers": 10,
+  "missed": 77,
+  "extra_triggers": 0,
+  "early_first_triggers": 22,
+  "latency_s": {
+   "p50": 0.379,
+   "p95": 0.586,
+   "mean": 0.378
+  },
+  "decodes_per_session_mean": 7.36,
+  "per_focus": {
+   "PAUSE": [
+    102,
+    113
+   ],
+   "STOP": [
+    75,
+    83
+   ],
+   "TIME": [
+    102,
+    108
+   ]
+  },
+  "nonzero_exit": 0
+ }
+}

@@ -1,0 +1,203 @@
+file,label,is_oos,slot_value,transcript,command_filename,wakeword_filename,noise_filename,rir_index,snr_db,lead_s,gap_s,wake_start_s,wake_end_s,command_start_s,speech_start_s,speech_end_s,aligned,duration_s
+audio/0000_PLAY_MUSIC.wav,PLAY_MUSIC,False,,Play a song,015018_PLAY_MUSIC.wav,ilonggo1.wav,015294_silence.wav,85,10.9,0.8,0.8,0.8,1.4,2.2,2.9371,3.7339,True,10.7
+audio/0001_PLAY_MUSIC.wav,PLAY_MUSIC,False,,Play music,015019_PLAY_MUSIC.wav,mongolian8.wav,015562_silence.wav,115,15.1,1.4,0.2,1.4,2.88,3.08,3.178,3.7856,True,7.56
+audio/0002_PLAY_MUSIC.wav,PLAY_MUSIC,False,,Start the music,015020_PLAY_MUSIC.wav,tagalog3.wav,015303_silence.wav,84,21.7,0.6,0.6,0.6,1.76,2.36,3.3162,7.36,True,10.86
+audio/0003_PLAY_MUSIC.wav,PLAY_MUSIC,False,,Start music,015021_PLAY_MUSIC.wav,tagalog13.wav,015683_silence.wav,186,17.6,1.0,0.4,1.0,2.28,2.68,2.68,3.4868,True,7.4
+audio/0004_PLAY_MUSIC.wav,PLAY_MUSIC,False,,Put on the music,015022_PLAY_MUSIC.wav,ilonggo1.wav,015505_silence.wav,71,19.6,1.4,0.2,1.4,2.8,3.0,3.5581,4.3354,True,9.2307
+audio/0005_PLAY_MUSIC.wav,PLAY_MUSIC,False,,Play some music,015023_PLAY_MUSIC.wav,ilonggo1.wav,015622_silence.wav,21,20.2,1.0,0.0,1.0,2.44,2.44,2.5579,3.3441,True,7.08
+audio/0006_WEATHER.wav,WEATHER,False,,Weather,015024_WEATHER.wav,mongolian7.wav,015603_silence.wav,77,17.3,1.5,0.4,1.5,2.18,2.58,6.2453,7.58,True,11.08
+audio/0007_WEATHER.wav,WEATHER,False,,Weather,015025_WEATHER.wav,ilonggo1.wav,015398_silence.wav,143,17.4,1.1,0.7,1.1,2.1,2.8,2.8,3.1306,True,7.0
+audio/0008_WEATHER.wav,WEATHER,False,,What's the weather?,015026_WEATHER.wav,mongolian7.wav,015756_silence.wav,130,12.4,0.6,0.7,0.6,1.32,2.02,2.9363,3.6933,True,10.52
+audio/0009_WEATHER.wav,WEATHER,False,,What's the weather?,015027_WEATHER.wav,ilonggo1.wav,016078_silence.wav,156,18.1,1.4,0.4,1.4,2.84,3.24,3.299,3.9869,True,7.88
+audio/0010_WEATHER.wav,WEATHER,False,,Tell me the weather,015028_WEATHER.wav,indonesian2.wav,015790_silence.wav,91,10.1,1.1,0.8,1.1,1.7,2.5,3.0976,3.994,True,11.0
+audio/0011_WEATHER.wav,WEATHER,False,,Tell me the weather,015029_WEATHER.wav,tagalog3.wav,016393_silence.wav,51,21.1,1.4,0.0,1.4,2.08,2.08,2.08,2.9655,True,6.8
+audio/0012_TIME.wav,TIME,False,,Time,015030_TIME.wav,tagalog7.wav,015458_silence.wav,162,11.7,1.0,0.7,1.0,2.52,3.22,4.0168,4.3953,True,11.72
+audio/0013_TIME.wav,TIME,False,,Time,015031_TIME.wav,mongolian7.wav,016215_silence.wav,81,12.4,1.2,1.0,1.2,1.92,2.92,2.92,3.3075,True,7.04
+audio/0014_TIME.wav,TIME,False,,What time is it?,015032_TIME.wav,ilonggo1.wav,015294_silence.wav,162,17.1,1.5,0.0,1.5,2.74,2.74,3.8954,4.8914,True,11.24
+audio/0015_TIME.wav,TIME,False,,What time is it?,015033_TIME.wav,korean31.wav,015811_silence.wav,68,19.0,1.3,0.7,1.3,2.38,3.08,3.0997,4.0048,True,7.8
+audio/0016_TIME.wav,TIME,False,,Tell me the time,015034_TIME.wav,ilonggo1.wav,015399_silence.wav,171,14.7,0.6,0.0,0.6,2.0,2.0,2.8167,3.8127,True,10.5
+audio/0017_TIME.wav,TIME,False,,Tell me the time,015035_TIME.wav,tagalog16.wav,015409_silence.wav,175,23.6,0.6,0.4,0.6,1.8,2.2,2.2,3.1041,True,6.84
+audio/0018_LIGHT_ON.wav,LIGHT_ON,False,,Lights on,015036_LIGHT_ON.wav,ilonggo1.wav,015579_silence.wav,20,18.6,0.9,0.0,0.9,1.7,1.7,2.5167,3.0546,True,10.2
+audio/0019_LIGHT_ON.wav,LIGHT_ON,False,,Lights on,015037_LIGHT_ON.wav,ilonggo1.wav,015649_silence.wav,139,10.7,0.5,0.2,0.5,1.42,1.62,1.7573,2.2869,True,6.14
+audio/0020_LIGHT_ON.wav,LIGHT_ON,False,,Power on the lights,015038_LIGHT_ON.wav,tagalog15.wav,015372_silence.wav,54,11.4,0.5,0.0,0.5,1.42,1.42,2.177,3.3124,True,9.92
+audio/0021_LIGHT_ON.wav,LIGHT_ON,False,,Power on the lights,015039_LIGHT_ON.wav,ilonggo1.wav,015658_silence.wav,186,24.0,1.3,0.1,1.3,2.02,2.12,2.2581,3.2841,True,7.08
+audio/0022_LIGHT_ON.wav,LIGHT_ON,False,,Turn on the lights,015040_LIGHT_ON.wav,mongolian3.wav,016118_silence.wav,157,14.5,1.4,0.6,1.4,2.92,3.52,4.1176,5.3327,True,12.02
+audio/0023_LIGHT_ON.wav,LIGHT_ON,False,,Turn on the lights,015041_LIGHT_ON.wav,indonesian4.wav,015808_silence.wav,48,21.7,1.0,0.1,1.0,2.18,2.28,2.28,3.1841,True,6.92
+audio/0024_LIGHT_OFF.wav,LIGHT_OFF,False,,Lights off,015042_LIGHT_OFF.wav,indonesian6.wav,016264_silence.wav,190,16.1,1.2,0.0,1.2,2.32,2.32,3.1567,3.7742,True,10.82
+audio/0025_LIGHT_OFF.wav,LIGHT_OFF,False,,Lights out,015043_LIGHT_OFF.wav,ilonggo1.wav,016063_silence.wav,2,25.0,1.3,0.6,1.3,2.1,2.7,2.8568,3.386,True,7.18
+audio/0026_LIGHT_OFF.wav,LIGHT_OFF,False,,Kill the lights,015044_LIGHT_OFF.wav,korean31.wav,015586_silence.wav,60,17.5,1.2,0.4,1.2,1.8,2.2,3.1562,3.9729,True,10.7
+audio/0027_LIGHT_OFF.wav,LIGHT_OFF,False,,Kill the lights,015045_LIGHT_OFF.wav,tagalog11.wav,015409_silence.wav,78,15.3,1.0,0.4,1.0,2.04,2.44,2.5386,3.4458,True,7.36
+audio/0028_LIGHT_OFF.wav,LIGHT_OFF,False,,Turn off the lights,015046_LIGHT_OFF.wav,tagalog10.wav,016364_silence.wav,79,15.8,1.3,0.7,1.3,2.14,2.84,3.8559,5.091,True,11.34
+audio/0029_LIGHT_OFF.wav,LIGHT_OFF,False,,Shut off the lights,015047_LIGHT_OFF.wav,mongolian6.wav,015778_silence.wav,129,11.7,1.2,0.0,1.2,2.4,2.4,2.4,3.6434,True,7.4
+audio/0030_PAUSE.wav,PAUSE,False,,Pause,015048_PAUSE.wav,tagalog7.wav,015947_silence.wav,21,14.4,0.8,0.5,0.8,1.4,1.9,2.9558,3.2347,True,10.4
+audio/0031_PAUSE.wav,PAUSE,False,,Pause,015049_PAUSE.wav,tagalog7.wav,016344_silence.wav,143,17.9,1.4,0.4,1.4,2.92,3.32,3.3395,3.6511,True,7.56
+audio/0032_PAUSE.wav,PAUSE,False,,Pause the music,015050_PAUSE.wav,mongolian6.wav,015505_silence.wav,56,11.9,1.5,0.9,1.5,2.7,3.6,4.4566,5.353,True,12.1
+audio/0033_PAUSE.wav,PAUSE,False,,Pause audio,015051_PAUSE.wav,mongolian5.wav,015531_silence.wav,75,15.1,1.0,0.2,1.0,1.72,1.92,2.0185,2.7674,True,6.76
+audio/0034_PAUSE.wav,PAUSE,False,,Pause this song,015052_PAUSE.wav,indonesian8.wav,015733_silence.wav,128,14.6,1.4,0.0,1.4,2.8,2.8,3.9355,4.7721,True,11.3
+audio/0035_PAUSE.wav,PAUSE,False,,Pause song,015053_PAUSE.wav,mongolian6.wav,015983_silence.wav,159,23.8,1.1,0.0,1.1,2.18,2.18,2.2585,2.945,True,6.7
+audio/0036_STOP.wav,STOP,False,,Stop music,015054_STOP.wav,korean31.wav,015357_silence.wav,185,11.6,0.5,1.0,0.5,1.1,2.1,2.8769,7.1,True,10.6
+audio/0037_STOP.wav,STOP,False,,Stop,015055_STOP.wav,ilonggo1.wav,015548_silence.wav,15,18.4,1.2,0.7,1.2,2.0,2.7,2.7,3.1253,True,6.78
+audio/0038_STOP.wav,STOP,False,,Stop playing music,015056_STOP.wav,8ce2ce74-e6f8-4862-8649-28be0373b5ad.wav,015783_silence.wav,187,14.6,1.0,0.6,1.0,2.48,3.08,3.2792,8.08,True,11.58
+audio/0039_STOP.wav,STOP,False,,Stop playing,015057_STOP.wav,korean31.wav,016279_silence.wav,118,22.3,0.7,0.8,0.7,1.74,2.54,2.54,3.4037,True,7.1
+audio/0040_STOP.wav,STOP,False,,Turn off the music,015058_STOP.wav,korean31.wav,016302_silence.wav,61,15.7,0.9,0.5,0.9,2.06,2.56,3.2546,4.227,True,8.62
+audio/0041_STOP.wav,STOP,False,,End playback,015059_STOP.wav,tagalog15.wav,015356_silence.wav,109,24.9,1.1,0.4,1.1,2.14,2.54,2.7176,3.4479,True,7.54
+audio/0042_NEXT.wav,NEXT,False,,Next song,015060_NEXT.wav,tagalog3.wav,015415_silence.wav,89,23.5,1.2,0.0,1.2,2.56,2.56,3.7353,4.3927,True,11.06
+audio/0043_NEXT.wav,NEXT,False,,Next song,015061_NEXT.wav,korean31.wav,015778_silence.wav,15,10.2,1.2,0.3,1.2,2.36,2.66,2.7972,3.3656,True,7.14
+audio/0044_NEXT.wav,NEXT,False,,Skip song,015062_NEXT.wav,tagalog11.wav,015411_silence.wav,147,23.3,1.5,0.2,1.5,2.98,3.18,4.1163,4.9529,True,11.68
+audio/0045_NEXT.wav,NEXT,False,,Skip song,015063_NEXT.wav,mongolian7.wav,016416_silence.wav,193,21.1,1.3,0.1,1.3,1.98,2.08,2.08,2.7061,True,6.48
+audio/0046_NEXT.wav,NEXT,False,,Play next song,015064_NEXT.wav,mongolian7.wav,015721_silence.wav,72,12.5,0.8,0.3,0.8,1.6,1.9,2.6769,3.5932,True,10.4
+audio/0047_NEXT.wav,NEXT,False,,Play next song,015065_NEXT.wav,tagalog10.wav,015411_silence.wav,75,17.9,1.5,0.4,1.5,2.46,2.86,2.9583,3.7253,True,7.54
+audio/0048_VOLUME_UP.wav,VOLUME_UP,False,,Volume up,015066_VOLUME_UP.wav,tagalog2.wav,016069_silence.wav,190,21.4,1.4,0.4,1.4,2.44,2.84,3.3978,5.848,True,11.34
+audio/0049_VOLUME_UP.wav,VOLUME_UP,False,,Volume up,015067_VOLUME_UP.wav,tagalog8.wav,016215_silence.wav,2,12.9,0.9,0.7,0.9,2.06,2.76,2.8777,3.4662,True,7.28
+audio/0050_VOLUME_UP.wav,VOLUME_UP,False,,Increase the volume,015068_VOLUME_UP.wav,indonesian7.wav,015941_silence.wav,186,17.1,1.3,0.8,1.3,2.42,3.22,4.4152,5.2718,True,11.72
+audio/0051_VOLUME_UP.wav,VOLUME_UP,False,,Increase the volume,015069_VOLUME_UP.wav,mongolian1.wav,015588_silence.wav,45,24.9,0.9,0.9,0.9,1.74,2.64,2.8969,3.8257,True,7.8
+audio/0052_VOLUME_UP.wav,VOLUME_UP,False,,Turn the volume up,015070_VOLUME_UP.wav,tagalog2.wav,015505_silence.wav,196,14.8,1.4,0.1,1.4,2.44,2.54,3.1177,4.2332,True,11.04
+audio/0053_VOLUME_UP.wav,VOLUME_UP,False,,Turn the volume up,015071_VOLUME_UP.wav,tagalog4.wav,015853_silence.wav,186,22.5,0.9,0.6,0.9,1.62,2.22,2.22,3.2245,True,7.02
+audio/0054_VOLUME_DOWN.wav,VOLUME_DOWN,False,,Volume down,015072_VOLUME_DOWN.wav,korean31.wav,015263_silence.wav,125,20.5,0.9,0.9,0.9,2.3,3.2,3.9171,4.5745,True,11.7
+audio/0055_VOLUME_DOWN.wav,VOLUME_DOWN,False,,Volume down,015073_VOLUME_DOWN.wav,ilonggo1.wav,015594_silence.wav,198,16.1,1.4,0.0,1.4,2.32,2.32,2.3396,2.9682,True,6.92
+audio/0056_VOLUME_DOWN.wav,VOLUME_DOWN,False,,Lower the volume,015074_VOLUME_DOWN.wav,mongolian7.wav,016270_silence.wav,178,12.8,1.1,0.6,1.1,1.82,2.42,3.0375,3.8543,True,10.92
+audio/0057_VOLUME_DOWN.wav,VOLUME_DOWN,False,,Lower the volume,015075_VOLUME_DOWN.wav,ilonggo1.wav,016009_silence.wav,13,19.7,0.5,0.2,0.5,1.9,2.1,2.1984,2.8871,True,6.82
+audio/0058_VOLUME_DOWN.wav,VOLUME_DOWN,False,,Turn the volume down,015076_VOLUME_DOWN.wav,korean31.wav,015475_silence.wav,45,15.1,1.1,1.0,1.1,1.7,2.7,3.457,4.692,True,11.2
+audio/0059_VOLUME_DOWN.wav,VOLUME_DOWN,False,,Turn the volume down,015077_VOLUME_DOWN.wav,tagalog3.wav,015972_silence.wav,55,21.5,0.7,1.0,0.7,1.38,2.38,2.5381,3.5657,True,7.54
+audio/0060_CALL.wav,CALL,False,,Call,015078_CALL.wav,tagalog15.wav,015808_silence.wav,8,11.0,0.8,0.6,0.8,1.72,2.32,3.1168,3.2961,True,10.82
+audio/0061_CALL.wav,CALL,False,,Call,015079_CALL.wav,ilonggo1.wav,015251_silence.wav,72,21.7,1.5,0.0,1.5,2.22,2.22,2.4144,2.6089,True,6.42
+audio/0062_CALL.wav,CALL,False,,Make a call,015080_CALL.wav,ilonggo1.wav,015379_silence.wav,109,20.3,0.7,0.9,0.7,2.1,3.0,3.7371,4.2749,True,11.5
+audio/0063_CALL.wav,CALL,False,,Make a call,015081_CALL.wav,korean31.wav,016452_silence.wav,120,14.3,1.5,0.5,1.5,2.5,3.0,3.1178,3.6478,True,7.56
+audio/0064_CALL.wav,CALL,False,,Make a phone call,015082_CALL.wav,9c07d435-c3b2-4556-a7cd-d183216655db.wav,015973_silence.wav,17,14.4,1.0,0.4,1.0,1.72,2.12,3.4347,4.7694,True,10.62
+audio/0065_CALL.wav,CALL,False,,Make a phone call,015083_CALL.wav,indonesian1.wav,015636_silence.wav,180,17.7,1.3,1.0,1.3,1.8,2.8,2.9179,3.6845,True,7.44
+audio/0066_MESSAGE.wav,MESSAGE,False,,Message,015084_MESSAGE.wav,ilonggo1.wav,015466_silence.wav,144,21.8,1.0,0.2,1.0,2.2,2.4,5.2685,7.4,True,10.9
+audio/0067_MESSAGE.wav,MESSAGE,False,,Message,015085_MESSAGE.wav,tagalog15.wav,015666_silence.wav,84,24.4,1.2,0.5,1.2,2.12,2.62,2.6786,3.2064,True,6.98
+audio/0068_MESSAGE.wav,MESSAGE,False,,Send a message,015086_MESSAGE.wav,indonesian7.wav,015740_silence.wav,92,23.3,1.2,0.4,1.2,2.32,2.72,3.5367,7.72,True,11.22
+audio/0069_MESSAGE.wav,MESSAGE,False,,Send a message,015087_MESSAGE.wav,ilonggo1.wav,015603_silence.wav,79,22.8,1.4,0.5,1.4,2.8,3.3,3.3,4.2056,True,8.06
+audio/0070_MESSAGE.wav,MESSAGE,False,,Send my message,015088_MESSAGE.wav,mongolian1.wav,015361_silence.wav,129,20.6,1.2,0.8,1.2,2.04,2.84,3.338,7.84,True,11.34
+audio/0071_MESSAGE.wav,MESSAGE,False,,Send my message,015089_MESSAGE.wav,korean31.wav,016419_silence.wav,74,12.0,1.2,0.5,1.2,2.0,2.5,2.5,3.444,True,7.18
+audio/0072_LIST_REMINDERS.wav,LIST_REMINDERS,False,,Reminders,015090_LIST_REMINDERS.wav,eb29c7b3-f942-407d-ad8a-c66bef16b51f.wav,016265_silence.wav,22,13.7,0.6,1.0,0.6,1.4,2.4,2.8582,7.4,True,10.9
+audio/0073_LIST_REMINDERS.wav,LIST_REMINDERS,False,,Reminders,015091_LIST_REMINDERS.wav,indonesian8.wav,015407_silence.wav,4,14.5,0.9,0.6,0.9,1.42,2.02,2.1572,2.7452,True,6.5
+audio/0074_LIST_REMINDERS.wav,LIST_REMINDERS,False,,Show my reminders,015092_LIST_REMINDERS.wav,indonesian8.wav,016106_silence.wav,49,10.1,1.3,0.6,1.3,2.7,3.3,3.7183,4.7542,True,11.8
+audio/0075_LIST_REMINDERS.wav,LIST_REMINDERS,False,,Show my reminders,015093_LIST_REMINDERS.wav,tagalog7.wav,015406_silence.wav,31,17.6,0.9,0.3,0.9,2.06,2.36,2.36,3.5433,True,7.28
+audio/0076_LIST_REMINDERS.wav,LIST_REMINDERS,False,,List my reminders,015094_LIST_REMINDERS.wav,ilonggo1.wav,015368_silence.wav,142,17.5,1.5,0.6,1.5,2.74,3.34,3.6786,8.34,True,11.84
+audio/0077_LIST_REMINDERS.wav,LIST_REMINDERS,False,,List my reminders,015095_LIST_REMINDERS.wav,korean31.wav,016393_silence.wav,96,19.7,0.9,0.3,0.9,2.06,2.36,2.5179,3.5837,True,7.36
+audio/0078_TIMER.wav,TIMER,False,10 seconds,Timer ten seconds,015096_TIMER.wav,ilonggo1.wav,015470_silence.wav,18,19.7,1.1,0.0,1.1,2.1,2.1,2.6378,4.2315,True,10.6
+audio/0079_TIMER.wav,TIMER,False,10 seconds,Timer ten seconds,015097_TIMER.wav,tagalog7.wav,015768_silence.wav,95,20.6,0.5,0.9,0.5,2.02,2.92,2.92,4.1634,True,7.92
+audio/0080_TIMER.wav,TIMER,False,30 seconds,Timer thirty seconds,015098_TIMER.wav,indonesian7.wav,016359_silence.wav,171,21.2,0.8,0.8,0.8,2.16,2.96,3.4779,4.9122,True,11.46
+audio/0081_TIMER.wav,TIMER,False,30 seconds,Timer thirty seconds,015099_TIMER.wav,mongolian9.wav,015466_silence.wav,41,11.9,1.0,0.8,1.0,2.12,2.92,2.92,4.585,True,8.64
+audio/0082_TIMER.wav,TIMER,False,1 minute,Timer one minute,015100_TIMER.wav,tagalog7.wav,015763_silence.wav,24,10.3,1.0,1.0,1.0,2.16,3.16,3.8174,6.1879,True,11.66
+audio/0083_TIMER.wav,TIMER,False,1 minute,Timer one minute,015101_TIMER.wav,ilonggo1.wav,015445_silence.wav,187,21.7,0.9,0.0,0.9,1.62,1.62,1.62,2.5241,True,6.26
+audio/0084_TIMER.wav,TIMER,False,10 seconds,Countdown for ten seconds,015102_TIMER.wav,ilonggo1.wav,015617_silence.wav,146,20.0,0.8,0.7,0.8,1.52,2.22,2.8375,4.3913,True,10.72
+audio/0085_TIMER.wav,TIMER,False,10 seconds,Countdown for ten seconds,015103_TIMER.wav,computer-en-2a810e89-1753-4b26-a8aa-d78d2e9c2c2d.wav,016456_silence.wav,12,10.5,1.2,0.4,1.2,2.44,2.84,2.84,4.3629,True,8.12
+audio/0086_TIMER.wav,TIMER,False,30 seconds,Countdown for thirty seconds,015104_TIMER.wav,tagalog15.wav,015684_silence.wav,161,10.3,0.6,0.8,0.6,1.64,2.44,2.8782,4.6711,True,10.94
+audio/0087_TIMER.wav,TIMER,False,30 seconds,Countdown for thirty seconds,015105_TIMER.wav,08fb146a-2a05-4a58-97d6-eb14bcee8fa7.wav,016302_silence.wav,73,14.6,1.3,0.5,1.3,2.18,2.68,2.68,4.5044,True,8.52
+audio/0088_TIMER.wav,TIMER,False,1 minute,Countdown for one minute,015106_TIMER.wav,tagalog3.wav,015425_silence.wav,156,22.2,1.2,0.7,1.2,2.56,3.26,3.7779,5.2321,True,11.76
+audio/0089_TIMER.wav,TIMER,False,1 minute,Countdown for one minute,015107_TIMER.wav,9c07d435-c3b2-4556-a7cd-d183216655db.wav,015372_silence.wav,196,10.8,1.2,0.1,1.2,1.92,2.02,2.02,3.3049,True,7.22
+audio/0090_TIMER.wav,TIMER,False,10 seconds,Start a timer for ten seconds,015108_TIMER.wav,indonesian4.wav,016344_silence.wav,108,15.6,1.3,1.0,1.3,2.16,3.16,3.917,6.1082,True,11.66
+audio/0091_TIMER.wav,TIMER,False,10 seconds,Start a timer for ten seconds,015109_TIMER.wav,mongolian7.wav,016254_silence.wav,79,13.6,0.5,0.8,0.5,1.58,2.38,2.38,4.2033,True,8.06
+audio/0092_TIMER.wav,TIMER,False,30 seconds,Start a timer for thirty seconds,015110_TIMER.wav,ilonggo1.wav,016393_silence.wav,109,18.6,1.4,0.5,1.4,2.48,2.98,3.5975,5.7688,True,11.48
+audio/0093_TIMER.wav,TIMER,False,30 seconds,Start a timer for thirty seconds,015111_TIMER.wav,indonesian3.wav,015462_silence.wav,117,18.8,1.3,0.6,1.3,2.02,2.62,2.62,4.5652,True,8.74
+audio/0094_TIMER.wav,TIMER,False,1 minute,Start a timer for one minute,015112_TIMER.wav,tagalog13.wav,016415_silence.wav,155,21.1,0.5,0.6,0.5,1.06,1.66,2.9548,4.8273,True,10.16
+audio/0095_TIMER.wav,TIMER,False,1 minute,Start a timer for one minute,015113_TIMER.wav,indonesian3.wav,015284_silence.wav,135,15.0,1.4,1.0,1.4,2.48,3.48,3.48,4.8855,True,8.92
+audio/0096_ALARM.wav,ALARM,False,6 AM,Alarm six AM,015114_ALARM.wav,indonesian2.wav,015918_silence.wav,182,17.2,0.7,0.9,0.7,1.3,2.2,4.0725,5.9052,True,10.7
+audio/0097_ALARM.wav,ALARM,False,6 AM,Alarm six AM,015115_ALARM.wav,tagalog13.wav,015890_silence.wav,0,20.1,0.8,0.9,0.8,1.6,2.5,2.7178,3.8857,True,7.94
+audio/0098_ALARM.wav,ALARM,False,8 AM,Alarm eight AM,015116_ALARM.wav,tagalog13.wav,015248_silence.wav,109,14.0,1.4,0.5,1.4,2.68,3.18,3.8374,4.8931,True,11.68
+audio/0099_ALARM.wav,ALARM,False,8 AM,Alarm eight AM,015117_ALARM.wav,ilonggo1.wav,015868_silence.wav,124,14.4,0.8,1.0,0.8,1.4,2.4,2.5384,3.7251,True,7.68
+audio/0100_ALARM.wav,ALARM,False,9 PM,Alarm nine PM,015118_ALARM.wav,korean31.wav,016076_silence.wav,194,10.5,0.5,0.6,0.5,1.98,2.58,2.7782,4.0664,True,8.26
+audio/0101_ALARM.wav,ALARM,False,9 PM,Alarm nine PM,015119_ALARM.wav,ilonggo1.wav,016391_silence.wav,8,11.0,1.0,0.5,1.0,2.4,2.9,3.0786,4.9837,True,8.96
+audio/0102_ALARM.wav,ALARM,False,6 AM,Wake me up at six AM,015120_ALARM.wav,indonesian5.wav,016090_silence.wav,52,19.6,1.4,0.6,1.4,2.88,3.48,3.9979,5.6314,True,11.98
+audio/0103_ALARM.wav,ALARM,False,6 AM,Wake me up at six AM,015121_ALARM.wav,tagalog7.wav,015459_silence.wav,195,19.5,1.4,0.7,1.4,2.2,2.9,3.1376,4.5239,True,8.42
+audio/0104_ALARM.wav,ALARM,False,8 AM,Wake me up at eight AM,015122_ALARM.wav,ilonggo1.wav,016228_silence.wav,137,21.3,0.7,0.2,0.7,1.9,2.1,2.4586,3.9924,True,10.6
+audio/0105_ALARM.wav,ALARM,False,8 AM,Wake me up at eight AM,015123_ALARM.wav,ilonggo1.wav,015562_silence.wav,128,12.2,1.5,0.0,1.5,2.7,2.7,2.7395,3.9443,True,7.78
+audio/0106_ALARM.wav,ALARM,False,9 PM,Wake me up at nine PM,015124_ALARM.wav,ilonggo1.wav,015403_silence.wav,20,16.2,1.4,0.2,1.4,2.24,2.44,3.0775,4.7906,True,10.94
+audio/0107_ALARM.wav,ALARM,False,9 PM,Wake me up at nine PM,015125_ALARM.wav,ilonggo1.wav,016416_silence.wav,129,10.7,1.4,0.8,1.4,2.32,3.12,3.1595,4.3638,True,8.16
+audio/0108_ALARM.wav,ALARM,False,6 AM,Set an alarm for six AM,015126_ALARM.wav,mongolian3.wav,015857_silence.wav,0,23.7,1.0,0.0,1.0,2.36,2.36,2.599,4.2325,True,10.86
+audio/0109_ALARM.wav,ALARM,False,6 AM,Set an alarm for six AM,015127_ALARM.wav,mongolian5.wav,016113_silence.wav,116,22.0,0.6,1.0,0.6,1.28,2.28,2.28,3.8435,True,7.68
+audio/0110_ALARM.wav,ALARM,False,8 AM,Set an alarm for eight AM,015128_ALARM.wav,tagalog13.wav,015598_silence.wav,115,20.4,0.7,0.0,0.7,1.98,1.98,2.2589,3.992,True,10.48
+audio/0111_ALARM.wav,ALARM,False,8 AM,Set an alarm for eight AM,015129_ALARM.wav,indonesian8.wav,015531_silence.wav,28,15.8,1.0,0.3,1.0,2.16,2.46,2.46,4.2637,True,8.18
+audio/0112_ALARM.wav,ALARM,False,9 PM,Set an alarm for nine PM,015130_ALARM.wav,mongolian9.wav,015223_silence.wav,42,13.7,1.1,0.3,1.1,1.62,1.92,2.2786,4.0116,True,10.42
+audio/0113_ALARM.wav,ALARM,False,9 PM,Set an alarm for nine PM,015131_ALARM.wav,ilonggo1.wav,016355_silence.wav,90,18.9,0.7,0.6,0.7,1.78,2.38,2.38,3.8439,True,7.7
+audio/0114_TEMPERATURE.wav,TEMPERATURE,False,18 degrees,Temperature eighteen degrees,015132_TEMPERATURE.wav,mongolian1.wav,015268_silence.wav,89,18.5,0.5,0.1,0.5,1.62,1.72,2.0786,3.7718,True,10.22
+audio/0115_TEMPERATURE.wav,TEMPERATURE,False,18 degrees,Temperature eighteen degrees,015133_TEMPERATURE.wav,ilonggo1.wav,015403_silence.wav,170,10.7,1.4,0.3,1.4,2.44,2.74,2.74,4.5032,True,8.34
+audio/0116_TEMPERATURE.wav,TEMPERATURE,False,22 degrees,Temperature twenty two degrees,015134_TEMPERATURE.wav,ilonggo1.wav,015368_silence.wav,8,12.2,0.8,0.5,0.8,1.72,2.22,2.479,4.3913,True,10.72
+audio/0117_TEMPERATURE.wav,TEMPERATURE,False,22 degrees,Temperature twenty two degrees,015135_TEMPERATURE.wav,indonesian7.wav,015398_silence.wav,109,13.6,0.9,0.7,0.9,2.34,3.04,3.04,4.765,True,8.84
+audio/0118_TEMPERATURE.wav,TEMPERATURE,False,26 degrees,Temperature twenty six degrees,015136_TEMPERATURE.wav,tagalog15.wav,016344_silence.wav,57,13.6,1.3,0.0,1.3,2.22,2.22,3.216,5.2479,True,10.72
+audio/0119_TEMPERATURE.wav,TEMPERATURE,False,26 degrees,Temperature twenty six degrees,015137_TEMPERATURE.wav,indonesian4.wav,015255_silence.wav,54,18.0,1.3,0.8,1.3,2.16,2.96,2.96,4.5248,True,8.52
+audio/0120_TEMPERATURE.wav,TEMPERATURE,False,18 degrees,Change the temperature to eighteen degrees,015138_TEMPERATURE.wav,mongolian6.wav,015263_silence.wav,57,10.3,1.0,0.1,1.0,2.2,2.3,2.6785,5.1486,True,10.8
+audio/0121_TEMPERATURE.wav,TEMPERATURE,False,18 degrees,Change the temperature to eighteen degrees,015139_TEMPERATURE.wav,indonesian1.wav,016420_silence.wav,22,13.9,1.5,0.9,1.5,2.0,2.9,2.9,5.4226,True,9.3
+audio/0122_TEMPERATURE.wav,TEMPERATURE,False,22 degrees,Change the temperature to twenty two degrees,015140_TEMPERATURE.wav,ilonggo1.wav,016198_silence.wav,27,14.0,0.9,0.4,0.9,1.5,1.9,2.2586,4.4299,True,10.4
+audio/0123_TEMPERATURE.wav,TEMPERATURE,False,22 degrees,Change the temperature to twenty two degrees,015141_TEMPERATURE.wav,ilonggo1.wav,015505_silence.wav,22,24.5,1.1,0.2,1.1,1.82,2.02,2.02,4.4021,True,8.18
+audio/0124_TEMPERATURE.wav,TEMPERATURE,False,26 degrees,Change the temperature to twenty six degrees,015142_TEMPERATURE.wav,ilonggo1.wav,015775_silence.wav,6,22.7,1.4,0.4,1.4,2.12,2.52,2.8786,5.1893,True,11.02
+audio/0125_TEMPERATURE.wav,TEMPERATURE,False,26 degrees,Change the temperature to twenty six degrees,015143_TEMPERATURE.wav,indonesian8.wav,016364_silence.wav,153,18.9,1.5,0.7,1.5,2.22,2.92,2.92,5.3629,True,9.28
+audio/0126_TEMPERATURE.wav,TEMPERATURE,False,18 degrees,Set the temperature to eighteen degrees,015144_TEMPERATURE.wav,ilonggo1.wav,015590_silence.wav,17,10.4,1.4,0.7,1.4,2.8,3.5,3.8187,6.0498,True,12.0
+audio/0127_TEMPERATURE.wav,TEMPERATURE,False,18 degrees,Set the temperature to eighteen degrees,015145_TEMPERATURE.wav,tagalog15.wav,016419_silence.wav,174,17.8,1.3,0.0,1.3,2.3,2.3,2.3,4.6223,True,8.42
+audio/0128_TEMPERATURE.wav,TEMPERATURE,False,22 degrees,Set the temperature to twenty two degrees,015146_TEMPERATURE.wav,tagalog10.wav,016283_silence.wav,55,13.3,0.5,0.5,0.5,1.38,1.88,2.2983,4.6091,True,10.38
+audio/0129_TEMPERATURE.wav,TEMPERATURE,False,22 degrees,Set the temperature to twenty two degrees,015147_TEMPERATURE.wav,tagalog3.wav,016220_silence.wav,135,19.5,1.3,0.0,1.3,2.46,2.46,2.46,4.5431,True,8.42
+audio/0130_TEMPERATURE.wav,TEMPERATURE,False,26 degrees,Set the temperature to twenty six degrees,015148_TEMPERATURE.wav,tagalog10.wav,016238_silence.wav,185,18.4,1.4,0.7,1.4,2.24,2.94,3.2189,5.5496,True,11.44
+audio/0131_TEMPERATURE.wav,TEMPERATURE,False,26 degrees,Set the temperature to twenty six degrees,015149_TEMPERATURE.wav,mongolian7.wav,015552_silence.wav,198,11.3,0.6,0.4,0.6,1.28,1.68,1.68,4.0422,True,7.84
+audio/0132_BRIGHTNESS.wav,BRIGHTNESS,False,20 percent,Brightness twenty percent,015150_BRIGHTNESS.wav,ilonggo1.wav,016150_silence.wav,130,24.5,0.9,0.3,0.9,1.62,1.92,2.4578,4.0316,True,10.42
+audio/0133_BRIGHTNESS.wav,BRIGHTNESS,False,20 percent,Brightness twenty percent,015151_BRIGHTNESS.wav,tagalog3.wav,015952_silence.wav,15,13.7,1.5,0.3,1.5,2.66,2.96,3.059,4.484,True,8.36
+audio/0134_BRIGHTNESS.wav,BRIGHTNESS,False,60 percent,Brightness sixty percent,015152_BRIGHTNESS.wav,mongolian7.wav,016379_silence.wav,174,15.0,0.7,0.5,0.7,1.5,2.0,2.5378,3.992,True,10.5
+audio/0135_BRIGHTNESS.wav,BRIGHTNESS,False,60 percent,Brightness sixty percent,015153_BRIGHTNESS.wav,tagalog10.wav,016131_silence.wav,101,23.6,1.5,0.7,1.5,2.38,3.08,3.1196,4.7223,True,8.44
+audio/0136_BRIGHTNESS.wav,BRIGHTNESS,False,100 percent,Brightness one hundred percent,015154_BRIGHTNESS.wav,indonesian8.wav,016406_silence.wav,139,16.5,0.7,0.4,0.7,1.22,1.62,2.0782,4.0304,True,10.12
+audio/0137_BRIGHTNESS.wav,BRIGHTNESS,False,100 percent,Brightness one hundred percent,015155_BRIGHTNESS.wav,indonesian3.wav,016385_silence.wav,39,14.5,0.8,0.8,0.8,1.88,2.68,2.7196,4.424,True,8.36
+audio/0138_BRIGHTNESS.wav,BRIGHTNESS,False,20 percent,Change the brightness to twenty percent,015156_BRIGHTNESS.wav,indonesian3.wav,016127_silence.wav,31,25.0,0.8,0.4,0.8,1.52,1.92,2.2786,4.2507,True,10.42
+audio/0139_BRIGHTNESS.wav,BRIGHTNESS,False,20 percent,Adjust brightness to twenty percent,015157_BRIGHTNESS.wav,tagalog7.wav,016228_silence.wav,27,16.5,1.4,0.4,1.4,2.2,2.6,2.8781,5.063,True,9.0
+audio/0140_BRIGHTNESS.wav,BRIGHTNESS,False,60 percent,Change the brightness to sixty percent,015158_BRIGHTNESS.wav,tagalog2.wav,015877_silence.wav,46,10.1,0.8,0.8,0.8,1.84,2.64,3.4767,5.7077,True,11.14
+audio/0141_BRIGHTNESS.wav,BRIGHTNESS,False,60 percent,Adjust brightness to sixty percent,015159_BRIGHTNESS.wav,ilonggo1.wav,015991_silence.wav,174,17.1,1.2,0.1,1.2,2.12,2.22,2.4185,4.3639,True,8.38
+audio/0142_BRIGHTNESS.wav,BRIGHTNESS,False,100 percent,Set the brightness to one hundred percent,015160_BRIGHTNESS.wav,indonesian7.wav,015659_silence.wav,146,10.0,1.0,1.0,1.0,2.12,3.12,3.5184,5.63,True,11.62
+audio/0143_BRIGHTNESS.wav,BRIGHTNESS,False,100 percent,Adjust brightness to one hundred percent,015161_BRIGHTNESS.wav,indonesian4.wav,015407_silence.wav,119,15.2,1.1,0.8,1.1,1.96,2.76,3.0181,5.1222,True,8.92
+audio/0144_BRIGHTNESS.wav,BRIGHTNESS,False,20 percent,Brightness level twenty percent,015162_BRIGHTNESS.wav,tagalog13.wav,015808_silence.wav,163,20.2,0.7,0.5,0.7,1.98,2.48,2.6584,4.4426,True,8.24
+audio/0145_BRIGHTNESS.wav,BRIGHTNESS,False,20 percent,Brightness level twenty percent,015163_BRIGHTNESS.wav,tagalog15.wav,015415_silence.wav,124,10.1,0.5,0.8,0.5,1.42,2.22,2.2596,4.0632,True,7.92
+audio/0146_BRIGHTNESS.wav,BRIGHTNESS,False,60 percent,Brightness level sixty percent,015164_BRIGHTNESS.wav,tagalog16.wav,015620_silence.wav,162,18.1,1.3,0.0,1.3,2.5,2.5,2.6387,4.4019,True,8.1
+audio/0147_BRIGHTNESS.wav,BRIGHTNESS,False,60 percent,Brightness level sixty percent,015165_BRIGHTNESS.wav,tagalog3.wav,016254_silence.wav,155,21.9,1.5,0.7,1.5,2.86,3.56,3.5996,5.6606,True,9.22
+audio/0148_BRIGHTNESS.wav,BRIGHTNESS,False,100 percent,Brightness level one hundred percent,015166_BRIGHTNESS.wav,tagalog3.wav,016213_silence.wav,136,12.8,0.6,0.1,0.6,1.28,1.38,1.5585,3.562,True,7.3
+audio/0149_BRIGHTNESS.wav,BRIGHTNESS,False,100 percent,Brightness level one hundred percent,015167_BRIGHTNESS.wav,indonesian8.wav,016118_silence.wav,24,21.1,1.4,0.6,1.4,2.56,3.16,3.3586,5.7222,True,9.54
+audio/0150_COLOR.wav,COLOR,False,Red,Change the lights to Red,015168_COLOR.wav,ilonggo1.wav,015863_silence.wav,132,12.2,0.7,0.1,0.7,1.78,1.88,2.2386,3.5334,True,10.38
+audio/0151_COLOR.wav,COLOR,False,Red,Change color to red,015169_COLOR.wav,tagalog10.wav,016294_silence.wav,150,20.3,1.1,0.6,1.1,1.98,2.58,2.58,3.7441,True,7.54
+audio/0152_COLOR.wav,COLOR,False,Blue,Change the lights to Blue,015170_COLOR.wav,indonesian4.wav,016416_silence.wav,178,22.5,0.8,0.5,0.8,1.98,2.48,2.9581,4.2131,True,10.98
+audio/0153_COLOR.wav,COLOR,False,Blue,Change color to blue,015171_COLOR.wav,tagalog2.wav,015251_silence.wav,43,16.0,1.0,0.1,1.0,1.8,1.9,1.9,3.2026,True,6.9
+audio/0154_COLOR.wav,COLOR,False,Green,Change the lights to Green,015172_COLOR.wav,mongolian9.wav,016067_silence.wav,156,16.6,1.3,0.5,1.3,2.66,3.16,3.5584,4.9329,True,11.66
+audio/0155_COLOR.wav,COLOR,False,Green,Change color to green,015173_COLOR.wav,indonesian6.wav,016379_silence.wav,177,12.0,1.2,0.0,1.2,2.16,2.16,2.16,3.5228,True,7.24
+audio/0156_COLOR.wav,COLOR,False,Red,Switch color to red,015174_COLOR.wav,indonesian3.wav,015361_silence.wav,190,22.8,0.6,0.1,0.6,1.68,1.78,1.78,3.0448,True,6.94
+audio/0157_COLOR.wav,COLOR,False,Red,Switch color to red,015175_COLOR.wav,indonesian3.wav,016150_silence.wav,181,18.4,0.5,0.2,0.5,1.58,1.78,1.78,2.9245,True,6.76
+audio/0158_COLOR.wav,COLOR,False,Blue,Switch color to blue,015176_COLOR.wav,tagalog7.wav,015766_silence.wav,6,20.4,0.9,0.5,0.9,1.7,2.2,2.2,3.4241,True,7.24
+audio/0159_COLOR.wav,COLOR,False,Blue,Switch color to blue,015177_COLOR.wav,korean31.wav,016391_silence.wav,15,18.3,1.5,0.0,1.5,2.66,2.66,2.66,4.2435,True,8.08
+audio/0160_COLOR.wav,COLOR,False,Green,Switch color to green,015178_COLOR.wav,ilonggo1.wav,016395_silence.wav,114,12.5,0.5,0.5,0.5,1.54,2.04,2.04,3.383,True,7.12
+audio/0161_COLOR.wav,COLOR,False,Green,Switch color to green,015179_COLOR.wav,indonesian3.wav,016452_silence.wav,73,16.0,0.8,0.8,0.8,1.52,2.32,2.32,3.7027,True,7.42
+audio/0162_COLOR.wav,COLOR,False,Red,Color Red,015180_COLOR.wav,tagalog8.wav,015560_silence.wav,15,20.6,0.6,0.4,0.6,1.8,2.2,2.7578,3.4948,True,10.7
+audio/0163_COLOR.wav,COLOR,False,Red,Set color to red,015181_COLOR.wav,mongolian5.wav,015463_silence.wav,102,19.1,0.5,0.2,0.5,1.42,1.62,1.62,3.0037,True,6.82
+audio/0164_COLOR.wav,COLOR,False,Blue,Color Blue,015182_COLOR.wav,indonesian7.wav,016228_silence.wav,73,19.7,0.5,0.1,0.5,1.62,1.72,2.218,6.72,True,10.22
+audio/0165_COLOR.wav,COLOR,False,Blue,Set color to blue,015183_COLOR.wav,tagalog4.wav,015871_silence.wav,123,19.8,1.2,0.9,1.2,2.28,3.18,3.18,4.2223,True,7.86
+audio/0166_COLOR.wav,COLOR,False,Green,Set the lights to Green,015184_COLOR.wav,korean31.wav,015552_silence.wav,38,12.7,0.6,0.9,0.6,1.76,2.66,3.0982,4.3731,True,11.16
+audio/0167_COLOR.wav,COLOR,False,Green,Set color to green,015185_COLOR.wav,indonesian6.wav,016264_silence.wav,162,13.3,0.8,0.3,0.8,1.92,2.22,2.22,3.3028,True,6.98
+audio/0168_CREATE_REMINDER.wav,CREATE_REMINDER,False,Drink water,Reminder Drink water,015186_CREATE_REMINDER.wav,08fb146a-2a05-4a58-97d6-eb14bcee8fa7.wav,015654_silence.wav,155,18.4,1.3,0.8,1.3,2.18,2.98,4.2549,5.2509,True,11.48
+audio/0169_CREATE_REMINDER.wav,CREATE_REMINDER,False,Drink water,Reminder drink water,015187_CREATE_REMINDER.wav,ilonggo1.wav,016045_silence.wav,192,22.0,1.1,0.8,1.1,1.58,2.38,2.6173,3.863,True,7.62
+audio/0170_CREATE_REMINDER.wav,CREATE_REMINDER,False,Study,Reminder Study,015188_CREATE_REMINDER.wav,tagalog8.wav,015991_silence.wav,87,17.6,1.3,0.3,1.3,2.5,2.8,3.3777,4.3139,True,11.3
+audio/0171_CREATE_REMINDER.wav,CREATE_REMINDER,False,Study,Reminder study,015189_CREATE_REMINDER.wav,ilonggo1.wav,016402_silence.wav,109,13.0,0.5,0.2,0.5,1.7,1.9,2.0176,2.684,True,6.38
+audio/0172_CREATE_REMINDER.wav,CREATE_REMINDER,False,Exercise,Reminder Exercise,015190_CREATE_REMINDER.wav,indonesian5.wav,016150_silence.wav,7,10.4,0.5,0.0,0.5,1.54,1.54,2.297,3.6117,True,10.04
+audio/0173_CREATE_REMINDER.wav,CREATE_REMINDER,False,Exercise,Reminder exercise,015191_CREATE_REMINDER.wav,korean31.wav,016355_silence.wav,138,11.9,0.8,0.9,0.8,2.28,3.18,3.5167,4.7049,True,8.7
+audio/0174_CREATE_REMINDER.wav,CREATE_REMINDER,False,Drink water,Remind me to Drink water,015192_CREATE_REMINDER.wav,tagalog9.wav,016138_silence.wav,176,18.2,1.1,0.1,1.1,1.66,1.76,2.7162,4.2301,True,10.26
+audio/0175_CREATE_REMINDER.wav,CREATE_REMINDER,False,Drink water,Remind me to drink water,015193_CREATE_REMINDER.wav,ilonggo1.wav,015294_silence.wav,48,23.0,0.5,0.2,0.5,1.7,1.9,2.2168,3.4444,True,7.38
+audio/0176_CREATE_REMINDER.wav,CREATE_REMINDER,False,Study,Remind me to Study,015194_CREATE_REMINDER.wav,92a058a8-424a-445c-b3eb-a466e45e5f1b.wav,015505_silence.wav,123,23.3,0.5,0.4,0.5,1.5,1.9,2.7167,3.8124,True,10.4
+audio/0177_CREATE_REMINDER.wav,CREATE_REMINDER,False,Study,Remind me to study,015195_CREATE_REMINDER.wav,indonesian8.wav,016209_silence.wav,72,22.8,1.1,1.0,1.1,1.7,2.7,2.8775,3.8242,True,7.62
+audio/0178_CREATE_REMINDER.wav,CREATE_REMINDER,False,Exercise,Remind me to Exercise,015196_CREATE_REMINDER.wav,08fb146a-2a05-4a58-97d6-eb14bcee8fa7.wav,015308_silence.wav,59,11.6,1.4,0.7,1.4,2.28,2.98,3.5776,5.0318,True,11.48
+audio/0179_CREATE_REMINDER.wav,CREATE_REMINDER,False,Exercise,Remind me to exercise,015197_CREATE_REMINDER.wav,mongolian5.wav,016417_silence.wav,197,16.0,1.5,0.3,1.5,2.42,2.72,2.9975,4.6225,True,8.4
+audio/0180_CREATE_REMINDER.wav,CREATE_REMINDER,False,Drink water,Create a reminder to Drink water,015198_CREATE_REMINDER.wav,mongolian7.wav,016451_silence.wav,173,19.9,0.5,0.0,0.5,1.22,1.22,2.6941,4.3873,True,9.72
+audio/0181_CREATE_REMINDER.wav,CREATE_REMINDER,False,Drink water,Create a reminder to drink water,015199_CREATE_REMINDER.wav,korean31.wav,015372_silence.wav,98,19.2,0.9,0.9,0.9,1.5,2.4,2.6182,4.4828,True,8.32
+audio/0182_CREATE_REMINDER.wav,CREATE_REMINDER,False,Study,Create a reminder to Study,015200_CREATE_REMINDER.wav,mongolian1.wav,015742_silence.wav,165,11.5,1.5,0.8,1.5,2.74,3.54,3.8786,5.3727,True,12.04
+audio/0183_CREATE_REMINDER.wav,CREATE_REMINDER,False,Study,Create a reminder to study,015201_CREATE_REMINDER.wav,ilonggo1.wav,015863_silence.wav,57,16.0,0.6,0.3,0.6,2.04,2.34,2.558,4.2227,True,8.02
+audio/0184_CREATE_REMINDER.wav,CREATE_REMINDER,False,Exercise,Create a reminder to Exercise,015202_CREATE_REMINDER.wav,ilonggo1.wav,015694_silence.wav,128,13.8,0.7,0.1,0.7,1.42,1.52,1.8985,6.52,True,10.02
+audio/0185_CREATE_REMINDER.wav,CREATE_REMINDER,False,Exercise,Create a reminder to exercise,015203_CREATE_REMINDER.wav,mongolian3.wav,016393_silence.wav,197,14.5,1.3,0.5,1.3,2.82,3.32,3.6577,5.9022,True,9.72
+audio/0186_unknown.wav,unknown,True,,They first met while both studying at University College Dublin.,015204_unknown.wav,mongolian5.wav,015586_silence.wav,160,12.9,0.7,0.6,0.7,1.38,1.98,1.98,7.956,False,11.456
+audio/0187_unknown.wav,unknown,True,,Then they scrambled round the rocks to the other side of the house.,015205_unknown.wav,tagalog6.wav,016062_silence.wav,130,21.8,1.5,0.1,1.5,2.24,2.34,2.34,7.884,False,11.384
+audio/0188_unknown.wav,unknown,True,,Then they scrambled round the rocks to the other side of the house.,015206_unknown.wav,indonesian8.wav,015944_silence.wav,192,15.4,1.4,0.8,1.4,2.56,3.36,3.36,8.904,False,12.404
+audio/0189_unknown.wav,unknown,True,,Kitchen heat up,015207_unknown.wav,mongolian9.wav,015839_silence.wav,126,11.7,0.8,0.0,0.8,1.4,1.4,1.4,3.704,False,7.204
+audio/0190_unknown.wav,unknown,True,,Decrease the heating,015208_unknown.wav,indonesian7.wav,015972_silence.wav,52,17.0,1.3,0.3,1.3,2.42,2.72,2.72,5.1947,False,8.6947
+audio/0191_unknown.wav,unknown,True,,Set language to Chinese,015209_unknown.wav,tagalog8.wav,016417_silence.wav,187,21.9,1.2,0.3,1.2,2.4,2.7,2.7,5.6013,False,9.1013
+audio/0192_unknown.wav,unknown,True,,Go get me some juice,015210_unknown.wav,mongolian8.wav,016339_silence.wav,157,12.6,1.5,0.6,1.5,2.98,3.58,3.58,6.14,False,9.64
+audio/0193_unknown.wav,unknown,True,,Fetch my socks,015211_unknown.wav,tagalog2.wav,016113_silence.wav,32,19.1,0.6,0.7,0.6,1.4,2.1,2.1,4.148,False,7.648
+audio/0194_unknown.wav,unknown,True,,Bring some juice,015212_unknown.wav,mongolian1.wav,016244_silence.wav,67,17.9,1.3,0.0,1.3,2.54,2.54,2.54,4.4173,False,7.9173
+audio/0195_unknown.wav,unknown,True,,More heat,015213_unknown.wav,ilonggo1.wav,015543_silence.wav,65,17.3,1.3,0.0,1.3,1.9,1.9,1.9,4.0333,False,7.5333
+audio/0196_unknown.wav,unknown,True,,Open the garage door.,015214_unknown.wav,ilonggo1.wav,015548_silence.wav,142,11.4,0.9,0.8,0.9,1.74,2.54,2.54,3.9361,False,7.4361
+audio/0197_unknown.wav,unknown,True,,My sister is visiting next month.,015215_unknown.wav,tagalog7.wav,016220_silence.wav,33,21.4,1.4,0.9,1.4,2.56,3.46,3.46,6.0666,False,9.5666
+audio/0198_unknown.wav,unknown,True,,Book a table for two tonight.,015216_unknown.wav,tagalog4.wav,016131_silence.wav,4,12.9,0.5,1.0,0.5,1.58,2.58,2.58,4.5455,False,8.0455
+audio/0199_unknown.wav,unknown,True,,Start the washing machine.,015217_unknown.wav,tagalog8.wav,016118_silence.wav,39,22.7,0.6,0.7,0.6,1.76,2.46,2.46,6.3633,False,9.8633
+audio/0200_unknown.wav,unknown,True,,Find flights to Cebu.,015218_unknown.wav,mongolian9.wav,016209_silence.wav,106,16.5,1.1,0.2,1.1,2.22,2.42,2.42,5.1161,False,8.6161
+audio/0201_unknown.wav,unknown,True,,We're going to the beach on Saturday.,015219_unknown.wav,indonesian6.wav,015399_silence.wav,72,17.8,1.0,0.6,1.0,2.12,2.72,2.72,8.0869,False,11.5869

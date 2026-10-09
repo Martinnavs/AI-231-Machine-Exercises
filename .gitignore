@@ -1,6 +1,9 @@
 # AI-only planning docs (not part of any submission)
 claude-independent-plan/
 
+# dev-flow ticket bookkeeping (process artifacts, not deliverables)
+.scratch/
+
 # Dev/iteration sandbox (final deliverables live in the exercise dirs, e.g. ME1/)
 scratchpad/
 
@@ -13,3 +16,6 @@ __pycache__/
 # Datasets pulled at runtime
 data/
 MNIST/
+
+# VCM benchmark clone and its recordings (see ME2/scripts/vcm_benchmark/)
+.vcm-benchmark/

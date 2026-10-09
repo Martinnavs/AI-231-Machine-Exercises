@@ -1,0 +1,428 @@
+{
+  "license_note": "Checkpoint trained on out/conversions/v2/test_set/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) in the silence bucket. Per docs/VCM-CONTRACT.md section 8, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution.",
+  "checkpoint_path": "out/vcm/option-d-fil50-ambient-rir-135m/checkpoints/checkpoint.pt",
+  "checkpoint_meta": {
+    "preset": "optiond",
+    "config": {
+      "n_mels": 40,
+      "n_blocks": 5,
+      "channels": 128,
+      "kernel_sizes": [
+        11,
+        13,
+        15,
+        17,
+        19
+      ],
+      "prologue_channels": 64,
+      "epilogue_channels": 224,
+      "alphabet_size": 29
+    },
+    "alphabet_size": 29,
+    "seed": 0,
+    "epoch": 66,
+    "val_loss": 0.2520240666445887,
+    "license": "Checkpoint trained on out/conversions/v2/test_set/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) in the silence bucket. Per docs/VCM-CONTRACT.md section 8, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution."
+  },
+  "manifest_path": "out/conversions/v2/optionb-v3-vcmx-fil50-ambient/manifest.csv",
+  "device": "cuda:3",
+  "beam_width": 50,
+  "grammar_sections": [
+    {
+      "grammar": "OPTIONB_GRAMMAR",
+      "intent_labels": [
+        "ALARM",
+        "BRIGHTNESS",
+        "CALL",
+        "COLOR",
+        "CREATE_REMINDER",
+        "LIGHT_OFF",
+        "LIGHT_ON",
+        "LIST_REMINDERS",
+        "MESSAGE",
+        "NEXT",
+        "PAUSE",
+        "PLAY_MUSIC",
+        "STOP",
+        "TEMPERATURE",
+        "TIME",
+        "TIMER",
+        "VOLUME_DOWN",
+        "VOLUME_UP",
+        "WEATHER"
+      ],
+      "threshold_sweep_on_val": [
+        {
+          "threshold": 0.0,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.0,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0,
+          "youden_j": 0.0
+        },
+        {
+          "threshold": -0.01,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.830575256107171,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.8292202425570355
+        },
+        {
+          "threshold": -0.02,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.8825847123719465,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.881229698821811
+        },
+        {
+          "threshold": -0.03,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9125295508274232,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.9111745372772877
+        },
+        {
+          "threshold": -0.05,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9434594168636722,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0040650406504065045,
+          "youden_j": 0.9393943762132657
+        },
+        {
+          "threshold": -0.075,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9609929078014184,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.009485094850948509,
+          "youden_j": 0.9515078129504699
+        },
+        {
+          "threshold": -0.1,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9743892828999212,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.017615176151761516,
+          "youden_j": 0.9567741067481597
+        },
+        {
+          "threshold": -0.15,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9854215918045706,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.10569105691056911,
+          "youden_j": 0.8797305348940014
+        },
+        {
+          "threshold": -0.2,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9901497241922774,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.24119241192411925,
+          "youden_j": 0.7489573122681582
+        },
+        {
+          "threshold": -0.25,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9923167848699763,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.34146341463414637,
+          "youden_j": 0.6508533702358299
+        },
+        {
+          "threshold": -0.3,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9934988179669031,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.3997289972899729,
+          "youden_j": 0.5937698206769302
+        },
+        {
+          "threshold": -0.35,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9944838455476753,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.42276422764227645,
+          "youden_j": 0.5717196179053989
+        },
+        {
+          "threshold": -0.4,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9946808510638298,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4241192411924119,
+          "youden_j": 0.5705616098714179
+        },
+        {
+          "threshold": -0.5,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9952718676122931,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.5684425993196103
+        },
+        {
+          "threshold": -0.75,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9968479117415288,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.5700186434488459
+        },
+        {
+          "threshold": -1.0,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9972419227738377,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.5704126544811547
+        },
+        {
+          "threshold": -1.5,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9976359338061466,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.5708066655134636
+        },
+        {
+          "threshold": -2.0,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9976359338061466,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.5708066655134636
+        },
+        {
+          "threshold": -5.0,
+          "n_target_commands": 5076,
+          "target_accept_rate": 0.9976359338061466,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4268292682926829,
+          "youden_j": 0.5708066655134636
+        }
+      ],
+      "chosen_operating_threshold": -0.1,
+      "chosen_operating_point_val_stats": {
+        "threshold": -0.1,
+        "n_target_commands": 5076,
+        "target_accept_rate": 0.9743892828999212,
+        "n_reject_probes": 738,
+        "false_accept_rate": 0.017615176151761516,
+        "youden_j": 0.9567741067481597
+      },
+      "required_command_margin": null,
+      "incomplete_prefix_rejections": {
+        "val": 0,
+        "test": 0
+      },
+      "test_split": {
+        "n_target_commands": 5527,
+        "n_accepted": 5411,
+        "n_exact_correct": 5407,
+        "accept_rate": 0.9790121223086665,
+        "exact_accuracy": 0.9782884023882757,
+        "per_intent_confusion": {
+          "ALARM": {
+            "ALARM": 515,
+            "REJECTED": 10
+          },
+          "BRIGHTNESS": {
+            "BRIGHTNESS": 381,
+            "REJECTED": 6
+          },
+          "CALL": {
+            "CALL": 145,
+            "REJECTED": 9
+          },
+          "COLOR": {
+            "COLOR": 551,
+            "REJECTED": 2
+          },
+          "CREATE_REMINDER": {
+            "CREATE_REMINDER": 495,
+            "REJECTED": 11
+          },
+          "LIGHT_OFF": {
+            "LIGHT_ON": 3,
+            "LIGHT_OFF": 182,
+            "REJECTED": 5
+          },
+          "LIGHT_ON": {
+            "LIGHT_ON": 188
+          },
+          "LIST_REMINDERS": {
+            "LIST_REMINDERS": 171,
+            "REJECTED": 7
+          },
+          "MESSAGE": {
+            "MESSAGE": 181,
+            "REJECTED": 2
+          },
+          "NEXT": {
+            "REJECTED": 2,
+            "NEXT": 331
+          },
+          "PAUSE": {
+            "PAUSE": 153,
+            "REJECTED": 4
+          },
+          "PLAY_MUSIC": {
+            "PLAY_MUSIC": 187,
+            "REJECTED": 2
+          },
+          "STOP": {
+            "STOP": 222,
+            "REJECTED": 4
+          },
+          "TEMPERATURE": {
+            "TEMPERATURE": 538,
+            "REJECTED": 10
+          },
+          "TIME": {
+            "TIME": 152,
+            "REJECTED": 5
+          },
+          "TIMER": {
+            "TIMER": 473,
+            "REJECTED": 28
+          },
+          "VOLUME_DOWN": {
+            "VOLUME_DOWN": 161,
+            "REJECTED": 4,
+            "VOLUME_UP": 1
+          },
+          "VOLUME_UP": {
+            "VOLUME_UP": 208,
+            "REJECTED": 3
+          },
+          "WEATHER": {
+            "WEATHER": 173,
+            "REJECTED": 2
+          }
+        },
+        "false_accept_rate_babble": {
+          "n": 255,
+          "false_accepts": 3,
+          "rate": 0.011764705882352941
+        },
+        "false_accept_rate_silence": {
+          "n": 324,
+          "false_accepts": 1,
+          "rate": 0.0030864197530864196
+        },
+        "speaker_group_breakdown": {
+          "filipino_reference": {
+            "n": 1747,
+            "n_accepted": 1722,
+            "n_exact_correct": 1720,
+            "accept_rate": 0.9856897538637664,
+            "exact_accuracy": 0.9845449341728678,
+            "exact_accuracy_ci95": [
+              0.9776066661322652,
+              0.9893568787138249
+            ],
+            "n_distinct_speakers": 18,
+            "distinct_speaker_ids": [
+              "ref_ilonggo1",
+              "ref_tagalog1",
+              "ref_tagalog10",
+              "ref_tagalog11",
+              "ref_tagalog12",
+              "ref_tagalog13",
+              "ref_tagalog14",
+              "ref_tagalog15",
+              "ref_tagalog16",
+              "ref_tagalog2",
+              "ref_tagalog3",
+              "ref_tagalog4",
+              "ref_tagalog5",
+              "ref_tagalog6",
+              "ref_tagalog7",
+              "ref_tagalog8",
+              "ref_tagalog9",
+              "s100"
+            ],
+            "train_overlap": {
+              "n_distinct_in_train": 17,
+              "n_distinct_total": 18
+            }
+          },
+          "foreign_reference": {
+            "n": 1618,
+            "n_accepted": 1605,
+            "n_exact_correct": 1605,
+            "accept_rate": 0.9919653893695921,
+            "exact_accuracy": 0.9919653893695921,
+            "exact_accuracy_ci95": [
+              0.9863016080371595,
+              0.9952985679602994
+            ],
+            "n_distinct_speakers": 9,
+            "distinct_speaker_ids": [
+              "s91",
+              "s92",
+              "s93",
+              "s94",
+              "s95",
+              "s96",
+              "s97",
+              "s98",
+              "s99"
+            ],
+            "train_overlap": {
+              "n_distinct_in_train": 0,
+              "n_distinct_total": 9
+            }
+          },
+          "n_unclassified": 2162,
+          "exact_accuracy_gap_foreign_minus_filipino": 0.007420455196724296
+        },
+        "slot_accuracy": {
+          "n_slot_bearing_target_rows": 1068,
+          "n_unparseable_ground_truth": 0,
+          "n_intent_correct": 1057,
+          "n_intent_and_slots_correct": 1057,
+          "slot_exact_match_rate_given_intent_correct": 1.0,
+          "per_slot_name_accuracy": {
+            "ALARM_TIME": {
+              "n": 172,
+              "n_correct": 172,
+              "accuracy": 1.0
+            },
+            "COLOR": {
+              "n": 180,
+              "n_correct": 180,
+              "accuracy": 1.0
+            },
+            "DEGREES": {
+              "n": 178,
+              "n_correct": 178,
+              "accuracy": 1.0
+            },
+            "DURATION": {
+              "n": 172,
+              "n_correct": 172,
+              "accuracy": 1.0
+            },
+            "PERCENT": {
+              "n": 176,
+              "n_correct": 176,
+              "accuracy": 1.0
+            },
+            "TASK": {
+              "n": 179,
+              "n_correct": 179,
+              "accuracy": 1.0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "slot_eval_sections": null,
+  "slot_eval_skipped_reason": "out/vcm/option-d-fil50-ambient-rir-135m/metadata/slot_eval/manifest.csv not found (Task 07 clips may not exist yet)"
+}

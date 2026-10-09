@@ -1,0 +1,27 @@
+.venv/
+vendor/
+models/
+out/
+raw_datasets/
+.pytest_cache/
+__pycache__/
+*.pyc
+personas.json
+personas/
+
+# Generated/dataset audio never belongs in this codebase -- datasets are
+# uploaded and referred to elsewhere. `out/` above already covers this in
+# the common case; these patterns are a second guard against a plain
+# `git add`/`git add -A`/`git add .` ever picking up audio living outside
+# `out/` (or if `out/` were ever narrowed). NOTE: `git add -f <file>`
+# overrides .gitignore regardless of pattern (verified) -- these patterns
+# do not stop a deliberate force-add of a specific audio file by name; the
+# real safeguard there is discipline about what gets force-added.
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.m4a
+
+# Kaggle dataset staging (make kaggle-pack-*)
+dist/

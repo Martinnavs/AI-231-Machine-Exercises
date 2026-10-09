@@ -1,0 +1,381 @@
+{
+  "license_note": "Checkpoint trained on out/conversions/v2/test_set/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) in the silence bucket. Per docs/VCM-CONTRACT.md section 8, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution.",
+  "checkpoint_path": "out/vcm/option-d-dataset-v2/checkpoints/checkpoint.pt",
+  "checkpoint_meta": {
+    "preset": "optiond",
+    "config": {
+      "n_mels": 40,
+      "n_blocks": 5,
+      "channels": 128,
+      "kernel_sizes": [
+        11,
+        13,
+        15,
+        17,
+        19
+      ],
+      "prologue_channels": 64,
+      "epilogue_channels": 224,
+      "alphabet_size": 29
+    },
+    "alphabet_size": 29,
+    "seed": 0,
+    "epoch": 88,
+    "val_loss": 0.43209828355519403,
+    "license": "Checkpoint trained on out/conversions/v2/test_set/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) in the silence bucket. Per docs/VCM-CONTRACT.md section 8, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution."
+  },
+  "manifest_path": "out/conversions/v2/optionb-v3-vcmx/manifest.csv",
+  "device": "cuda:7",
+  "beam_width": 50,
+  "grammar_sections": [
+    {
+      "grammar": "OPTIONB_GRAMMAR",
+      "intent_labels": [
+        "ALARM",
+        "BRIGHTNESS",
+        "CALL",
+        "COLOR",
+        "CREATE_REMINDER",
+        "LIGHT_OFF",
+        "LIGHT_ON",
+        "LIST_REMINDERS",
+        "MESSAGE",
+        "NEXT",
+        "PAUSE",
+        "PLAY_MUSIC",
+        "STOP",
+        "TEMPERATURE",
+        "TIME",
+        "TIMER",
+        "VOLUME_DOWN",
+        "VOLUME_UP",
+        "WEATHER"
+      ],
+      "threshold_sweep_on_val": [
+        {
+          "threshold": 0.0,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.0,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0,
+          "youden_j": 0.0
+        },
+        {
+          "threshold": -0.01,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.7570789865871833,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.7557239730370479
+        },
+        {
+          "threshold": -0.02,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.8296075509190264,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.8282525373688909
+        },
+        {
+          "threshold": -0.03,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.8663686040735221,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.8650135905233867
+        },
+        {
+          "threshold": -0.05,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9130650769995032,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.0013550135501355014,
+          "youden_j": 0.9117100634493678
+        },
+        {
+          "threshold": -0.075,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9478390461997019,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.005420054200542005,
+          "youden_j": 0.9424189919991599
+        },
+        {
+          "threshold": -0.1,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9642324888226528,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.017615176151761516,
+          "youden_j": 0.9466173126708912
+        },
+        {
+          "threshold": -0.15,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9801291604570294,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.10840108401084012,
+          "youden_j": 0.8717280764461892
+        },
+        {
+          "threshold": -0.2,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9870839542970691,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.24796747967479674,
+          "youden_j": 0.7391164746222724
+        },
+        {
+          "threshold": -0.25,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9905613512170889,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.34146341463414637,
+          "youden_j": 0.6490979365829426
+        },
+        {
+          "threshold": -0.3,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9910581222056631,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.3861788617886179,
+          "youden_j": 0.6048792604170452
+        },
+        {
+          "threshold": -0.35,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.992548435171386,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4010840108401084,
+          "youden_j": 0.5914644243312777
+        },
+        {
+          "threshold": -0.4,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.994535519125683,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4065040650406504,
+          "youden_j": 0.5880314540850327
+        },
+        {
+          "threshold": -0.5,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9960258320914058,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4092140921409214,
+          "youden_j": 0.5868117399504844
+        },
+        {
+          "threshold": -0.75,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9970193740685543,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4092140921409214,
+          "youden_j": 0.5878052819276329
+        },
+        {
+          "threshold": -1.0,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9975161450571287,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4092140921409214,
+          "youden_j": 0.5883020529162073
+        },
+        {
+          "threshold": -1.5,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9975161450571287,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4092140921409214,
+          "youden_j": 0.5883020529162073
+        },
+        {
+          "threshold": -2.0,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9975161450571287,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4092140921409214,
+          "youden_j": 0.5883020529162073
+        },
+        {
+          "threshold": -5.0,
+          "n_target_commands": 2013,
+          "target_accept_rate": 0.9975161450571287,
+          "n_reject_probes": 738,
+          "false_accept_rate": 0.4092140921409214,
+          "youden_j": 0.5883020529162073
+        }
+      ],
+      "chosen_operating_threshold": -0.1,
+      "chosen_operating_point_val_stats": {
+        "threshold": -0.1,
+        "n_target_commands": 2013,
+        "target_accept_rate": 0.9642324888226528,
+        "n_reject_probes": 738,
+        "false_accept_rate": 0.017615176151761516,
+        "youden_j": 0.9466173126708912
+      },
+      "required_command_margin": null,
+      "incomplete_prefix_rejections": {
+        "val": 0,
+        "test": 0
+      },
+      "test_split": {
+        "n_target_commands": 1927,
+        "n_accepted": 1889,
+        "n_exact_correct": 1887,
+        "accept_rate": 0.9802802283341983,
+        "exact_accuracy": 0.9792423456149455,
+        "per_intent_confusion": {
+          "ALARM": {
+            "ALARM": 176,
+            "REJECTED": 6
+          },
+          "BRIGHTNESS": {
+            "BRIGHTNESS": 176,
+            "REJECTED": 4
+          },
+          "CALL": {
+            "CALL": 53,
+            "STOP": 1
+          },
+          "COLOR": {
+            "COLOR": 180
+          },
+          "CREATE_REMINDER": {
+            "CREATE_REMINDER": 177,
+            "REJECTED": 3
+          },
+          "LIGHT_OFF": {
+            "LIGHT_OFF": 57,
+            "REJECTED": 2,
+            "LIGHT_ON": 1
+          },
+          "LIGHT_ON": {
+            "LIGHT_ON": 57
+          },
+          "LIST_REMINDERS": {
+            "LIST_REMINDERS": 55,
+            "REJECTED": 3
+          },
+          "MESSAGE": {
+            "MESSAGE": 58
+          },
+          "NEXT": {
+            "NEXT": 119,
+            "REJECTED": 1
+          },
+          "PAUSE": {
+            "PAUSE": 60,
+            "REJECTED": 1
+          },
+          "PLAY_MUSIC": {
+            "PLAY_MUSIC": 65,
+            "REJECTED": 2
+          },
+          "STOP": {
+            "STOP": 65
+          },
+          "TEMPERATURE": {
+            "TEMPERATURE": 180
+          },
+          "TIME": {
+            "TIME": 53,
+            "REJECTED": 7
+          },
+          "TIMER": {
+            "TIMER": 172,
+            "REJECTED": 4
+          },
+          "VOLUME_DOWN": {
+            "VOLUME_DOWN": 61,
+            "REJECTED": 3
+          },
+          "VOLUME_UP": {
+            "VOLUME_UP": 71
+          },
+          "WEATHER": {
+            "WEATHER": 52,
+            "REJECTED": 2
+          }
+        },
+        "false_accept_rate_babble": {
+          "n": 255,
+          "false_accepts": 3,
+          "rate": 0.011764705882352941
+        },
+        "false_accept_rate_silence": {
+          "n": 324,
+          "false_accepts": 5,
+          "rate": 0.015432098765432098
+        },
+        "speaker_group_breakdown": {
+          "filipino_reference": {
+            "n": 180,
+            "n_accepted": 170,
+            "n_exact_correct": 169,
+            "accept_rate": 0.9444444444444444,
+            "exact_accuracy": 0.9388888888888889,
+            "exact_accuracy_ci95": [
+              0.8938978709273627,
+              0.965537643123864
+            ]
+          },
+          "foreign_reference": {
+            "n": 1618,
+            "n_accepted": 1601,
+            "n_exact_correct": 1600,
+            "accept_rate": 0.9894932014833128,
+            "exact_accuracy": 0.9888751545117429,
+            "exact_accuracy_ci95": [
+              0.9824827859657705,
+              0.9929515597804479
+            ]
+          },
+          "n_unclassified": 129,
+          "exact_accuracy_gap_foreign_minus_filipino": 0.04998626562285402
+        },
+        "slot_accuracy": {
+          "n_slot_bearing_target_rows": 1068,
+          "n_unparseable_ground_truth": 0,
+          "n_intent_correct": 1057,
+          "n_intent_and_slots_correct": 1057,
+          "slot_exact_match_rate_given_intent_correct": 1.0,
+          "per_slot_name_accuracy": {
+            "ALARM_TIME": {
+              "n": 172,
+              "n_correct": 172,
+              "accuracy": 1.0
+            },
+            "COLOR": {
+              "n": 180,
+              "n_correct": 180,
+              "accuracy": 1.0
+            },
+            "DEGREES": {
+              "n": 180,
+              "n_correct": 180,
+              "accuracy": 1.0
+            },
+            "DURATION": {
+              "n": 172,
+              "n_correct": 172,
+              "accuracy": 1.0
+            },
+            "PERCENT": {
+              "n": 176,
+              "n_correct": 176,
+              "accuracy": 1.0
+            },
+            "TASK": {
+              "n": 177,
+              "n_correct": 177,
+              "accuracy": 1.0
+            }
+          }
+        }
+      }
+    }
+  ],
+  "slot_eval_sections": null,
+  "slot_eval_skipped_reason": "out/vcm/option-d-dataset-v2/metadata/slot_eval/manifest.csv not found (Task 07 clips may not exist yet)"
+}

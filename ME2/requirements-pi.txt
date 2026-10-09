@@ -1,0 +1,11 @@
+# Lean runtime for the hybrid streaming path and the soak scorer on a Raspberry Pi (64-bit Raspberry Pi OS, aarch64, Python 3.10).
+# The project's pyproject.toml pins torch/torchaudio to the CUDA 12.1 index (x86_64 only), which is why `uv sync` fails on ARM.
+# On aarch64, PyPI serves plain CPU wheels for these versions. See docs/RASPBERRY-PI.md.
+#   uv venv --python 3.10 .venv-pi && uv pip install --python .venv-pi/bin/python -r requirements-pi.txt
+#   export PYTHONPATH=src
+torch==2.3.1
+torchaudio==2.3.1
+numpy==1.26.4
+onnxruntime==1.18.0
+soundfile==0.12.1
+numba==0.67.0

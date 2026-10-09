@@ -1,0 +1,1795 @@
+{
+  "license": "Checkpoint trained on out/conversions/v2/test_set/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) in the silence bucket. Per docs/VCM-CONTRACT.md section 8, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution.",
+  "seed": 0,
+  "preset": "optiond",
+  "device": "cuda:7",
+  "max_minutes": 60.0,
+  "epoch0_val_loss": 89.73539146312851,
+  "epochs_run": 90,
+  "deadline_hit": true,
+  "nan_or_inf_seen": true,
+  "best_val_loss": 0.43209828355519403,
+  "total_wall_clock_s": 3601.349954247009,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 24.898111410651413,
+      "val_loss": 11.055962692527048,
+      "elapsed_s": 44.955275889951736,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": " "
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": " "
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "  "
+        }
+      ]
+    },
+    {
+      "epoch": 2,
+      "train_loss": 7.077079859414403,
+      "val_loss": 7.542559553069162,
+      "elapsed_s": 85.04827884305269,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": " "
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": " "
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": " "
+        }
+      ]
+    },
+    {
+      "epoch": 3,
+      "train_loss": 5.054741473997692,
+      "val_loss": 6.358915841141201,
+      "elapsed_s": 124.74065570300445,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": " "
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": " "
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": " "
+        }
+      ]
+    },
+    {
+      "epoch": 4,
+      "train_loss": 3.5369318057920687,
+      "val_loss": 4.601186137459688,
+      "elapsed_s": 164.81473134318367,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": " "
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": " "
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": ""
+        }
+      ]
+    },
+    {
+      "epoch": 5,
+      "train_loss": 3.012912627085055,
+      "val_loss": 2.4388796849141015,
+      "elapsed_s": 204.74960851296782,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": ""
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": " "
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": ""
+        }
+      ]
+    },
+    {
+      "epoch": 6,
+      "train_loss": 2.3460512156745983,
+      "val_loss": 1.8700961694813023,
+      "elapsed_s": 244.89050263911486,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "a"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "al a"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "k p a"
+        }
+      ]
+    },
+    {
+      "epoch": 7,
+      "train_loss": 1.9461835717671163,
+      "val_loss": 1.5042978013608697,
+      "elapsed_s": 284.5918027628213,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "a i "
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "ral i a"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "ak m px a"
+        }
+      ]
+    },
+    {
+      "epoch": 8,
+      "train_loss": 1.666416684521529,
+      "val_loss": 1.3575781565415475,
+      "elapsed_s": 324.20880046114326,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "aarm si am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at ix am"
+        }
+      ]
+    },
+    {
+      "epoch": 9,
+      "train_loss": 1.462480487977398,
+      "val_loss": 1.0676666551193161,
+      "elapsed_s": 364.081905328203,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarmix am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "ake m up t six am"
+        }
+      ]
+    },
+    {
+      "epoch": 10,
+      "train_loss": 1.3164684182436484,
+      "val_loss": 0.9943614280300206,
+      "elapsed_s": 403.9827465391718,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm ix am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 11,
+      "train_loss": 1.2196361483647002,
+      "val_loss": 0.9135464533628821,
+      "elapsed_s": 443.97855606582016,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm sixm"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm sixm"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at sixam"
+        }
+      ]
+    },
+    {
+      "epoch": 12,
+      "train_loss": 1.1627601152110836,
+      "val_loss": 0.8233555905324484,
+      "elapsed_s": 482.7290260992013,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 13,
+      "train_loss": 1.0802937317220223,
+      "val_loss": 0.781992619149622,
+      "elapsed_s": 522.172532542143,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm sixam"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 14,
+      "train_loss": 1.0301501944588247,
+      "val_loss": 0.7684792081385884,
+      "elapsed_s": 561.6324890600517,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 15,
+      "train_loss": 0.9841074730856303,
+      "val_loss": 0.736365711748755,
+      "elapsed_s": 601.6319355829619,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 16,
+      "train_loss": 0.9471008064079294,
+      "val_loss": 0.7466141565544119,
+      "elapsed_s": 640.8668603277765,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 17,
+      "train_loss": 0.9021793844746429,
+      "val_loss": 0.7025150891214974,
+      "elapsed_s": 680.0197649388574,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 18,
+      "train_loss": 0.8849866672520108,
+      "val_loss": 0.6715021690514908,
+      "elapsed_s": 719.7637594589032,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 19,
+      "train_loss": 0.8482407241056651,
+      "val_loss": 0.6785151580237253,
+      "elapsed_s": 759.5643161460757,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 20,
+      "train_loss": 0.8260416878643174,
+      "val_loss": 0.6509937706226715,
+      "elapsed_s": 799.7662652120925,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 21,
+      "train_loss": 0.8078696044975208,
+      "val_loss": 0.6555117913118933,
+      "elapsed_s": 839.18081601616,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 22,
+      "train_loss": 0.790711531497598,
+      "val_loss": 0.605999392484627,
+      "elapsed_s": 879.0210605561733,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 23,
+      "train_loss": 0.7667003568853538,
+      "val_loss": 0.6201515886068034,
+      "elapsed_s": 918.7218006690964,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 24,
+      "train_loss": 0.7594756535916216,
+      "val_loss": 0.6699964766038912,
+      "elapsed_s": 958.1759635331109,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 25,
+      "train_loss": 0.7456905517083392,
+      "val_loss": 0.5911491036558966,
+      "elapsed_s": 997.2677913540974,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 26,
+      "train_loss": 0.7321755334079316,
+      "val_loss": 0.5728568485234247,
+      "elapsed_s": 1036.7900802078657,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 27,
+      "train_loss": 0.7187700823315382,
+      "val_loss": 0.6334247979319233,
+      "elapsed_s": 1076.6547121419571,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 28,
+      "train_loss": 0.7114663236537545,
+      "val_loss": 0.5940302604836378,
+      "elapsed_s": 1116.0087069729343,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 29,
+      "train_loss": 0.6966088623829505,
+      "val_loss": 0.5687858143477603,
+      "elapsed_s": 1156.2078397357836,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 30,
+      "train_loss": 0.6942950557926563,
+      "val_loss": 0.5623786108664451,
+      "elapsed_s": 1195.8711351249367,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 31,
+      "train_loss": 0.6825582851118366,
+      "val_loss": 0.5739834431463398,
+      "elapsed_s": 1235.7963013597764,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 32,
+      "train_loss": 0.6733976994122512,
+      "val_loss": 0.5593495768627357,
+      "elapsed_s": 1276.2330835280009,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 33,
+      "train_loss": 0.6628330537796888,
+      "val_loss": 0.5401378936603571,
+      "elapsed_s": 1316.9545871447772,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 34,
+      "train_loss": 0.6527625970192333,
+      "val_loss": 0.5259169564121415,
+      "elapsed_s": 1357.619375302922,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 35,
+      "train_loss": 0.645003081733436,
+      "val_loss": 0.5247824526285754,
+      "elapsed_s": 1397.644275158178,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 36,
+      "train_loss": 0.6382287645987889,
+      "val_loss": 0.5557577126350626,
+      "elapsed_s": 1437.1974826101214,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 37,
+      "train_loss": 0.6323269487197447,
+      "val_loss": 0.5268417450731134,
+      "elapsed_s": 1476.7057462628,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 38,
+      "train_loss": 0.6267431958544138,
+      "val_loss": 0.5085906859610411,
+      "elapsed_s": 1516.884928632062,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 39,
+      "train_loss": 0.6174885289213926,
+      "val_loss": 0.514883683811122,
+      "elapsed_s": 1558.3992151301354,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 40,
+      "train_loss": 0.6146255556399722,
+      "val_loss": 0.5120951790698745,
+      "elapsed_s": 1598.4274742649868,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 41,
+      "train_loss": 0.6084963221471289,
+      "val_loss": 0.5083881375610529,
+      "elapsed_s": 1639.686318158172,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 42,
+      "train_loss": 0.6071460089334522,
+      "val_loss": 0.5624942716074132,
+      "elapsed_s": 1680.3825930128805,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 43,
+      "train_loss": 0.6021219664239876,
+      "val_loss": 0.4980839971920515,
+      "elapsed_s": 1721.3192877168767,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 44,
+      "train_loss": 0.5887164055792704,
+      "val_loss": 0.5144912461783755,
+      "elapsed_s": 1761.669586936012,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 45,
+      "train_loss": 0.5883204856146557,
+      "val_loss": 0.5110614784919569,
+      "elapsed_s": 1801.3915555537678,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 46,
+      "train_loss": 0.5901690690250138,
+      "val_loss": 0.5067572584808028,
+      "elapsed_s": 1841.573986152187,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 47,
+      "train_loss": 0.5810972762184925,
+      "val_loss": 0.5169579685578172,
+      "elapsed_s": 1881.9810510938987,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 48,
+      "train_loss": 0.5761382130840431,
+      "val_loss": 0.5159411268648365,
+      "elapsed_s": 1924.4444520599209,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 49,
+      "train_loss": 0.5645151305360859,
+      "val_loss": 0.4977644557497131,
+      "elapsed_s": 1966.765840887092,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 50,
+      "train_loss": 0.5652704232295771,
+      "val_loss": 0.501256686820335,
+      "elapsed_s": 2006.4219176359475,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 51,
+      "train_loss": 0.5506431709031329,
+      "val_loss": 0.5087170792260092,
+      "elapsed_s": 2045.6047940189019,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 52,
+      "train_loss": 0.5598161121510542,
+      "val_loss": 0.4802862093311856,
+      "elapsed_s": 2084.998014742043,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 53,
+      "train_loss": 0.550604593027401,
+      "val_loss": 0.47054007238297935,
+      "elapsed_s": 2124.73058639979,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 54,
+      "train_loss": 0.5486332979482543,
+      "val_loss": 0.4828170171416286,
+      "elapsed_s": 2164.282802126836,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 55,
+      "train_loss": 0.5507010870896084,
+      "val_loss": 0.4913100190675097,
+      "elapsed_s": 2203.3987465482205,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 56,
+      "train_loss": 0.5396074021715236,
+      "val_loss": 0.49626723413880963,
+      "elapsed_s": 2242.951816159766,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 57,
+      "train_loss": 0.534791780369838,
+      "val_loss": 0.48360875783286883,
+      "elapsed_s": 2282.0076287537813,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 58,
+      "train_loss": 0.537332729748844,
+      "val_loss": 0.4821259372982114,
+      "elapsed_s": 2321.03703878494,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 59,
+      "train_loss": 0.5286477258759728,
+      "val_loss": 0.495009086969403,
+      "elapsed_s": 2361.1196859278716,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 60,
+      "train_loss": 0.5312941399521796,
+      "val_loss": 0.5023267086577313,
+      "elapsed_s": 2400.360702441074,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 61,
+      "train_loss": 0.5165350530197772,
+      "val_loss": 0.4625166134792596,
+      "elapsed_s": 2450.001621542033,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 62,
+      "train_loss": 0.5231771558163679,
+      "val_loss": 0.4591044955221176,
+      "elapsed_s": 2508.215711757075,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 63,
+      "train_loss": 0.5165733294038755,
+      "val_loss": 0.47019779917462756,
+      "elapsed_s": 2549.2424170481972,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 64,
+      "train_loss": 0.5088151253134756,
+      "val_loss": 0.4747855506652003,
+      "elapsed_s": 2590.9350129179657,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 65,
+      "train_loss": 0.51456886480024,
+      "val_loss": 0.49463250081276544,
+      "elapsed_s": 2631.3100627819076,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 66,
+      "train_loss": 0.5045474414669601,
+      "val_loss": 0.49205589157484564,
+      "elapsed_s": 2671.5584741667844,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 67,
+      "train_loss": 0.5029221821246316,
+      "val_loss": 0.4485379842867694,
+      "elapsed_s": 2711.9601421351545,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 68,
+      "train_loss": 0.4989936570442717,
+      "val_loss": 0.45911095267306284,
+      "elapsed_s": 2752.9640803299844,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 69,
+      "train_loss": 0.4991325218367178,
+      "val_loss": 0.46328178746089743,
+      "elapsed_s": 2792.392735267058,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 70,
+      "train_loss": 0.49551390374514315,
+      "val_loss": 0.470009770146144,
+      "elapsed_s": 2831.573951303959,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 71,
+      "train_loss": 0.4968365968649644,
+      "val_loss": 0.45268862833767975,
+      "elapsed_s": 2871.5500136218034,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 72,
+      "train_loss": 0.4951093335133141,
+      "val_loss": 0.4597980664158361,
+      "elapsed_s": 2912.8899736851454,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 73,
+      "train_loss": 0.4879365902431818,
+      "val_loss": 0.46074604390087376,
+      "elapsed_s": 2953.543618339114,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 74,
+      "train_loss": 0.48457906887026236,
+      "val_loss": 0.4663763079744536,
+      "elapsed_s": 2994.1173798497766,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 75,
+      "train_loss": 0.4825944434743295,
+      "val_loss": 0.46014843203785843,
+      "elapsed_s": 3034.360631954856,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 76,
+      "train_loss": 0.48235167394990314,
+      "val_loss": 0.44819418929145155,
+      "elapsed_s": 3074.1010396899655,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 77,
+      "train_loss": 0.4788299548745077,
+      "val_loss": 0.4536956218972171,
+      "elapsed_s": 3114.905713636894,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 78,
+      "train_loss": 0.47399291604169175,
+      "val_loss": 0.4555111174031434,
+      "elapsed_s": 3154.9468003627844,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 79,
+      "train_loss": 0.4755627113384701,
+      "val_loss": 0.4574476200665323,
+      "elapsed_s": 3195.806106599048,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 80,
+      "train_loss": 0.4768156679294041,
+      "val_loss": 0.46963255449775376,
+      "elapsed_s": 3236.241338295862,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 81,
+      "train_loss": 0.4691328500271929,
+      "val_loss": 0.4546328404319334,
+      "elapsed_s": 3276.70671996288,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 82,
+      "train_loss": 0.4681625363744082,
+      "val_loss": 0.45812089594113553,
+      "elapsed_s": 3316.9345239098184,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 83,
+      "train_loss": 0.4589913991695759,
+      "val_loss": 0.4406881720481964,
+      "elapsed_s": 3356.376134819817,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 84,
+      "train_loss": 0.45790443839685346,
+      "val_loss": 0.44499420079396057,
+      "elapsed_s": 3395.4297619708814,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 85,
+      "train_loss": 0.4596746859949144,
+      "val_loss": 0.4403665904761484,
+      "elapsed_s": 3434.4335881359875,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 86,
+      "train_loss": 0.4656553197199929,
+      "val_loss": 0.46864672913051786,
+      "elapsed_s": 3473.9080469049513,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 87,
+      "train_loss": 0.455086366029193,
+      "val_loss": 0.4735738087405381,
+      "elapsed_s": 3513.1914765429683,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 88,
+      "train_loss": 0.4540157861032498,
+      "val_loss": 0.43209828355519403,
+      "elapsed_s": 3552.5191848869435,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    },
+    {
+      "epoch": 89,
+      "train_loss": 0.4562369751322168,
+      "val_loss": 0.4406732286057185,
+      "elapsed_s": 3592.904559665825,
+      "samples": [
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "alarm six am",
+          "decoded": "alarm six am"
+        },
+        {
+          "expected": "wake me up at six am",
+          "decoded": "wake me up at six am"
+        }
+      ]
+    }
+  ]
+}

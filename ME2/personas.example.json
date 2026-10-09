@@ -1,0 +1,14 @@
+{
+  "personas": [
+    {
+      "name": "english_woman",
+      "wav_path": "personas/english_woman.wav",
+      "text": "Replace this with the exact transcript of personas/english_woman.wav."
+    },
+    {
+      "name": "indian_man",
+      "wav_path": "personas/indian_man.wav",
+      "text": "Replace this with the exact transcript of personas/indian_man.wav."
+    }
+  ]
+}

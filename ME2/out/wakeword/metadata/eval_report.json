@@ -1,0 +1,75 @@
+{
+  "license": "Checkpoint trained on out/conversions/v2/wakeword/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into adversaries_noisy/positives_converted_noisy. Per docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution.",
+  "checkpoint_path": "out/wakeword/checkpoints/checkpoint.pt",
+  "checkpoint_meta": {
+    "preset": "default",
+    "config": {
+      "n_mels": 40,
+      "n_classes": 3,
+      "n_blocks": 4,
+      "channels": 64,
+      "kernel_sizes": [
+        10,
+        10,
+        10,
+        10
+      ],
+      "prologue_channels": 32
+    },
+    "labels": [
+      "_wakeword_",
+      "_unknown_",
+      "_silence_"
+    ],
+    "seed": 0,
+    "epoch": 20,
+    "val_loss": 0.01252965535719519,
+    "val_acc": 0.9971613949716139,
+    "window_seconds": 1.5,
+    "license": "Checkpoint trained on out/conversions/v2/wakeword/, which includes background_noise (ESC-50, CC-BY-NC-SA-4.0) additively mixed into adversaries_noisy/positives_converted_noisy. Per docs/WAKEWORD-DATASET-CONTRACT.md section 7, any checkpoint trained on this data inherits CC-BY-NC-SA-4.0: non-commercial use only, share-alike on redistribution."
+  },
+  "manifest_path": "out/conversions/v2/wakeword/manifest.csv",
+  "device": "cpu",
+  "confusion_matrix": [
+    [
+      1092,
+      5,
+      0
+    ],
+    [
+      1,
+      1097,
+      1
+    ],
+    [
+      0,
+      0,
+      270
+    ]
+  ],
+  "labels": [
+    "_wakeword_",
+    "_unknown_",
+    "_silence_"
+  ],
+  "per_class": {
+    "_wakeword_": {
+      "precision": 0.9990850869167429,
+      "recall": 0.9954421148587056,
+      "f1": 0.9972602739726028,
+      "support": 1097
+    },
+    "_unknown_": {
+      "precision": 0.9954627949183303,
+      "recall": 0.9981801637852593,
+      "f1": 0.9968196274420718,
+      "support": 1099
+    },
+    "_silence_": {
+      "precision": 0.996309963099631,
+      "recall": 1.0,
+      "f1": 0.9981515711645101,
+      "support": 270
+    }
+  }
+}
