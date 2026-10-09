@@ -114,6 +114,16 @@ decoder = HybridDecoder(load_hybrid_part(f"{H}/ctc-wide/export/vcm_model.int8.on
 decision, trace = decoder.decode(wav)   # wav: mono 16 kHz float tensor in [-1, 1]; decision.intent is None = rejected
 ```
 
+## UI music (for testing)
+
+The UI's music panel plays real audio from `extras/music/` (git-ignored, so the audio never enters the repo). To try it, create the folder and add a few `.mp3`/`.wav`/`.flac`/`.ogg`/`.m4a` files:
+
+```bash
+mkdir -p extras/music && cp ~/Music/*.mp3 extras/music/    # then restart the UI: make app
+```
+
+File names become the track titles. With no files (or no `ffplay`) the panel stays silent and simulated. Playback starts at 30% volume; the wake word soft-pauses it and it resumes afterwards, except after a PAUSE or STOP command. Set `ME2_MUSIC_AUDIODEV` (an ALSA device, e.g. `plughw:CARD=CD002AUDIO,DEV=0`) to pick the speaker.
+
 ## Test
 
 ```bash

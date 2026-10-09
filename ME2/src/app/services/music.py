@@ -9,13 +9,16 @@ list and is valid while playing or paused; it is ignored while stopped
 attribute (like the lights' color): settable in any state, including
 stopped.
 
-Audio output is a deliberate seam: nothing here plays a sound, so the
-panel is state-only for now (decision: "audio later -- leave seam").
+Audio output is a seam: with no `player` (the default, used by tests)
+nothing plays and the panel is state-only; `services.music_player`
+supplies an ffplay-backed player for the real app.
 """
 
 from __future__ import annotations
 
+import time
 from enum import Enum, auto
+from typing import Callable
 
 # The simulated playlist (decision Q9: five named tracks).
 TRACKS = ("Midnight Drive", "Ocean Calm", "City Lights", "Morning Fog", "Starfall")
@@ -36,6 +39,12 @@ class MusicEvent(Enum):
 
 class MusicService:
     """Explicit `(state, event) -> next_state` table + ignore-on-unhandled."""
+
+    # Soft pause (wake word heard): resume this long after the listening
+    # period ends so a PAUSE/STOP that follows can cancel it; the cap
+    # guards against a `passive` that never arrives.
+    RESUME_GRACE_S = 0.8
+    SOFT_PAUSE_MAX_S = 10.0
 
     DEFAULT_VOLUME = 50
     VOLUME_STEP = 10
@@ -59,14 +68,68 @@ class MusicService:
         # NEXT while STOPPED.
     }
 
-    def __init__(self) -> None:
+    def __init__(self, tracks: tuple[str, ...] = TRACKS, player=None, volume: int | None = None,
+                 clock: Callable[[], float] = time.monotonic) -> None:
+        """`player` is the audio seam (`services.music_player`); None keeps
+        the service state-only."""
+        self.tracks = tracks
+        self.player = player
         self.state = MusicState.STOPPED
         self.track_index = 0
-        self.volume = self.DEFAULT_VOLUME
+        self.volume = self.DEFAULT_VOLUME if volume is None else volume
+        self._clock = clock
+        self.soft_paused = False
+        self._resume_at = 0.0
 
     @property
     def track(self) -> str:
-        return TRACKS[self.track_index]
+        return self.tracks[self.track_index]
+
+    def _drive_player(self, event: MusicEvent, prev: MusicState) -> None:
+        if self.player is None:
+            return
+        try:
+            if event is MusicEvent.PLAY:
+                if prev is MusicState.PAUSED:
+                    self.player.resume()
+                else:
+                    self.player.start(self.track_index, self.volume)
+            elif event is MusicEvent.PAUSE:
+                self.player.pause()
+            elif event is MusicEvent.NEXT:
+                self.player.start(self.track_index, self.volume, paused=self.state is MusicState.PAUSED)
+            elif event is MusicEvent.STOP:
+                self.player.stop()
+        except OSError:
+            pass  # no audio device/binary: keep the UI state, drop the sound
+
+    def on_listening(self, listening: str) -> None:
+        """Wake word heard -> soft-pause (audio only; the state stays PLAYING).
+        Listening over -> schedule the resume. A music transition that
+        lands in between (PAUSE, STOP, NEXT) clears the soft pause."""
+        if listening == "active":
+            if self.state is MusicState.PLAYING and self.player is not None and not self.soft_paused:
+                try:
+                    self.player.pause()
+                except OSError:
+                    return
+                self.soft_paused = True
+            if self.soft_paused:
+                self._resume_at = self._clock() + self.SOFT_PAUSE_MAX_S
+        elif self.soft_paused:
+            self._resume_at = self._clock() + self.RESUME_GRACE_S
+
+    def tick(self) -> None:
+        """Resume a due soft pause; advance when the track ends on its own."""
+        if self.soft_paused and self._clock() >= self._resume_at:
+            self.soft_paused = False
+            try:
+                self.player.resume()
+            except OSError:
+                pass
+            return
+        if self.player is not None and self.state is MusicState.PLAYING and self.player.finished():
+            self.next_track()
 
     def dispatch(self, event: MusicEvent) -> tuple[bool, str]:
         """Apply `event` if a transition is defined; else ignore."""
@@ -75,11 +138,14 @@ class MusicService:
             return False, (
                 f"Ignored: cannot {event.name.lower()} while {self.state.name.lower()}"
             )
+        prev = self.state
+        self.soft_paused = False  # an applied command supersedes the soft pause
         self.state = next_state
         if event is MusicEvent.NEXT:
-            self.track_index = (self.track_index + 1) % len(TRACKS)
+            self.track_index = (self.track_index + 1) % len(self.tracks)
         elif event is MusicEvent.STOP:
             self.track_index = 0
+        self._drive_player(event, prev)
         return True, (
             f"[{event.name}] -> {self.state.name} "
             f"(track {self.track_index + 1}: {self.track})"
@@ -102,6 +168,11 @@ class MusicService:
         if new_volume < self.VOLUME_MIN or new_volume > self.VOLUME_MAX:
             return False, f"Ignored: volume already at {self.volume} (limit)"
         self.volume = new_volume
+        if self.player is not None:
+            try:
+                self.player.set_volume(new_volume)
+            except OSError:
+                pass
         return True, f"volume -> {new_volume}"
 
     def volume_up(self) -> tuple[bool, str]:
@@ -115,6 +186,7 @@ class MusicService:
             "state": self.state.name,
             "track_index": self.track_index,
             "track": self.track,
-            "track_total": len(TRACKS),
+            "track_total": len(self.tracks),
             "volume": self.volume,
+            "soft_paused": self.soft_paused,
         }

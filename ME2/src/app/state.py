@@ -8,8 +8,8 @@ check, indicator status TTL) once per second; the FastAPI app runs it on
 a 1-second background loop and fans the resulting snapshot out over the
 WebSocket.
 
-Everything here is pure in-process state -- no I/O, no model imports,
-no audio. The clock and RNG are injectable so tests are deterministic.
+Everything here is pure in-process state -- no model imports; audio only
+through an injected music player (none by default). The clock and RNG are injectable so tests are deterministic.
 """
 
 from __future__ import annotations
@@ -37,6 +37,7 @@ class AppState:
         now: Now | None = None,
         rng: random.Random | None = None,
         weather: WeatherProvider | None = None,
+        music: MusicService | None = None,
     ) -> None:
         self.now: Now = now if now is not None else datetime.now
         self.weather: WeatherProvider = (
@@ -44,7 +45,7 @@ class AppState:
         )
         self.rng: random.Random = rng if rng is not None else random.Random()
         self.lights = LightService()
-        self.music = MusicService()
+        self.music = music if music is not None else MusicService()
         self.phone = PhoneService(rng=self.rng, now=self.now)
         self.reminders = ReminderService(now=self.now)
         self.thermostat = ThermostatService()
@@ -67,6 +68,7 @@ class AppState:
 
     def tick(self) -> None:
         """One second of app time: advance the time-based services."""
+        self.music.tick()
         self.timer.tick()
         self.phone.tick()
         self.alarm.tick()

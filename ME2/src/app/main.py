@@ -30,7 +30,7 @@ from . import dispatch
 from .intents import REMINDER_TASKS
 from .services.alarm import AlarmService
 from .services.lights import LightEvent, LightService, LightState
-from .services.music import TRACKS
+from .services.music_player import default_music
 from .services.thermostat import ThermostatService
 from .services.timer import TimerService
 from .services.indicator import LISTENING_STATES
@@ -121,6 +121,8 @@ def create_app(state: AppState | None = None) -> FastAPI:
             yield
         finally:
             task.cancel()
+            if state.music.player is not None:
+                state.music.player.stop()
 
     app = FastAPI(title="UI Site", lifespan=lifespan)
 
@@ -154,6 +156,13 @@ def create_app(state: AppState | None = None) -> FastAPI:
                 content={"ok": False, "error": f"unknown listening state {body.state!r}"},
             )
         changed, message = state.indicator.set_listening(body.state)
+        state.music.on_listening(body.state)
+        if state.music.soft_paused and body.state == "passive":
+            # resume promptly after the grace instead of waiting for the 1 s tick
+            asyncio.get_running_loop().call_later(
+                state.music.RESUME_GRACE_S + 0.05,
+                lambda: (state.music.tick(), asyncio.ensure_future(_push())),
+            )
         await _push()
         return _respond(changed, message)
 
@@ -239,7 +248,7 @@ def create_app(state: AppState | None = None) -> FastAPI:
             "light_colors": list(LightService.COLORS),
             "light_levels": [s.value for s in LightState if s is not LightState.OFF],
             "thermostat_degrees": sorted(ThermostatService.DEGREES),
-            "tracks": list(TRACKS),
+            "tracks": list(state.music.tracks),
         }
 
     # --- websocket (push) -----------------------------------------------------
@@ -261,4 +270,4 @@ def create_app(state: AppState | None = None) -> FastAPI:
     return app
 
 
-app = create_app()
+app = create_app(AppState(music=default_music()))
