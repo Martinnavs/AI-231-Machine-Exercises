@@ -2,7 +2,7 @@
 
 The goal for this model is reproducibility from public data. This page separates three things: what you can re-run today and get the
 documented numbers, what you can retrain, and the part of the training recipe that is
-rebuildable from the published datasets (section 3). Nothing below was run end to end on a clean machine; each step says what was actually checked.
+rebuildable from the published datasets (section 3). **Shortcut:** `make reproduce` runs sections 1 and 3 and the soak in one go (see section 4); the steps below are what it runs.
 
 ## 1. Check the checked-in model (verified)
 
@@ -42,7 +42,8 @@ difference has not been measured. Retraining, export and scoring were all run fo
 PYTHONPATH=src uv run python scripts/rebuild_training_manifest.py --ai231 raw_datasets/ai231-me2-voice-commands-v2 --out out/conversions/v2/rebuilt
 ```
 
-It downloads the persona dataset (default split and the `gap_fill` and `numeral_wordings` configs of `martinnavs/ai231-fil-supplemental-data`), runs the two builders below,
+Run alone like this, it downloads the persona dataset (default split and the `gap_fill` and `numeral_wordings` configs of `martinnavs/ai231-fil-supplemental-data`). `make reproduce` instead
+passes the persona clips from the DOI dataset's `supplemental_fil/` (`--persona-dir`) and pins `martinnavs` at revision 230c8b8 for the gap-fill and numeral clips; both give the same 28,858 rows (checked 2026-10-10). It runs the two builders below,
 extracts the audio the manifest uses, and asserts the result equals the committed `recipes/ai231-fil50-supp/manifest.ai231-fil50-supp.csv`. **Verified
 2026-10-03** (about 36 s with local copies of the data): **all 28,858 rows equal the committed manifest**, and the 8,405 persona and gap-fill clips it uses were
 extracted from the public shards (the persona ones byte-identical to the originals, by SHA-256). Four of those clips are spelled-out-number wordings
@@ -70,9 +71,22 @@ What is still not reproducible:
 
 | Item | State |
 |---|---|
-| Single reproduction command | no; sections 1-2 are commands per step; `make hybrid-decode`, `hybrid-stream`, `hybrid-test` cover the checked-in model |
-| Dataset DOI and licence | the two Hugging Face datasets are public; no DOI; several source corpora are non-commercial; the persona reference-voice provenance is an open item the uploader accepted (see the dataset card) |
+| Single reproduction command | `make reproduce` (below) |
+| Dataset DOI and licence | `airimonda/ai231-me2-voice-commands` revision `e8283202634f23257ad944ee104b9de7a1223bb5`, DOI 10.57967/hf/10723 (Ailene Nunez 2026, "ai231-me2-voice-commands (Revision e828320)", Hugging Face). The gap-fill (1,849) and numeral-wording (4) clips are not in it: they come from `martinnavs/ai231-fil-supplemental-data` @ `230c8b8`; persona clips come from the DOI dataset's `supplemental_fil`. Several source corpora are non-commercial; the persona reference-voice provenance is an open item the uploader accepted (see the dataset card) |
 | Test set with unseen speakers | ai231 test is speaker-disjoint from train; the persona test uses 5 held-out voices; the real-speaker holdout is one person (186 clips) |
-| Baselines | same architecture at 1, 4 and 10 MB, the internal-data model (not reproducible) and old production (inflated on ai231 test by training overlap) |
+| Baselines | every model tried, with sources and caveats: [`BASELINES.md`](BASELINES.md) |
 | Pi 4 | measured 2026-10-03: same answers as the server, but decode 443 / 764 ms mean / p95 per window, RTF 3.21 at the 0.25 s stride (does not keep up live); see `BENCHMARKS.md` |
 | Seeds | one per model |
+
+### The single command
+
+```bash
+make reproduce                                          # data, manifest, verify, soak: about 9 min on a server CPU, ~4.8 GB download
+make reproduce REPRO_TRAIN=1 REPRO_GPU=N                # also retrain both models (about 2.5 h on one A100; never GPU 6)
+make reproduce REPRO_STAGES=verify,soak                 # a subset of stages
+```
+
+Measured on a server CPU (all 12 checks PASS): data 0:29, manifest 6:19, verify 1:06, soak 1:15. Each stage skips if its output exists. The report is `out/reproduce/REPORT.md`: one row per check (PASS/FAIL, expected, got), stage wall-clock, and the data source and revision used.
+Expected values are in `recipes/reproduce/expected.json`. Retrained-model checks report the delta and a plus or minus 2-point band (within/outside), not PASS/FAIL.
+Data source: the ai231 shards and persona clips (`supplemental_fil`) from the DOI revision above; the gap-fill and numeral-wording clips from `martinnavs/ai231-fil-supplemental-data` @ `230c8b8` (the driver looks in the DOI dataset first and falls back).
+Holdout: 143/186 (76.9%) is on the full imported `manifest.csv` (`--split holdout`), as in section 1.

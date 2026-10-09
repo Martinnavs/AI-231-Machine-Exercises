@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -39,23 +40,23 @@ def write(path: Path, rows: list[dict], fields: list[str]) -> None:
         w.writerows(rows)
 
 
-def shards(local: Path | None, pattern: str, repo_glob: str) -> list[Path]:
+def shards(local: Path | None, pattern: str, repo_glob: str, repo: str = REPO, revision: str | None = None) -> list[Path]:
     if local is not None:
         found = sorted(local.glob(pattern))
         assert found, f"no {pattern} under {local}"
         return found
     from huggingface_hub import snapshot_download
-    root = Path(snapshot_download(REPO, repo_type="dataset", allow_patterns=[repo_glob]))
+    root = Path(snapshot_download(repo, repo_type="dataset", revision=revision, allow_patterns=[repo_glob]))
     return sorted(root.glob(repo_glob))
 
 
 def extract(parquets: list[Path], wanted: dict[str, Path]) -> set[str]:
-    """Write the clips whose `file` basename is in `wanted` (published name -> destination); returns the names written."""
+    """Write the clips whose `file` basename (without that prefix) is in `wanted` (published name -> destination); returns the names written."""
     done: set[str] = set()
     for shard in parquets:
         for batch in pq.ParquetFile(shard).iter_batches(batch_size=128, columns=["audio", "file"]):
             for r in batch.to_pylist():
-                name = Path(r["file"]).name
+                name = re.sub(r"^supplemental-fil_\d+_", "", Path(r["file"]).name)  # the ai231 dataset's supplemental_fil copy prefixes the persona names
                 if name in wanted and name not in done:
                     wanted[name].parent.mkdir(parents=True, exist_ok=True)
                     wanted[name].write_bytes(r["audio"]["bytes"])
@@ -71,6 +72,8 @@ def main() -> None:
     ap.add_argument("--persona-dir", type=Path, help="local copy of the persona dataset's train-*.parquet shards")
     ap.add_argument("--numerals-dir", type=Path, help="local copy of the numeral_wordings train-*.parquet shard")
     ap.add_argument("--gap-fill-dir", type=Path, help="local copy of the gap_fill train-*.parquet shard")
+    ap.add_argument("--repo", default=REPO, help="Hugging Face dataset to download the persona, numeral and gap-fill shards from (when no local dir is given)")
+    ap.add_argument("--revision", default=None, help="revision of --repo to pin (default: its head)")
     ap.add_argument("--no-audio", action="store_true", help="manifests only: do not extract audio")
     a = ap.parse_args()
     out = a.out.resolve()
@@ -110,8 +113,9 @@ def main() -> None:
         used = {Path((base_dir / r["path"]).resolve()) for r in kept if r["source_dataset"] == "fil50_persona"}
         persona_want = {p.name: p for p in used if p.parent.name == "persona"}
         gap_want = {p.name: p for p in used if p.parent.name == "gap_fill"}
-        got = extract(shards(a.persona_dir, "train-*.parquet", "data/train-*.parquet") + shards(a.numerals_dir, "train-*.parquet", "numeral_wordings/train-*.parquet"), persona_want)
-        got |= extract(shards(a.gap_fill_dir, "train-*.parquet", "gap_fill/train-*.parquet"), gap_want)
+        src = {"repo": a.repo, "revision": a.revision}
+        got = extract(shards(a.persona_dir, "train-*.parquet", "data/train-*.parquet", **src) + shards(a.numerals_dir, "train-*.parquet", "numeral_wordings/train-*.parquet", **src), persona_want)
+        got |= extract(shards(a.gap_fill_dir, "train-*.parquet", "gap_fill/train-*.parquet", **src), gap_want)
         missing = (set(persona_want) | set(gap_want)) - got
         assert not missing, f"{len(missing)} clips not found in the published shards, e.g. {sorted(missing)[:3]}"
         print(f"extracted {len(got)} clips to {out / 'audio'}")

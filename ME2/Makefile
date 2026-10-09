@@ -500,7 +500,7 @@ HYBRID_WAV ?=
 HYBRID_SOURCE ?= mic
 HYBRID_MIC_COMMAND ?=               # e.g. "arecord -D plughw:3,0 -f S16_LE -r 16000 -c 1 -t raw -" (Raspberry Pi, docs/RASPBERRY-PI.md)
 HYBRID_WAKEWORD ?= out/wakeword-sesame-ambient-rir-45m
-.PHONY: hybrid-decode hybrid-stream hybrid-test soak-run
+.PHONY: hybrid-decode hybrid-stream hybrid-test soak-run reproduce
 hybrid-decode: ## Decode HYBRID_WAV="a.wav b.wav" with the hybrid (JSON per clip + which model answered)
 	@test -n "$(HYBRID_WAV)" || { echo "set HYBRID_WAV=\"clip.wav [more.wav]\""; exit 2; }
 	$(UV) run python scripts/hybrid_decode_file.py $(HYBRID_WAV) --ctc-checkpoint $(HYBRID_CTC) --cls-checkpoint $(HYBRID_CLS) --cls-threshold $(HYBRID_CLS_THRESHOLD)
@@ -513,6 +513,13 @@ soak-run: ## Stream SOAK_DIR/continuous.wav once and score it (SOAK_NAME=..., SO
 
 hybrid-test: ## Tests for the hybrid decoder, the streaming policy and the wake-word gate
 	$(UV) run pytest -q tests/test_vcm_hybrid.py tests/test_vcm_streaming_endpointed.py tests/test_vcm_streaming_wakeword_gate.py tests/test_vcm_streaming_config.py tests/test_vcm_quartznet_heads.py tests/test_vcm_perturbation_plan.py tests/test_soak_run.py
+
+REPRO_TRAIN ?=
+REPRO_GPU ?=
+REPRO_STAGES ?=
+REPRO_ARGS ?=
+reproduce: ## One-command reproduction (CPU ~10 min; REPRO_TRAIN=1 REPRO_GPU=N adds a ~2.5 h A100 retrain; REPRO_STAGES=verify,soak REPRO_ARGS=--dry-run)
+	$(UV) run python scripts/reproduce.py $(if $(REPRO_STAGES),--stages $(REPRO_STAGES)) $(if $(REPRO_TRAIN),--train) $(if $(REPRO_GPU),--gpu $(REPRO_GPU)) $(REPRO_ARGS)
 
 .DEFAULT_GOAL := help
 help: ## List documented targets

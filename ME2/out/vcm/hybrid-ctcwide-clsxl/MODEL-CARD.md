@@ -19,7 +19,7 @@ Per clip it returns a trace (each component's intent and confidence, agreement, 
 
 - **Data:** public `airimonda/ai231-me2-voice-commands` v2 (train split incl. val speakers and `synthetic_negatives`) plus the public persona clips
   (`martinnavarez/ai231-fil-supplemental-data` and the capped fil50 persona rows), the "H-all" manifest. Noise and babble are the dataset's own
-  clips and synthetic coloured noise; no ESC-50. Inherits the dataset source terms, several of which are non-commercial (the checkpoint `license` field says so).
+  clips and synthetic coloured noise; no ESC-50. Inherits the dataset source terms, several of which are non-commercial (the checkpoint `license` field says so). Code is MIT (`LICENSE`); the weights are also bound by the dataset's research-and-education terms.
 - **Training:** `vcm.train --seed 0 --p-rir 0.7 --p-timestretch 0.25 --p-noise 0.5 --p-babble 0.15 --noise-source dataset --perturbation-plan table --dump-plan
   --skip-prenoised --noise-random-offset --onecycle-epochs 60 --max-epochs 70 --patience 20 --max-minutes 135` (`train.log` in each folder). One seed each.
 - **Results** (`eval/hybrid-end-to-end.md`, scored from audio): ai231 test clean 98.8%, perturbed 94.9%, holdout (186, real Filipino speaker) 77.4%,

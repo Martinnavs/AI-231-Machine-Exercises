@@ -8,7 +8,9 @@ Then [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) for what can and cannot be rep
 | Doc | What it holds |
 |---|---|
 | [`CURRENT-MODEL.md`](CURRENT-MODEL.md) | The hybrid (wide CTC + XL heads): decision rule, quick start, numbers, data, training, evaluation, code map, open items |
-| [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) | Verified check of the checked-in model; retraining; the part of the data recipe that is not public |
+| [`USAGE.md`](USAGE.md) | Commands at a glance (laptop and Pi), serving and the Python API, tests, training |
+| [`BASELINES.md`](BASELINES.md) | Every model tried, side by side: size, data, scores on each split, latency, caveats |
+| [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) | `make reproduce`; verified check of the checked-in model; retraining; rebuilding the training manifest from public data |
 | [`BENCHMARKS.md`](BENCHMARKS.md) | Every benchmark table: headline metrics, results by split, seen vs unseen data, the unseen-noise replay, the soak on a Pi and a server |
 | [`SOAK-TEST.md`](SOAK-TEST.md) | The deployment-shaped soak: wake word + gap + command with reverb and noise, how to run it (also on a Raspberry Pi), results, tuning, failure analysis |
 | [`VCM-BENCHMARK-RESULTS.md`](VCM-BENCHMARK-RESULTS.md) | The final pre-production test: the class VCM benchmark on a Pi 4 (clean file replay, phone and laptop speaker -> USB mic runs, mel-band map, AGC check), what to report and what not to |
