@@ -13,6 +13,7 @@ Then [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) for what can and cannot be rep
 | [`SOAK-TEST.md`](SOAK-TEST.md) | The deployment-shaped soak: wake word + gap + command with reverb and noise, how to run it (also on a Raspberry Pi), results, tuning, failure analysis |
 | [`VCM-BENCHMARK-RESULTS.md`](VCM-BENCHMARK-RESULTS.md) | The final pre-production test: the class VCM benchmark on a Pi 4 (clean file replay, phone and laptop speaker -> USB mic runs, mel-band map, AGC check), what to report and what not to |
 | [`RASPBERRY-PI.md`](RASPBERRY-PI.md) | Running the hybrid on a Pi: the torch +cu121 fix, the lean install, the microphone command, the soak run |
+| [`UI-DEMO.md`](UI-DEMO.md) | The UI dashboard: running it with the live pipeline, music, and the headless Pi demo on a phone hotspot |
 | [`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md) | Which model binaries were untracked from git, where the archive is, what needs them |
 | [`AI231-FIL50.md`](AI231-FIL50.md) | The experiment log: persona padding, rules A-D, wider models, internal data, the leak finding, the hybrid, streaming, wake-word polling, ticket 04 re-evaluation |
 | [`CTC-ATTENTION.md`](CTC-ATTENTION.md) | The heads architecture, joint loss, the reproducible perturbation table, v2 results on the ai231 data, streaming commands |
