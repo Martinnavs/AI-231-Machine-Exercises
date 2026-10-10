@@ -12,7 +12,7 @@ Mic 16 kHz -> log-mel 40 x 250 (2.5 s window, 0.25 s stride)
   -> wide QuartzNet 5x3: grammar-constrained CTC beam search (beam 50, 19 intents, 93 wordings)
        else XL QuartzNet 5x3: attention-pooled intent head + 6 slot heads (confidence >= 0.8787)
        else reject
-  -> actuator (intent + slots)
+  -> smart-home UI dashboard (intent + slot; 7 panels, music plays real audio, the rest simulated)
 ```
 
 | Part | Params | INT8 ONNX |
