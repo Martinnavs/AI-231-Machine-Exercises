@@ -77,7 +77,7 @@ Raspberry Pi: `uv sync` does not work there, see [`docs/RASPBERRY-PI.md`](docs/R
 | Dataset licensed and citable | DOI 10.57967/hf/10723 |
 | Training logs and final checkpoints committed | `train.log`, `metadata/loss_history.json`, `.pt` and ONNX under `out/vcm/hybrid-ctcwide-clsxl/{ctc-wide,cls-xl}/` |
 | Pi 4 latency reproduced by the posted script | `scripts/soak_run.py`; results in [`docs/SOAK-TEST.md`](docs/SOAK-TEST.md) |
-| Held-out test set with unseen speakers | ai231 test is speaker-disjoint; the real-accent holdout is one speaker (186 clips) |
+| Held-out test set with unseen speakers | ai231 test is speaker-disjoint; the holdout (186 commands) is 86 real clips, 84 of them from one Filipino speaker, plus 100 clips from 2 synthetic voices |
 | Baseline of comparable size | [`docs/BASELINES.md`](docs/BASELINES.md): ~1 M, ~4 M, ~10 M, ~14 M models |
 
 ## Where everything else is

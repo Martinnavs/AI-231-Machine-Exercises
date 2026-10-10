@@ -71,7 +71,7 @@ Intent + slot, one seed, one training run per model. **Read the caveats in the n
 | ai231 persona rows, voice-disjoint (2,946) | 99.7 | 98.7 | 99.2 |
 | 129 real recordings (old internal test) | **98.4** | 96.1 | 84.5 |
 | leak-free internal held-out (638), clean / perturbed | 97.8 / 87.3 | 93.4 / 80.7 | 94.2 / 85.1 |
-| ai231 holdout (186 commands, one real Filipino speaker) | 77.4 | 66.7 | 76.9 |
+| ai231 holdout (186 commands: 84 from one real Filipino speaker, 2 other real, 100 synthetic) | 77.4 | 66.7 | 76.9 |
 | streaming replay, wake word + command (784 sessions), first trigger correct | **90.1** | 88.9 | |
 | soak: holdout behind a wake word, reverb + noise (186 commands, tuned settings), first trigger correct | **81.7** (CPU INT8: 81.2) | 74.7 | |
 
@@ -92,7 +92,7 @@ Intent + slot, one seed, one training run per model. **Read the caveats in the n
   (`scripts/build_internal_heldout.py`, `scripts/build_user_voice_eval.py`, `scripts/filter_internal_overlap.py`) when comparing
   against an internal-data model. Details: `AI231-FIL50.md`, "Leak finding".
 - **Seen vs unseen.** Test and holdout are clip-disjoint and speaker-disjoint from training (README, "Seen vs unseen"), but the perturbed gate and the soak use the same seed-0 synthetic rooms as training, and 131 of the 202 soak sessions use noise clips from the training split; whether any persona or synthetic voice is the same person as a real test speaker is unverified.
-- **One seed, small real-speaker sets.** The holdout is 186 clips from one speaker; the user-voice sets are 20 raw and 648 converted
+- **One seed, small real-speaker sets.** The holdout is 186 commands, but only 86 are real speech (84 from one Filipino speaker); the other 100 are 2 synthetic voices; the user-voice sets are 20 raw and 648 converted
   clips. The hybrid's cross-model edge over wide+wide (same-model hybrid) is small except on the holdout and the perturbed ai231 test.
 - **Pi 4 (measured 2026-10-03, one thread, numba beam search, fan on):** the same 151/186 soak answers as the server, estimated live latency
   0.48 s median / 0.92 s p95 after the end of speech, 100 ms mean compute per window, p95 real-time factor 0.96, so it keeps up live with

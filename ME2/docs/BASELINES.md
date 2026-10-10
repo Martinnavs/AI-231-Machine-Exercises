@@ -30,7 +30,7 @@ Source keys: **[F]** = `docs/AI231-FIL50.md` (section named in the cell notes be
 Notes on cells (section of [F] in brackets):
 
 - Perturbed = fixed-seed reverb + the split's own `noise_only` clips, no babble ([F] "Pre-registered success rules", B).
-- Holdout = 186 real commands (one real Filipino speaker, 84 clips, plus synthetic voices and 2 Fluent Speech Commands clips) scored once ([F] round 1 "Holdout").
+- Holdout = 186 commands: 84 clips from one real Filipino speaker, 2 Fluent Speech Commands clips, and 100 clips from 2 synthetic voices; scored once ([F] round 1 "Holdout").
 - Leak-free subset (393 rows) = ai231 test originals that are neither byte-identical to the internal data nor from a speaker in the internal train split ([F] "A leak in the evaluation").
 - Hybrid holdout 76.9% is the INT8 figure; fp32 PyTorch is 77.4% ([O]). Soak and replay results for the hybrid are in [`SOAK-TEST.md`](SOAK-TEST.md) and [B], not repeated here.
 - The `v2s1-heads-A` perturbed figure (76.1%) is its seed-1 value in the round-1 reference table; its classifier path is 95.4% clean / 88.9% perturbed ([M]).
@@ -96,7 +96,7 @@ Sizes: wide CTC INT8 4.16 MB (4,156,784 B), xl heads INT8 10.10 MB, so the hybri
   Old production and the `fil50-*` models therefore score inflated on the ai231 test: old production drops from 96.9% to 92.0% clean (1,261 rows) and 89.6% (393 rows) ([F] "A leak in the evaluation").
   H-int had byte-identical clips removed but near-duplicates and shared speakers remain, so its full-set numbers are inflated too. **Compare internal-data models with public-data models on the leak-free columns only**, not on the "ai231 test clean" and "Perturbed" columns.
   The public-data models (everything marked public) are not affected.
-- **The holdout is one real speaker.** It is 186 commands: 84 clips from one real Filipino speaker plus synthetic voices (100% for most models on the synthetic part). The human-voice part is 86 clips ([H]). It measures accent coverage for that one person, not accent coverage in general.
+- **The holdout's real speech is mostly one speaker.** It is 186 commands: 84 clips from one real Filipino speaker, 2 Fluent Speech Commands clips, and 100 clips from 2 synthetic voices (100% for most models on the synthetic part). The human-voice part is those 86 clips ([H]). It measures accent coverage for that one person, not accent coverage in general.
 - **The test split was scored many times** during the project and val chose every setting ([B] "Results by split"), so the test numbers are not a single-shot estimate.
 - **The pre-registered pass bars (96.5% clean, 90% perturbed) were set from old production's inflated numbers**; old production itself fails them on the non-overlapping rows ([F] "A leak in the evaluation"). Verdicts in [F] are kept as registered.
 - **Pi latency exists only for the hybrid.** Other rows: n/m.

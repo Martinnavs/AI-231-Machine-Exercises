@@ -33,7 +33,7 @@ On the perturbed gate (room reverb + dataset noise, fixed seed): hybrid 94.8% vs
 | Test | unseen | 3,823 | 98.8% | 98.9% | 91.8% (233) | 99.3% (3,590) | 3.9% (3 of 76) | 1.0% |
 | Holdout (whole clip, offline) | unseen | 186 + 16 | 76.9% | 78.0% | 50.0% (86) | 100.0% (100) | 6.2% (1 of 16) | 20.4% |
 
-Train is not scored here (the training manifest also holds persona clips; the train-to-test gap on human voices is the weakness to look at: the holdout's human voices are one real Filipino speaker, 50.0% vs
+Train is not scored here (the training manifest also holds persona clips; the train-to-test gap on human voices is the weakness to look at: the holdout's 86 human-voice clips are 84 from one real Filipino speaker plus 2 Fluent Speech Commands clips, 50.0% vs
 91.8% on the test split's human voices). Val chose every setting, so it is not an independent estimate, and the test split was scored many times during the project (`docs/AI231-FIL50.md`).
 The wide CTC alone scores 95.8% / 95.0% / 66.7% on val / test / holdout, and 30.2% on the holdout's human voices.
 

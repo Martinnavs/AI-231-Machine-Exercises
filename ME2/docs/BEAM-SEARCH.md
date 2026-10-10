@@ -91,7 +91,7 @@ Same soak (186 commands + 16 out-of-scope clips, 32.6 min), server CPU, one thre
 | 15 | 152 | 8 | 3 | 0.654 s | 34 / 71 ms | 0.31 |
 | 10 | 151 | 9 | 3 | 0.661 s | 28 / 65 ms | 0.29 |
 
-Accuracy and rejection are unchanged within one command down to beam 10 on this soak (one real speaker; it is a check, not a proof for other speakers). The curve is roughly linear,
+Accuracy and rejection are unchanged within one command down to beam 10 on this soak (86 real commands, 84 from one Filipino speaker, plus 100 synthetic; it is a check, not a proof for other speakers). The curve is roughly linear,
 about 1-1.5 ms of p95 per beam of width. Extrapolated to beam 0 that leaves a floor of roughly 50 ms of p95 that no beam width removes. The encoder is about 15 ms of it; the rest (policy, the classifier on the fallback windows, other per-window overhead) is not separated here.
 
 **Budget on the Pi (original search; superseded by section 6, and the 6x ratio is suspect, see section 7).** The RTF is the p95 of gate + decode over the 250 ms stride. On the Pi that is 41.75 + 764 = 806 ms (3.21 x 250 ms); on the server it is about 126 ms plus a few ms of gate. The ratio is about 6, so the
@@ -132,7 +132,7 @@ Scored with `vcm.semantic_eval score --beam 50` and `--beam 10` on the shipped w
 | ai231 test, original rows, perturbed | 87.8% | 87.4% | 0/76 | **1/76** | 60 of 4,149 |
 | ai231 persona rows, clean (2,946) | 98.7% | 98.6% | 0/50 | 0/50 | 10 of 2,996 |
 | old internal test, non-persona, clean (1,927) | 96.2% | 96.0% | 1/579 | **2/579** | 34 of 4,073 |
-| holdout, real speaker (186) | 66.7% | **64.5%** | 0/16 | 0/16 | 13 of 202 |
+| holdout (186: 86 real, 100 synthetic) | 66.7% | **64.5%** | 0/16 | 0/16 | 13 of 202 |
 | leak-free internal held-out, clean (638) | 93.4% | 92.8% | 0/117 | 0/117 | 9 of 755 |
 | leak-free internal held-out, perturbed | 80.7% | 80.3% | 0/117 | 0/117 | 9 of 755 |
 | user voice raw (20), clean / perturbed | 95.0% / 95.0% | 95.0% / 95.0% | 0/50 | 0/50 | 1 of 70 each |

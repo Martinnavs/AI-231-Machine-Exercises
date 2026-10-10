@@ -22,7 +22,7 @@ Per clip it returns a trace (each component's intent and confidence, agreement, 
   clips and synthetic coloured noise; no ESC-50. Inherits the dataset source terms, several of which are non-commercial (the checkpoint `license` field says so). Code is MIT (`LICENSE`); the weights are also bound by the dataset's research-and-education terms.
 - **Training:** `vcm.train --seed 0 --p-rir 0.7 --p-timestretch 0.25 --p-noise 0.5 --p-babble 0.15 --noise-source dataset --perturbation-plan table --dump-plan
   --skip-prenoised --noise-random-offset --onecycle-epochs 60 --max-epochs 70 --patience 20 --max-minutes 135` (`train.log` in each folder). One seed each.
-- **Results** (`eval/hybrid-end-to-end.md`, scored from audio): ai231 test clean 98.8%, perturbed 94.9%, holdout (186, real Filipino speaker) 77.4%,
+- **Results** (`eval/hybrid-end-to-end.md`, scored from audio): ai231 test clean 98.8%, perturbed 94.9%, holdout (186: 86 real, 84 of them one Filipino speaker, plus 100 synthetic) 77.4%,
   129 real recordings 98.4%, leak-free internal held-out 97.8% / 87.3% perturbed. Versus the vanilla networks and old production: `docs/AI231-FIL50.md`.
 - **Known limits:** non-command false accepts 3.4% (clean) to 6.1% (perturbed) on the ai231 negatives, mostly from the classifier fallback (CTC alone: 0.9%
   and 2.5%); the wake word sits in front in deployment. 19% of holdout commands are still rejected. Single seed; small holdout.
