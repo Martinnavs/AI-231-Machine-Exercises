@@ -4,9 +4,9 @@ Start here if you are picking up the VCM work. This page says what the current m
 scores and how far to trust that, how it was trained and evaluated, where the code lives, and what is still open. It links to the
 long, dated records instead of repeating them.
 
-- **Status (2026-10-03, branch `optionb-ctc-attention`):** best model so far for streaming tests, trained only on public data.
-  It is **not promoted**: `make app-pipeline*` and the README's "production checkpoint" still name the older model
-  (`option-d-fil50-ambient-rir-135m`, and `quartznet5x3-s2-fil50-ambient-rir-135m` for the live targets). Promotion is a separate decision.
+- **Status (2026-10-10, `master`):** the canonical ME2 model, trained only on public data (merged from `optionb-ctc-attention-fast-beam`, PR #1).
+  The UI demo and the Pi services serve it with `make app-pipeline-ctcwide`; plain `make app-pipeline` and the `-perchar`/`-quartznet`
+  variants still run the older models (`option-d-fil50-ambient-rir-135m`, `quartznet5x3-s2-fil50-ambient-rir-135m`).
 - **Reproducibility:** the task is to be reproducible from public data. Read [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) before
   claiming a result: the training manifest rebuilds exactly from the published datasets (28,858 of 28,858 rows); retraining on the rebuilt manifest was not re-run.
 - **Archived checkpoints:** the other models' binaries were untracked on 2026-10-03; see [`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md).
@@ -94,9 +94,10 @@ Intent + slot, one seed, one training run per model. **Read the caveats in the n
 - **Seen vs unseen.** Test and holdout are clip-disjoint and speaker-disjoint from training (README, "Seen vs unseen"), but the perturbed gate and the soak use the same seed-0 synthetic rooms as training, and 131 of the 202 soak sessions use noise clips from the training split; whether any persona or synthetic voice is the same person as a real test speaker is unverified.
 - **One seed, small real-speaker sets.** The holdout is 186 clips from one speaker; the user-voice sets are 20 raw and 648 converted
   clips. The hybrid's cross-model edge over wide+wide (same-model hybrid) is small except on the holdout and the perturbed ai231 test.
-- **Pi 4 not measured.** There is no Raspberry Pi on the development node. Latency numbers are server cores
-  (ONNX Runtime, one thread): network 13.6 ms (wide) / 30.2 ms (XL) per 2.5 s window, beam search ~40-90 ms, streaming latency
-  after end of speech 0.38 s median / 0.60 s p95 (algorithmic).
+- **Pi 4 (measured 2026-10-03, one thread, numba beam search, fan on):** the same 151/186 soak answers as the server, estimated live latency
+  0.48 s median / 0.92 s p95 after the end of speech, 100 ms mean compute per window, p95 real-time factor 0.96, so it keeps up live with
+  little spare time ([`BENCHMARKS.md`](BENCHMARKS.md), [`BEAM-SEARCH.md`](BEAM-SEARCH.md)). Server cores (one thread): network 13.6 ms (wide) /
+  30.2 ms (XL) per 2.5 s window; replay latency after end of speech 0.38 s median / 0.60 s p95 on the 784 test sessions (0.65 s p95 in the soak; algorithmic, no compute time).
 - **Pre-registered rules** (A-D in `AI231-FIL50.md`) were written against the old production numbers, which turned out to be inflated;
   every public-data model fails some of them. Report against the public-only baseline and the leak-free sets.
 

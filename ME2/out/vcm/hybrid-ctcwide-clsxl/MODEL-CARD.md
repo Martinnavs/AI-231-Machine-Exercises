@@ -29,11 +29,11 @@ Per clip it returns a trace (each component's intent and confidence, agreement, 
 - **ONNX:** both halves run in ONNX Runtime (pass the `.onnx` paths to `scripts/hybrid_decode_file.py` / `hybrid_score.py`; `vcm.hybrid.OnnxCtc` /
   `OnnxHeads`). The heads file comes from `vcm.export_onnx --heads-only`. Scored end to end on every set (`eval/hybrid-onnx-vs-pytorch.md`):
   ONNX fp32 equals PyTorch on every set; INT8 costs at most one clip per set (129 real 98.4 -> 97.7, holdout 77.4 -> 76.9, perturbed 94.9 -> 94.8,
-  clean unchanged at 98.8). Together about 14.3 MB INT8. Pi latency and memory are not measured (no Pi hardware on the node).
+  clean unchanged at 98.8). Together about 14.3 MB INT8. On a Raspberry Pi 4 (one thread, numba beam search): 0.48 / 0.92 s median / p95 estimated live latency, p95 real-time factor 0.96 (`docs/BENCHMARKS.md`).
 - **Streaming:** `vcm.streaming --policy endpointed ... --cls-model cls-xl/export/vcm_heads.int8.onnx` (command in `docs/AI231-FIL50.md`).
   Wake word + command replay, 784 ai231 test sessions: 89.4% correct first trigger vs 88.3% CTC only (95.1% vs 93.9% where the wake word opened a period),
   latency p50 0.38 s after speech end (`eval/streaming-replay-*.json`). With `--wakeword-poll-s 0.05` (finer wake-word polling)
   the hybrid reaches 90.1% (706/784); the remaining 38 missed sessions are the wake-word model not firing.
 - **Soak test** (`docs/SOAK-TEST.md`; holdout behind a wake word with reverb and noise; wake-word threshold 0.8, slot gate 0.6): 152/186 (81.7%) correct first trigger on the A100, 151/186 on CPU INT8 (CTC only: 139 / 137);
-  0.38 s median latency after the end of speech; ~70 ms per decoded window on a server core; Raspberry Pi 4 not run yet.
-- **Status:** best hybrid so far for streaming tests, not promoted. Ticket 04 is deferred (see `docs/AI231-FIL50.md`).
+  0.38 s median latency after the end of speech; ~70 ms per decoded window on a server core; on a Raspberry Pi 4 the same 151/186 (`soak/holdout-wake-gap-v1/results/rpi4-numba-beam50-t1-fan.md`).
+- **Status:** the canonical ME2 model on `master` (served by `make app-pipeline-ctcwide`). Ticket 04 is deferred (see `docs/AI231-FIL50.md`).
