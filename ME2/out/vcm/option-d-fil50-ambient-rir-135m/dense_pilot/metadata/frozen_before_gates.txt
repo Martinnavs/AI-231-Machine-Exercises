@@ -1,7 +1,0 @@
-2026-09-30T09:03:47+08:00
-b9e57fe4e31bdf21f701533ee9c62dff026da79a4b6f9179149b7618299bd988  scripts/dense_pilot_gates.py
-e18ebfa03dbb3096b0ff3cbc52ba2b2249df2f69e8fc732ae0f30b6078fc243e  src/me2_voicegen/vcm/dense_pilot.py
-AMENDED (added P3b; B cascade soak had 0 periods, before any candidate number)
-2026-09-30T09:09:17+08:00
-557a06e0faeee714fc4e4fe5dc4805cb6c1cb47e4f3eaebe12bfd85745563bb6  scripts/dense_pilot_gates.py
-e18ebfa03dbb3096b0ff3cbc52ba2b2249df2f69e8fc732ae0f30b6078fc243e  src/me2_voicegen/vcm/dense_pilot.py

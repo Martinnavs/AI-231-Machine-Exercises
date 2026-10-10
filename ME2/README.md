@@ -2,7 +2,7 @@
 
 **BLUF.** A wake word ("sesame") followed by one of 19 spoken commands, decoded on-device by a 14.3 MB INT8 model trained on public data only.
 The answer is ready about 0.5 s after the end of speech on a Raspberry Pi 4 using one core. Out-of-scope rejection is the weak spot.
-This is the canonical ME2 on `master`. The UI demo serves it with `make app-pipeline-ctcwide`; plain `make app-pipeline` still runs the earlier model.
+This is the canonical ME2 on `master`. The UI demo serves it with `make app-pipeline` (`app-pipeline-ctcwide` is the same target).
 
 ## Model: hybrid CTC + attention classifier
 

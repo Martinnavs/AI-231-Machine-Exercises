@@ -1,3 +1,0 @@
-2026-09-30T07:52:44+08:00
-7ac3ac7a01e7036943c9c3ce47e38cb3d14874e69777a73f6b78de9141df459c  scripts/dense_pilot_stability.py
-e18ebfa03dbb3096b0ff3cbc52ba2b2249df2f69e8fc732ae0f30b6078fc243e  src/me2_voicegen/vcm/dense_pilot.py

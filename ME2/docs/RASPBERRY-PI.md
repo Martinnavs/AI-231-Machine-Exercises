@@ -76,7 +76,7 @@ Checked on a cold clone of the branch: the first set passes (162 tests, 4 desele
 ## What a fresh clone does and does not contain
 
 Tracked and enough for everything on this page: the hybrid model (`out/vcm/hybrid-ctcwide-clsxl/`), the wake word (`out/wakeword-sesame-ambient-rir-45m/`), and the 63 MB soak recording with its truth file (`soak/holdout-wake-gap-v1/`, check with `sha256sum -c SHA256SUMS`).
-**Not in a clone:** the earlier models. `make app-pipeline`, `make vcmx-serve`, `make stream-wakeword` and the older tests default to them; see [`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md) to restore them or point the variable at the hybrid.
+**Not in a clone:** the earlier models. `make vcmx-serve`, `make stream-wakeword` and the older tests default to them (`make app-pipeline` serves the hybrid); see [`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md) to restore them or point the variable at the hybrid.
 **`make` and Python 3.10:** the Makefile pins `UV_PYTHON=/usr/bin/python3.10`. Raspberry Pi OS does not ship 3.10 (this Pi has 3.13), so use the `uv venv --python 3.10` route above, which downloads it.
 
 ## Soak-run gotchas on a Pi

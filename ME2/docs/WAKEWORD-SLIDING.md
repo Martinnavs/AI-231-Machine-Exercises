@@ -17,7 +17,8 @@ is confident (threshold and incomplete-prefix margin, as before) and ended (the 
 output is blank with probability >= 0.9) is emitted at once and closes the period. If nothing qualifies
 within 3 s of the last wake-word detection, the period closes with no output.
 
-Run it with `make app-pipeline-live` (QuartzNet INT8, the settings below). `make app-pipeline` is unchanged.
+This was first served with `make app-pipeline-live` (QuartzNet INT8, the settings below; removed from `master` on 2026-10-10). The
+production hybrid uses the same policy and settings through `make app-pipeline`.
 
 ## How it was measured
 
@@ -52,7 +53,7 @@ among settings within 0.5 pp of that, the lowest p95 latency.
 
 Requiring two identical decodes in a row ("stable 2") roughly halves wrong-intent triggers (14 to 8) for
 about one fewer correct session. The rule chose stable 1; stable 2 is the safer alternative if wrong actions
-matter more than a 0.1 pp accuracy difference (`APP_LIVE_STABLE=2`).
+matter more than a 0.1 pp accuracy difference (`--stable-strides 2`).
 
 ## Result (test, run once with the chosen setting)
 
@@ -86,10 +87,9 @@ Latency is unchanged across margins (p50 0.36 s, p95 0.50 s). Larger margins mos
 commands: "time" is a character prefix of "timer ...", and in growing windows the gate treats a real "time"
 as a possibly unfinished "timer". The whole-clip calibration set has too few TIME clips to show this. Margin
 10 cuts wrong-intent triggers to about a third at the cost of 12 correct sessions, mostly TIME; it is the
-alternative if wrong actions matter more (`APP_LIVE_MARGIN=10`). The test numbers above are at margin 4.0.
+alternative if wrong actions matter more (`--required-command-margin 10`). The test numbers above are at margin 4.0.
 
-The two serving modes therefore use different margins if the `quartznet-promotion` branch is merged:
-`app-pipeline-quartznet` (3 s mode, whole-window decode) 20.0, `app-pipeline-live` (this mode) 4.0.
+The two serving modes used different margins: the QuartzNet 3 s mode (whole-window decode) 20.0, this mode 4.0.
 
 ## Reading the numbers
 

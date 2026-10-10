@@ -107,30 +107,8 @@ STREAM_ARGS ?=
 # override with a wav path for a deterministic file-replay run).
 APP_VENV_BIN ?= .venv/bin
 APP_PIPELINE_SOURCE ?= mic
-# Run dir `app-pipeline` serves. Default is the production optiond run, which
-# is also the original hardcoded value, so `make -n app-pipeline` output is
-# byte-identical to before the variable existed (quartznet-promotion ticket 01).
-APP_PIPELINE_MODEL ?= out/vcm/option-d-fil50-ambient-rir-135m
-# Defaults are the original hardcoded app-pipeline values (mean_frame scoring).
-APP_PIPELINE_THRESHOLD ?= -0.075
-APP_PIPELINE_MARGIN ?= 4.0
-APP_PIPELINE_SCORE_MODE ?= mean_frame
-# Opt-in trial threshold for `make app-pipeline-perchar` (per-character scale, ~-1; see
-# docs/archive/DENSE-SCORING-DECISION.md for the safe range).
-APP_PERCHAR_THRESHOLD ?= -1.204
-# `app-pipeline-quartznet` operating point (quartznet-promotion ticket 02,
-# docs/archive/QUARTZNET-OPERATING-POINT.md): -0.1 is the seed-0 clean-val Youden
-# choice with full test gates in
-# out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/metadata/eval_report.json;
-# 20.0 is the incomplete-prefix gate's val selection on the real-target
-# manifest (val_selection.json in
-# out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/metadata/
-# incomplete_calibration_realtarget/; holdout test_report.json consistent:
-# target exact 116/129 -> 115/129, far_excl_digital_zero 0.0132 -> 0.0057).
-APP_QUARTZNET_THRESHOLD ?= -0.1
-APP_QUARTZNET_MARGIN ?= 20.0
 
-.PHONY: help sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream app-pipeline-perchar app-pipeline-quartznet quartznet-eval-report wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline app-pipeline-ctcwide app-lan
+.PHONY: help sync vendor download-model generate generate-personas generate-conversions test clean vcm-train vcm-bench vcm-eval optionb-train optionb-eval optionb-refresh vcmx-build vcmx-export vcmx-serve vcmx-serve-wakeword stream wakeword-fetch-positives wakeword-fetch-positives-dry-run wakeword-convert-positives wakeword-convert-positives-dry-run wakeword-generate-silence wakeword-generate-silence-dry-run wakeword-generate-adversaries wakeword-generate-adversaries-dry-run wakeword-mix-noise wakeword-mix-noise-dry-run wakeword-consolidate-manifest wakeword-build-unknown-external wakeword-build-unknown-external-dry-run wakeword-build-dataset wakeword-derive-spans wakeword-train wakeword-export wakeword-bench soak-tally app app-pipeline app-pipeline-ctcwide app-lan
 
 WAKEWORD_CLONE_DIR ?= $(if $(TMPDIR),$(TMPDIR),/tmp)/me2_wakeword_clone
 WAKEWORD_POSITIVES_OUT_DIR ?= out/conversions/v2/wakeword/positives_real
@@ -291,51 +269,17 @@ app-lan:
 	$(MAKE) app APP_HOST=0.0.0.0
 
 # Feature `ui-site`: the live model-serving pipeline that feeds the
-# dashboard (terminal 1 of the two-window setup; terminal 2 runs `make
-# app`). The Option D (fil50) VCM int8 export fronted by the trained
-# `out/wakeword-sesame` DS-CNN (one 3 s listening period per wakeword
-# detection), piped one-way into the forwarder. Period digest/banner go
-# to stderr, so stdout stays clean JSONL for the pipe. Override
-# APP_PIPELINE_SOURCE with a wav path for a file-replay run.
-app-pipeline:
-	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model $(APP_PIPELINE_MODEL) --backend onnx --onnx-variant int8 --grammar optionb --threshold $(APP_PIPELINE_THRESHOLD) $(if $(APP_PIPELINE_MARGIN),--required-command-margin $(APP_PIPELINE_MARGIN),) --score-mode $(APP_PIPELINE_SCORE_MODE) --beam-width 50 --gate wakeword --policy single_period --gate-period 3 --wakeword-model out/wakeword-sesame --wakeword-backend onnx --log-periods --source "$(APP_PIPELINE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward
-
+# dashboard (terminal 1 of the two-window setup; terminal 2 runs `make app`).
 # The Pi 4 production operating point (hybrid CTC-wide + classifier heads,
-# endpointed policy, ambient-RIR wakeword) piped one-way into the UI, with
-# `--emit-listening` so the dashboard's listening indicator follows the gate.
-# Terminal 2 runs `make app`. APP_PIPELINE_SOURCE=mic uses APP_MIC_COMMAND
-# (override the ALSA device); set it to a wav path for a file replay.
+# endpointed policy, ambient-RIR wakeword) piped one-way into the forwarder,
+# with `--emit-listening` so the dashboard's listening indicator follows the
+# gate. `app-pipeline-ctcwide` is the same target under its older name.
+# APP_PIPELINE_SOURCE=mic uses APP_MIC_COMMAND (override the ALSA device);
+# set it to a wav path for a file replay.
 APP_MIC_COMMAND ?= arecord -D plughw:3,0 -f S16_LE -r 16000 -c 1 -t raw -
 APP_CTCWIDE_DIR ?= out/vcm/hybrid-ctcwide-clsxl
-app-pipeline-ctcwide:
+app-pipeline app-pipeline-ctcwide:
 	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model $(APP_CTCWIDE_DIR)/ctc-wide --backend onnx --onnx-variant int8 --grammar optionb --threshold=-0.1 --required-command-margin 4.0 --beam-width 50 --gate wakeword --policy endpointed --gate-period 3 --hold-ms 200 --stable-strides 1 --wakeword-model out/wakeword-sesame-ambient-rir-45m --wakeword-backend onnx --wakeword-threshold 0.8 --wakeword-poll-s 0.05 --cls-model $(APP_CTCWIDE_DIR)/cls-xl/export/vcm_heads.int8.onnx --cls-threshold 0.8787 --cls-slot-threshold 0.6 --log-periods --emit-listening --source "$(APP_PIPELINE_SOURCE)" $(if $(filter mic,$(APP_PIPELINE_SOURCE)),--mic-command "$(APP_MIC_COMMAND)",) | $(APP_VENV_BIN)/python -m app.forward
-
-# OPT-IN TRIAL (dense-d2-loose-impl): the same pipeline scored per character
-# instead of per frame, no incomplete-prefix margin gate. NOT the production
-# setting -- see docs/archive/DENSE-SCORING-DECISION.md for the evidence, caveats, and
-# what to report back. Rollback = use `make app-pipeline` (unchanged defaults).
-app-pipeline-perchar:
-	$(MAKE) app-pipeline APP_PIPELINE_SCORE_MODE=per_char APP_PIPELINE_THRESHOLD=$(APP_PERCHAR_THRESHOLD) APP_PIPELINE_MARGIN=
-
-# quartznet-promotion ticket 01: the same pipeline serving the stride-2
-# QuartzNet-5x3-tiny INT8 export at ticket 02's recalibrated operating point
-# (APP_QUARTZNET_THRESHOLD/APP_QUARTZNET_MARGIN,
-# docs/archive/QUARTZNET-OPERATING-POINT.md); the default `make app-pipeline` above is
-# unchanged. Run `make quartznet-eval-report` first so the run dir's
-# metadata/eval_report.json exists (see that target).
-app-pipeline-quartznet:
-	$(MAKE) app-pipeline APP_PIPELINE_MODEL=out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m APP_PIPELINE_THRESHOLD=$(APP_QUARTZNET_THRESHOLD) APP_PIPELINE_MARGIN=$(APP_QUARTZNET_MARGIN)
-
-# quartznet-promotion ticket 01: materialize
-# out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/metadata/eval_report.json --
-# the layout the streaming CLI's resolve_threshold() reads (see
-# docs/STREAMING-CONTRACT.md section 2). The noisy-gate copy already under
-# <run_dir>/noisy_eval/ is a subdir and is NOT what gets read; without this
-# artifact a QuartzNet serve with no explicit --threshold would fall back to
-# FALLBACK_THRESHOLD (0.0, accepts almost nothing). ~45-60 min on a GPU; use
-# a free non-6 GPU (VCM_DEVICE=cuda:N).
-quartznet-eval-report:
-	$(UV) run python -m me2_voicegen.vcm.evaluate --manifest out/conversions/v2/optionb-v3-vcmx-fil50/manifest.csv --checkpoint out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m/checkpoints/checkpoint.pt --out-dir out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m --device $(VCM_DEVICE) --beam-width 50 --grammar optionb --noisy-eval-seed 0
 
 # Wakeword ("computer"-only) dataset-build targets. See
 # docs/WAKEWORD-DATASET-CONTRACT.md for the manifest schema/output layout
@@ -486,7 +430,7 @@ clean:
 include kaggle.mk
 
 # Current model (docs/CURRENT-MODEL.md): the hybrid -- wide CTC + XL classifier heads, both INT8 ONNX, checked in under out/vcm/hybrid-ctcwide-clsxl.
-# Not yet the default of `app-pipeline*` (those still point at the older production model).
+# `make app-pipeline` serves it into the dashboard.
 HYBRID_DIR ?= out/vcm/hybrid-ctcwide-clsxl
 HYBRID_CTC ?= $(HYBRID_DIR)/ctc-wide/export/vcm_model.int8.onnx
 HYBRID_CLS ?= $(HYBRID_DIR)/cls-xl/export/vcm_heads.int8.onnx
@@ -525,17 +469,3 @@ reproduce: ## One-command reproduction (CPU ~10 min; REPRO_TRAIN=1 REPRO_GPU=N a
 help: ## List documented targets
 	@grep -hE '^[a-zA-Z0-9_-]+:.*## ' $(MAKEFILE_LIST) | sed -E 's/:[^#]*## /\t/' | sort | awk -F'\t' '{printf "  \033[36m%-22s\033[0m %s\n", $$1, $$2}'
 
-# wakeword-sliding (docs/WAKEWORD-SLIDING.md): wake word + sliding window,
-# answers ~0.4 s after the command ends instead of after a fixed 3 s period.
-# QuartzNet INT8, settings chosen on val replay sessions (hold 200 ms, no
-# stability requirement). `make app-pipeline` is unchanged (rollback).
-APP_LIVE_MODEL ?= out/vcm/quartznet5x3-s2-fil50-ambient-rir-135m
-APP_LIVE_THRESHOLD ?= -0.1
-APP_LIVE_MARGIN ?= 4.0
-APP_LIVE_HOLD_MS ?= 200
-APP_LIVE_STABLE ?= 1
-APP_LIVE_WAKEWORD ?= out/wakeword-sesame-ambient-rir-45m
-APP_LIVE_SOURCE ?= mic
-.PHONY: app-pipeline-live
-app-pipeline-live:
-	$(APP_VENV_BIN)/python -m me2_voicegen.vcm.streaming --model $(APP_LIVE_MODEL) --backend onnx --onnx-variant int8 --grammar optionb --threshold=$(APP_LIVE_THRESHOLD) --required-command-margin $(APP_LIVE_MARGIN) --beam-width 50 --gate wakeword --policy endpointed --gate-period 3 --hold-ms $(APP_LIVE_HOLD_MS) --stable-strides $(APP_LIVE_STABLE) --wakeword-model $(APP_LIVE_WAKEWORD) --wakeword-backend onnx --log-periods --source "$(APP_LIVE_SOURCE)" | $(APP_VENV_BIN)/python -m app.forward

@@ -1,3 +1,0 @@
-2026-09-30T06:37:53+08:00
-24b5d9abe319a5194a147f400378cd6d4d438010d2409914fee5f9fe076a02b5  scripts/dense_pilot_ghosts.py
-e18ebfa03dbb3096b0ff3cbc52ba2b2249df2f69e8fc732ae0f30b6078fc243e  src/me2_voicegen/vcm/dense_pilot.py

@@ -280,10 +280,11 @@ heads vs CTC, run more seeds (two are not enough) and, if accent coverage matter
 
 ## Run the checked-in model in streaming
 
-`out/vcm/v2s1-heads-A/` is a normal run directory (`export/vcm_model.{fp32,int8}.onnx`, `metadata/eval_report.json` with the
+`out/vcm/v2s1-heads-A/` (its reports are no longer on `master`; restore the run directory as described in
+[`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md)) is a normal run directory (`export/vcm_model.{fp32,int8}.onnx`, `metadata/eval_report.json` with the
 checkpoint's preset and licence note), so the existing streaming CLI takes it as `--model`. The ONNX holds the CTC path only;
 the intent and slot heads are not exported, so streaming uses the same grammar-constrained beam search as every other
-QuartzNet model here. The settings below are the repo's current live ones (`make app-pipeline-live`): the `endpointed`
+QuartzNet model here. The settings below were the repo's live ones at the time: the `endpointed`
 policy, threshold -0.1, incomplete-prefix margin 4.0, hold 200 ms, wake word gate.
 
 ```bash
@@ -294,9 +295,6 @@ uv run python -m me2_voicegen.vcm.streaming \
   --gate wakeword --policy endpointed --gate-period 3 --hold-ms 200 --stable-strides 1 \
   --wakeword-model out/wakeword-sesame-ambient-rir-45m --wakeword-backend onnx --log-periods \
   --source mic
-
-# same through the app pipeline (pipes events to app.forward)
-make app-pipeline-live APP_LIVE_MODEL=out/vcm/v2s1-heads-A
 
 # deterministic file replay without the wake word (a clip that contains only the command)
 uv run python -m me2_voicegen.vcm.streaming \

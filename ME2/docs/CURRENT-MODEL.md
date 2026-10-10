@@ -5,8 +5,8 @@ scores and how far to trust that, how it was trained and evaluated, where the co
 long, dated records instead of repeating them.
 
 - **Status (2026-10-10, `master`):** the canonical ME2 model, trained only on public data (merged from `optionb-ctc-attention-fast-beam`, PR #1).
-  The UI demo and the Pi services serve it with `make app-pipeline-ctcwide`; plain `make app-pipeline` and the `-perchar`/`-quartznet`
-  variants still run the older models (`option-d-fil50-ambient-rir-135m`, `quartznet5x3-s2-fil50-ambient-rir-135m`).
+  The UI demo and the Pi services serve it with `make app-pipeline` (alias `app-pipeline-ctcwide`). The older models' serving
+  targets and reports were removed from `master` on 2026-10-10; see [`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md).
 - **Reproducibility:** the task is to be reproducible from public data. Read [`REPRODUCE-HYBRID.md`](REPRODUCE-HYBRID.md) before
   claiming a result: the training manifest rebuilds exactly from the published datasets (28,858 of 28,858 rows); retraining on the rebuilt manifest was not re-run.
 - **Archived checkpoints:** the other models' binaries were untracked on 2026-10-03; see [`ARCHIVED-CHECKPOINTS.md`](ARCHIVED-CHECKPOINTS.md).
@@ -170,9 +170,9 @@ Perturbed gate = `vcm.noisy_eval` (RIR + dataset noise at fixed seed 0, no babbl
 - **Open:** Pi 4 latency and memory; a one-command reproduction (see `REPRODUCE-HYBRID.md`); second seeds for both models; a stricter
   fallback to cut non-command false accepts (sweep on validation only); more Filipino-accented speakers in training and a larger
   real-speaker holdout; wake-word model retraining (38 of 784 replay sessions never open a period); a DOI and licence for the persona
-  data; promoting the hybrid in `make app-pipeline*`.
+  data.
 - **Open (soak):** false wakes from ordinary speech at wake-word threshold 0.8 are unmeasured (the soak gaps hold only noise); decide hybrid vs CTC only given the wrong-action cost (`--cls-slot-threshold` trades them); run the soak on a Raspberry Pi 4 and fill the comparison (`soak/holdout-wake-gap-v1/README.md`).
-- **Gotchas:** `--device` default is CPU; the heads are not in the CTC ONNX files (use `vcm_heads.int8.onnx`); the Make targets use wake-word threshold 0.8 and slot gate 0.6, older docs and `make app-pipeline*` use 0.9; the streaming `--device cuda` path needs the wake-word fix in `wakeword_gate.py` (CPU feature extractor); some wake-word clips in the
+- **Gotchas:** `--device` default is CPU; the heads are not in the CTC ONNX files (use `vcm_heads.int8.onnx`); the Make targets use wake-word threshold 0.8 and slot gate 0.6, older docs use 0.9; the streaming `--device cuda` path needs the wake-word fix in `wakeword_gate.py` (CPU feature extractor); some wake-word clips in the
   replay sessions carry ESC-50 noise (rebuild sessions without them for strict public-only claims); the checkpoint `license` field of
   older runs is the ESC-50 text.
 

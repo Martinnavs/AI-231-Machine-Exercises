@@ -5,7 +5,7 @@ Nothing here was re-run: each number is copied from the file named next to it. *
 All numbers are intent + slot accuracy on the CTC path (threshold -0.1, margin 4.0, beam 50) unless a row says otherwise. One training run (one seed) per model.
 Read the caveats at the end first if you plan to quote a number.
 
-Source keys: **[F]** = `docs/AI231-FIL50.md` (section named in the cell notes below); **[B]** = `docs/BENCHMARKS.md`; **[M]** = `out/vcm/v2s1-heads-A/MODEL-CARD.md`;
+Source keys: **[F]** = `docs/AI231-FIL50.md` (section named in the cell notes below); **[B]** = `docs/BENCHMARKS.md`; **[M]** = [`out/vcm/v2s1-heads-A/MODEL-CARD.md`](https://github.com/Martinnavs/AI-231-Machine-Exercises/blob/4812047/ME2/out/vcm/v2s1-heads-A/MODEL-CARD.md) (removed from `master`, kept at commit `4812047`);
 **[H]** = `out/vcm/hybrid-ctcwide-clsxl/eval/headline-metrics.md`; **[X]** = `out/vcm/hybrid-ctcwide-clsxl/eval/report-xl-full.md` and `report-xl-nonoverlap.md`;
 **[C]** = `docs/CURRENT-MODEL.md`; **[O]** = `out/vcm/hybrid-ctcwide-clsxl/eval/hybrid-onnx-vs-pytorch.md` (quoted in [F] "Hybrid in ONNX").
 `out/vcm/ai231fil50-compare/*.md` is not in this branch; its tables are quoted in [F] and [X].
